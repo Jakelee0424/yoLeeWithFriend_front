@@ -14,7 +14,7 @@ const FullLayout = () => {
           <Sidebar />
         </aside>
         {/********Content Area**********/}
-        <div className="contentArea"> 
+        <div className="contentArea" style={{width:"100%"}}> 
           {/********Middle Content**********/}
           <Container className="p-4" fluid>
             <Outlet />
