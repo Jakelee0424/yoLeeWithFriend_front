@@ -10,6 +10,7 @@ import BoardList from "./pages/admin/board/BoardList.js";
 import LogList from "./pages/admin/log/LogList.js";
 import MemberList from "./pages/admin/member/MemberList.js";
 import MenuList from "./pages/admin/menu/MenuList.js";
+import Login from "./pages/admin/login/Login.js";
 import { lazy } from "react";
 
 /****Layouts*****/
@@ -29,6 +30,7 @@ function AppAdmin () {
               <Route path="memberMngr" element={<MemberList />} /> {/* /Member */}
               <Route path="menuMngr" element={<MenuList />} /> {/* /Menu */}
             </Route>
+            <Route path="login" element={<Login />} /> {/* /Login */}
           </Routes>
       </div> 
   );
