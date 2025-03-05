@@ -30,7 +30,7 @@ const Header = () => {
     document.getElementById("sidebarArea").classList.toggle("showSidebar");
   };
   return (
-    <Navbar color="primary" dark expand="md" className="fix-header">
+    <Navbar style={{backgroundColor:"#495057"}} dark expand="md" className="fix-header">
       <div className="d-flex align-items-center">
         <div className="d-lg-block d-none me-5 pe-3">
           <Logo />
@@ -60,8 +60,10 @@ const Header = () => {
           )}
         </Button>
       </div>
-
-      <Collapse navbar isOpen={isOpen}>
+      <div>
+          <Link to={"/admin/login"} style={{color:"black"}}>로그인</Link>
+      </div>
+      {/* <Collapse navbar isOpen={isOpen}>
         <Nav className="me-auto" navbar>
           <NavItem>
             <Link to="/starter" className="nav-link">
@@ -104,7 +106,7 @@ const Header = () => {
             <DropdownItem>Logout</DropdownItem>
           </DropdownMenu>
         </Dropdown>
-      </Collapse>
+      </Collapse> */}
     </Navbar>
   );
 };
