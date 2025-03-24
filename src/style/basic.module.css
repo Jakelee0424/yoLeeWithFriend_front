@@ -2,10 +2,11 @@
 .basicInput{
     box-sizing: border-box;
     width: 100%;
-    height: 10%;
+    height: 13%;
     background: #FFFFFF;
     border: 1px solid rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
+    border-radius: 5px;
+    padding : 0.5rem;
 }
 
 .basicLabel{
