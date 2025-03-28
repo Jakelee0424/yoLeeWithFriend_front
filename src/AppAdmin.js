@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Main from "./pages/admin/Main.js";
 import AdminList from "./pages/admin/admin/AdminList.js";
+import AdminView from "./pages/admin/admin/AdminView.js";
 import AuthorList from "./pages/admin/author/AuthorList.js";
 import BannerList from "./pages/admin/banner/BannerList.js";
 import BoardList from "./pages/admin/board/BoardList.js";
@@ -23,6 +24,7 @@ function AppAdmin () {
             <Route path="/" element={<FullLayout />} >
               <Route index element={<Main />} /> {/* 기본 경로 */}
               <Route path="adminMngr" element={<AdminList />} /> {/* /Admin */}
+              <Route path="adminView" element={<AdminView />} /> {/* /Admin */}
               <Route path="authorMngr" element={<AuthorList />} /> {/* /Author */}
               <Route path="bannerMngr" element={<BannerList />} /> {/* /Banner */}
               <Route path="boardMngr" element={<BoardList />} /> {/* /Board */}
