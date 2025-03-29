@@ -19,6 +19,7 @@ const AdminList = () => {
 
       adminService.fetcherAdminList(inputData).then((outPutData) => {
         console.log(outPutData);
+        console.log("test");
         setAdminList(outPutData.data);
       })
   };
