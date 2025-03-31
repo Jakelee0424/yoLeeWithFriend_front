@@ -3,11 +3,14 @@ import {  Card, CardBody, CardTitle, CardSubtitle, Table } from "reactstrap";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, React, useState, useRef } from "react";
 import * as adminService from "service/admin/admin/adminService";
+import bS from "style/basic.module.css"
 
 const AdminList = () => {
 
   // 관리자 목록
   const [getAdminList, setAdminList] = useState([]);
+  // 호버 이벤트 
+  const [hovered, setHovered] = useState(false);
 
   // 네비게이터
   const navigate = useNavigate(); 
@@ -18,14 +21,12 @@ const AdminList = () => {
       };
 
       adminService.fetcherAdminList(inputData).then((outPutData) => {
-        console.log(outPutData);
-        console.log("test");
         setAdminList(outPutData.data);
       })
   };
 
   const clickAdmin = (adminSn) => {
-    navigate(`/admin/adminView`); // 피드 
+    navigate(`/admin/adminView`, { state: { adminSn } });
   };
 
   useEffect(() => {
@@ -48,7 +49,11 @@ const AdminList = () => {
             </thead>
             <tbody>
               {getAdminList.map((tdata, index) => (
-                <tr key={index} className="border-top">
+                <tr key={index} className={`${bS.hoverRow} border-top`} 
+                  onClick={(e) => {
+                  e.preventDefault(); // NavLink 기본 이동 방지
+                  clickAdmin(tdata.sn);
+              }}>
                   <td>
                     {tdata.sn}
                   </td>
@@ -56,11 +61,7 @@ const AdminList = () => {
                     {tdata.name}
                   </td>
                   <td>
-                    <h6 className="mb-0" onClick={(e) => {
-                                                e.preventDefault(); // NavLink 기본 이동 방지
-                                                clickAdmin(tdata.sn);
-                                            }}
-                    >{tdata.id}</h6>
+                    {tdata.id}
                   </td>
                   <td>
                     {tdata.authority}
