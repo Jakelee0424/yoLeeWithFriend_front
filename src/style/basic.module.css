@@ -18,3 +18,20 @@
     color: #000000;
     margin: 2%;
 }
+
+/* 기본 테이블 행 스타일 */
+.hoverRow  {
+    transition: background-color 0.3s ease-in-out;
+}
+  
+/* 마우스 호버 시 스타일 */
+.hoverRow:hover {
+    background-color: #fffbcc;
+}
+
+/* td에 배경색을 설정 */
+.hoverRow td {
+    background-color: inherit;  /* tr에서 상속받은 배경색을 td에도 적용 */
+    cursor: pointer;
+}
+
