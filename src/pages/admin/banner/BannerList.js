@@ -1,52 +1,22 @@
 import { Col, Row } from "reactstrap";
-import {  Card, CardBody, CardTitle, CardSubtitle, Table } from "reactstrap";
+import { Card, CardBody, CardTitle, CardSubtitle, Table, Button, Form, FormGroup, Label, Input } from "reactstrap";
 
 const tableData = [
   {
-    avatar: "",
-    name: "Hanna Gover",
-    email: "hgover@gmail.com",
-    project: "Flexy React",
-    status: "pending",
-    weeks: "35",
-    budget: "95K",
+    id :"1",
+    bannerNm : "테스트 배너 1",
+    dueDate : "3",
   },
   {
-    avatar: "",
-    name: "Hanna Gover",
-    email: "hgover@gmail.com",
-    project: "Lading pro React",
-    status: "done",
-    weeks: "35",
-    budget: "95K",
+    id :"2",
+    bannerNm : "테스트 배너 2",
+    dueDate : "3",
   },
   {
-    avatar: "",
-    name: "Hanna Gover",
-    email: "hgover@gmail.com",
-    project: "Elite React",
-    status: "holt",
-    weeks: "35",
-    budget: "95K",
-  },
-  {
-    avatar: "",
-    name: "Hanna Gover",
-    email: "hgover@gmail.com",
-    project: "Flexy React",
-    status: "pending",
-    weeks: "35",
-    budget: "95K",
-  },
-  {
-    avatar: "",
-    name: "Hanna Gover",
-    email: "hgover@gmail.com",
-    project: "Ample React",
-    status: "done",
-    weeks: "35",
-    budget: "95K",
-  },
+    id :"3",
+    bannerNm : "테스트 배너 3",
+    dueDate : "3",
+  }
 ];
 
 const BannerList = () => {
@@ -56,54 +26,89 @@ const BannerList = () => {
         <CardBody>
           <CardTitle tag="h5">배너 관리</CardTitle>
           <CardSubtitle className="mb-2 text-muted" tag="h6">
-            Overview of the projects
+            배너 현황 확인 및 등록,삭제
           </CardSubtitle>
-
-          <Table className="no-wrap mt-3 align-middle" responsive borderless>
-            <thead>
-              <tr>
-                <th>Team Lead</th>
-                <th>Project</th>
-
-                <th>Status</th>
-                <th>Weeks</th>
-                <th>Budget</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tableData.map((tdata, index) => (
-                <tr key={index} className="border-top">
-                  <td>
-                    <div className="d-flex align-items-center p-2">
-                      <img
-                        src={tdata.avatar}
-                        className="rounded-circle"
-                        alt="avatar"
-                        width="45"
-                        height="45"
-                      />
-                      <div className="ms-3">
-                        <h6 className="mb-0">{tdata.name}</h6>
-                        <span className="text-muted">{tdata.email}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>{tdata.project}</td>
-                  <td>
-                    {tdata.status === "pending" ? (
-                      <span className="p-2 bg-danger rounded-circle d-inline-block ms-3"></span>
-                    ) : tdata.status === "holt" ? (
-                      <span className="p-2 bg-warning rounded-circle d-inline-block ms-3"></span>
-                    ) : (
-                      <span className="p-2 bg-success rounded-circle d-inline-block ms-3"></span>
-                    )}
-                  </td>
-                  <td>{tdata.weeks}</td>
-                  <td>{tdata.budget}</td>
+          <hr/>
+          <div>
+            <Table className="no-wrap mt-3 align-middle" responsive borderless>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>배너명</th>
+                  <th>남은 기간</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
+              </thead>
+              <tbody>
+                {tableData.map((tdata, index) => (
+                  <tr key={index} className="border-top">
+                    <td>{tdata.id}</td>
+                    <td>{tdata.bannerNm}</td>
+                    <td>{tdata.dueDate} 일</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+
+          <hr/>
+
+          <div>
+            <Form style={{padding:"10px"}}>
+              <Row>
+                <Col md={3}>
+                  <FormGroup>
+                    <Label for="bannerNm">
+                      배너명
+                    </Label>
+                    <Input
+                      id="bannerNm"
+                      name="bannerNm"
+                      placeholder="배너명 입력"
+                      type="text"
+                    />
+                  </FormGroup>
+                </Col>
+                <Col md={3}>
+                  <FormGroup>
+                    <Label for="dueDate">
+                      배너 유지 기한
+                    </Label>
+                    <Input
+                      id="dueDate"
+                      name="dueDate"
+                      type="date"
+                    />
+                  </FormGroup>
+                </Col>
+                <Col></Col>
+                <Col md={1}> 
+                  <Button color="secondary" outline> 등록 </Button>
+                </Col>
+                <Col md={1}> 
+                  <Button color="secondary" outline> 변경 </Button>
+                </Col>
+                <Col md={1}> 
+                  <Button color="danger" outline> 삭제 </Button>
+                </Col>
+              </Row>
+              <FormGroup>
+                <Label for="bannerFile">
+                  배너 사진 파일
+                </Label>
+                <Input
+                  id="bannerFile"
+                  name="bannerFile"
+                  type="file"
+                />
+              </FormGroup>
+              <Row>
+                
+
+              </Row>
+            </Form>
+            
+
+          </div>
         </CardBody>
       </Card>
     </div>
