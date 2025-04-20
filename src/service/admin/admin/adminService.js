@@ -29,18 +29,3 @@ export const fetcherAdmin = async (data) => {
 
 };
 
-export const fetcherAdminSave = async (data) => {
-
-  const fetcher = new Fetcher().setUrl("/admin/"+data.id)
-                                     .setMethod("POST")
-                                     .setData(JSON.stringify(data));
-  try {
-    const result = await fetcher.jsonFetch();
-    return result;
-    //console.log("result : ", result.data);
-  } catch (error) {
-    console.error('login error:', error);
-  }
-
-};
-

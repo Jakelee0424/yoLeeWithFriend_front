@@ -8,7 +8,7 @@ function Main() {
 
   return (
     <div className="App">
-      <h1>유저 화면 분활 표시 안녕하세요!</h1>
+      <h1>안녕하세요!</h1>
     </div>
   );
 }

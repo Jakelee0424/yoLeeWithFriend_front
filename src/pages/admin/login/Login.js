@@ -1,5 +1,5 @@
 import { useEffect, React, useState, useRef } from "react";
-import {  Card, CardBody, CardTitle, CardSubtitle, Table, Button, Label} from "reactstrap";
+import {  Card, CardBody, CardTitle, CardSubtitle, Table, Button, } from "reactstrap";
 import loginStyle from "../../../style/login.module.css"
 import basicStyle from "../../../style/basic.module.css"
 import Logo from "../template/Logo";
@@ -43,17 +43,13 @@ const Login = () => {
         <Logo></Logo>
         <Card  style={{height:"40%", width:"25%"}}>
           <CardBody style={{display:"flex", justifyContent:"center", flexDirection:"column"}}>
-              <Label for="adminId">아이디</Label>
+              <label className={basicStyle.basicLabel} >아이디</label>
               <input className={basicStyle.basicInput}
-                id="adminId"
-                name="adminId"
                 value={getAdminId}
                 onChange={saveAdminId}
               ></input> 
-              <Label for="adminPwd">비밀번호</Label>
+              <label className={basicStyle.basicLabel} >비밀번호</label>
               <input className={basicStyle.basicInput}
-                id="adminPwd"
-                name="adminPwd"
                 value={getAdminPassWord}
                 onChange={saveAdminPassWord}
                 type="password"
