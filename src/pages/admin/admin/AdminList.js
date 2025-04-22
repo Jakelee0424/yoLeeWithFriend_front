@@ -1,5 +1,5 @@
 import { Col, Row } from "reactstrap";
-import {  Card, CardBody, CardTitle, CardSubtitle, Table } from "reactstrap";
+import {  Card, CardBody, CardTitle, CardSubtitle, Table , Input, Button } from "reactstrap";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, React, useState, useRef } from "react";
 import * as adminService from "service/admin/admin/adminService";
@@ -64,12 +64,31 @@ const AdminList = () => {
                     {tdata.id}
                   </td>
                   <td>
-                    {tdata.authority}
+                    <Input
+                      type="select"
+                      name="select"
+                      id="exampleSelect"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <option value="option1">일반</option>
+                      <option value="option2">정지</option>
+                    </Input>
                   </td>
                 </tr>
               ))}
             </tbody>
           </Table>
+          <div>
+            <Button style={{width:"10%", marginRight:"3%", float:"right"}} 
+                    color="primary"
+                    onClick={(e) => {
+                      e.preventDefault(); // NavLink 기본 이동 방지
+                      clickAdmin("");
+                  }}
+            >
+              생성
+            </Button> 
+          </div>
         </CardBody>
       </Card>
     </div>
