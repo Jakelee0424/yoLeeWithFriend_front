@@ -1,8 +1,8 @@
 import Fetcher from 'utils/Fetcher';
 
-export const fetcherAdminList = async (data) => {
+export const fetcherUserList = async (data) => {
 
-      const fetcher = new Fetcher().setUrl("/admin/all")
+      const fetcher = new Fetcher().setUrl("/user/all")
                                          .setMethod("POST")
                                          .setData(JSON.stringify(data));
       try {
@@ -15,39 +15,25 @@ export const fetcherAdminList = async (data) => {
 
 };
 
-export const fetcherAdmin = async (data) => {
+export const fetcherUserDelte = async (data) => {
 
-  const fetcher = new Fetcher().setUrl("/admin/"+data.id)
-                                     .setMethod("GET");
-  try {
-    const result = await fetcher.jsonFetch();
-    return result;
-    //console.log("result : ", result.data);
-  } catch (error) {
-    console.error('login error:', error);
-  }
-
-};
-
-export const fetcherAdminSave = async (data) => {
-
-  const fetcher = new Fetcher().setUrl("/admin/"+data.id)
-                                     .setMethod("POST")
-                                     .setData(JSON.stringify(data));
-  try {
-    const result = await fetcher.jsonFetch();
-    return result;
-    //console.log("result : ", result.data);
-  } catch (error) {
-    console.error('login error:', error);
-  }
-
-};
-
-export const fetcherAdminDelte = async (data) => {
-
-  const fetcher = new Fetcher().setUrl("/admin/"+data.id)
+  const fetcher = new Fetcher().setUrl("/user/"+data.id)
                                      .setMethod("DELETE");
+  try {
+    const result = await fetcher.jsonFetch();
+    return result;
+    //console.log("result : ", result.data);
+  } catch (error) {
+    console.error('login error:', error);
+  }
+
+};
+
+export const fetcherUserStatus = async (data) => {
+
+  const fetcher = new Fetcher().setUrl("/user/"+data.id)
+                                     .setMethod("PUT")
+                                     .setData(JSON.stringify(data));
   try {
     const result = await fetcher.jsonFetch();
     return result;
