@@ -28,6 +28,7 @@ const AdminView = () => {
       adminService.fetcherAdmin(inputData).then((outPutData) => {
         //console.log(outPutData);
         setAdmin(outPutData.data);
+        setAdminId(outPutData.data.id)
         setAdminName(outPutData.data.name)
         setAdminPwd(outPutData.data.passWord)
       })       
@@ -36,6 +37,22 @@ const AdminView = () => {
   };
 
   const saveAdminInfo = async  () => {
+
+    if(getAdminId ==""){
+      alert("아이디를 입력해주세요!");
+      return false;
+    }
+
+    if(getAdminPwd ==""){
+      alert("비밀번호를 입력해주세요!");
+      return false;
+    }
+
+    if(getAdminName==""){
+      alert("이름을 입력해주세요!");
+      return false;
+    }
+
     const inputData ={
       id: location.state.adminSn ? location.state.adminSn : 0,
       adminId: getAdminId,
@@ -47,6 +64,18 @@ const AdminView = () => {
         const adminSn = outPutData.data.sn;
         alert("완료되었습니다.")
         navigate(`/admin/adminView`, { state: {  adminSn } });
+      }
+    })       
+  } 
+
+  const deleteAdmin = async  () => {
+    const inputData ={
+      id: location.state.adminSn,
+    };
+    adminService.fetcherAdminDelte(inputData).then((outPutData) => {
+      if(outPutData.result === "SUCCESS"){
+        alert("완료되었습니다.")
+        navigate(`/admin/adminMngr`);
       }
     })       
   } 
@@ -147,7 +176,7 @@ const AdminView = () => {
             </Button>
             <Button style={{width:"15%", marginRight:"3%", float:"right"}} 
                     color="danger"
-                    onClick={() => console.log("test")}
+                    onClick={() => deleteAdmin()}
             >
               삭제
             </Button>
