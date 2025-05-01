@@ -1,25 +1,55 @@
 import { Col, Row } from "reactstrap";
 import { Card, CardBody, CardTitle, CardSubtitle, Table, Button, Form, FormGroup, Label, Input } from "reactstrap";
+import React, { useState, useEffect } from 'react';
+import { endOfDay } from "date-fns";
 
 const tableData = [
   {
     id :"1",
     bannerNm : "테스트 배너 1",
-    dueDate : "3",
+    dueDate : "7",
+    endDay : "2025-07-01"
   },
   {
     id :"2",
     bannerNm : "테스트 배너 2",
-    dueDate : "3",
+    dueDate : "5",
+    endDay : "2025-08-01"
   },
   {
     id :"3",
     bannerNm : "테스트 배너 3",
     dueDate : "3",
+    endDay : "2025-06-01"
   }
 ];
 
 const BannerList = () => {
+  const [selectedBannerId, setSelectedBannerId] = useState(null);
+  const [bannerName, setBannerName] = useState("");
+  const [bannerEndDay, setBannerEndDay] = useState("");
+
+  const handleBannerNameChange = (e) => {
+    setBannerName(e.target.value);
+  };
+  const handleDueDateChange = (e) => {
+    setBannerEndDay(e.target.value);
+  };
+
+  const handleRowClick = (tdata) => {
+
+    if(selectedBannerId == null || selectedBannerId != tdata.id){
+      setSelectedBannerId(tdata.id);
+      setBannerName(tdata.bannerNm);
+      setBannerEndDay(tdata.endDay);
+    }else{
+      setSelectedBannerId(null);
+      setBannerName("");
+      setBannerEndDay("");
+    }
+
+  };
+
   return (
     <div style={{display:"flex",width:"100%"}}>
       <Card style={{width:"100%"}}>
@@ -30,7 +60,7 @@ const BannerList = () => {
           </CardSubtitle>
           <hr/>
           <div>
-            <Table className="no-wrap mt-3 align-middle" responsive borderless>
+            <Table className="no-wrap mt-3 align-middle" responsive borderless hover>
               <thead>
                 <tr>
                   <th>ID</th>
@@ -39,11 +69,15 @@ const BannerList = () => {
                 </tr>
               </thead>
               <tbody>
-                {tableData.map((tdata, index) => (
-                  <tr key={index} className="border-top">
+                {tableData.map((tdata) => (
+                  <tr key={tdata.id} 
+                      className={`border-top ${tdata.id === selectedBannerId ? 'table-primary' : ''}`}
+                      onClick={() => handleRowClick(tdata)}
+                      style={{ cursor: 'pointer' }}
+                      >
                     <td>{tdata.id}</td>
                     <td>{tdata.bannerNm}</td>
-                    <td>{tdata.dueDate} 일</td>
+                    <td>{tdata.dueDate} 일 ( 종료일자 : {tdata.endDay})</td>
                   </tr>
                 ))}
               </tbody>
@@ -65,6 +99,8 @@ const BannerList = () => {
                       name="bannerNm"
                       placeholder="배너명 입력"
                       type="text"
+                      value={bannerName}
+                      onChange={handleBannerNameChange}
                     />
                   </FormGroup>
                 </Col>
@@ -77,18 +113,20 @@ const BannerList = () => {
                       id="dueDate"
                       name="dueDate"
                       type="date"
+                      value={bannerEndDay}
+                      onChange={handleDueDateChange}
                     />
                   </FormGroup>
                 </Col>
                 <Col></Col>
                 <Col md={1}> 
-                  <Button color="secondary" outline> 등록 </Button>
+                  <Button color="secondary" outline className="bannerInsertBtn" disabled={bannerName == "" || selectedBannerId != null}> 등록 </Button>
                 </Col>
                 <Col md={1}> 
-                  <Button color="secondary" outline> 변경 </Button>
+                  <Button color="secondary" outline className="bannerUpdateBtn" disabled={selectedBannerId == null}> 변경 </Button>
                 </Col>
                 <Col md={1}> 
-                  <Button color="danger" outline> 삭제 </Button>
+                  <Button color="danger" outline className="bannerDeleteBtn" disabled={selectedBannerId == null}> 삭제 </Button>
                 </Col>
               </Row>
               <FormGroup>
