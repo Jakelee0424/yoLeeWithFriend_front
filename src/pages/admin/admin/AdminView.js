@@ -5,10 +5,12 @@ import * as adminService from "service/admin/admin/adminService";
 import { useLocation, useNavigate } from 'react-router-dom';
 import bS from "style/basic.module.css"
 
-const AdminView = () => {
+const AdminView = ({adminSn, adminList, setAdminSn}) => {
   const location = useLocation();
   // 관리자 정보
   const [getAdmin, setAdmin] = useState({});
+  // 일련번호
+  const [getAdminSn] = useState(adminSn);
   // 이름
   const [getAdminName, setAdminName] = useState("");
   // 아이디
@@ -18,11 +20,10 @@ const AdminView = () => {
 
   const navigate = useNavigate();
 
-  const getAdminByFetcher = async  () => {
-
-    if(location.state.adminSn !=""){  // adminSn이 담겨있을때만 정보조회
+  const getAdminByFetcher = async  (adminSn) => {
+    if(adminSn !=""){  // adminSn이 담겨있을때만 정보조회
       const inputData ={
-        id:location.state.adminSn,
+        id:adminSn,
       };
   
       adminService.fetcherAdmin(inputData).then((outPutData) => {
@@ -54,28 +55,33 @@ const AdminView = () => {
     }
 
     const inputData ={
-      id: location.state.adminSn ? location.state.adminSn : 0,
+      id: getAdminSn ? getAdminSn : 0,
       adminId: getAdminId,
       passWord: getAdminPwd,
       name: getAdminName
     };
     adminService.fetcherAdminSave(inputData).then((outPutData) => {
-      if(outPutData.result === "SUCCESS"){
+      if(outPutData.result === "SUCCESS" && outPutData.data != null){
         const adminSn = outPutData.data.sn;
         alert("완료되었습니다.")
-        navigate(`/admin/adminView`, { state: {  adminSn } });
+        adminList();
+        
+      }else if (outPutData.data == null){
+        alert("관리자 아이디가 중복입니다.")
       }
     })       
   } 
 
   const deleteAdmin = async  () => {
     const inputData ={
-      id: location.state.adminSn,
+      id: getAdminSn,
     };
     adminService.fetcherAdminDelte(inputData).then((outPutData) => {
       if(outPutData.result === "SUCCESS"){
         alert("완료되었습니다.")
-        navigate(`/admin/adminMngr`);
+        adminList();
+        setAdminSn("");
+        
       }
     })       
   } 
@@ -97,11 +103,11 @@ const AdminView = () => {
   };
 
   useEffect(() => {
-    getAdminByFetcher();
+    getAdminByFetcher(getAdminSn);
   },[])
 
   return (
-    <div style={{display:"flex", width:"100%", alignContent:"center"}}>
+    <div style={{display:"flex", width:"100%", alignContent:"center", marginTop:"1%"}}>
       <Card style={{width:"50%"}}>
         <CardBody>
           <CardTitle tag="h5">관리자 상세정보</CardTitle>
@@ -168,18 +174,17 @@ const AdminView = () => {
             </tbody>
           </Table>
           <div style={{marginBottom:"3%"}} >
-            <Button style={{width:"15%", marginRight:"3%", float:"right"}} 
-                    color="secondary"
-                    onClick={() => goBack()}
-            >
-              목록
-            </Button>
-            <Button style={{width:"15%", marginRight:"3%", float:"right"}} 
-                    color="danger"
-                    onClick={() => deleteAdmin()}
-            >
-              삭제
-            </Button>
+            {Object.keys(getAdmin).length !== 0 ? (
+                          <Button style={{width:"15%", marginRight:"3%", float:"right"}} 
+                          color="danger"
+                          onClick={() => deleteAdmin()}
+                          >
+                            삭제
+                          </Button>
+                        ):(
+                          <></>
+                        ) 
+            }
             <Button style={{width:"15%", marginRight:"3%", float:"right"}} 
                     color="primary"
                     onClick={() => saveAdminInfo()}

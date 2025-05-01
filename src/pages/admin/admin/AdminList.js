@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, React, useState, useRef } from "react";
 import * as adminService from "service/admin/admin/adminService";
 import bS from "style/basic.module.css"
+import AdminView from "./AdminView";
 
 const AdminList = () => {
 
@@ -11,6 +12,8 @@ const AdminList = () => {
   const [getAdminList, setAdminList] = useState([]);
   // 호버 이벤트 
   const [hovered, setHovered] = useState(false);
+  // 관리자 일련번호
+  const [getAdminSn, setAdminSn] = useState("");
 
   // 네비게이터
   const navigate = useNavigate(); 
@@ -21,12 +24,13 @@ const AdminList = () => {
       };
 
       adminService.fetcherAdminList(inputData).then((outPutData) => {
+        //console.log(outPutData.data)
         setAdminList(outPutData.data);
       })
   };
 
   const clickAdmin = (adminSn) => {
-    navigate(`/admin/adminView`, { state: { adminSn } });
+    setAdminSn(adminSn);
   };
 
   useEffect(() => {
@@ -34,7 +38,7 @@ const AdminList = () => {
   },[])
 
   return (
-    <div style={{display:"flex",width:"100%"}}>
+    <div style={{width:"100%"}}>
       <Card style={{width:"100%"}}>
         <CardBody>
           <CardTitle tag="h5">관리자관리</CardTitle>
@@ -55,7 +59,7 @@ const AdminList = () => {
                   clickAdmin(tdata.sn);
               }}>
                   <td>
-                    {tdata.sn}
+                    {index}
                   </td>
                   <td>
                     {tdata.name}
@@ -64,15 +68,7 @@ const AdminList = () => {
                     {tdata.id}
                   </td>
                   <td>
-                    <Input
-                      type="select"
-                      name="select"
-                      id="exampleSelect"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <option value="option1">일반</option>
-                      <option value="option2">정지</option>
-                    </Input>
+                    {tdata.authority}
                   </td>
                 </tr>
               ))}
@@ -91,6 +87,12 @@ const AdminList = () => {
           </div>
         </CardBody>
       </Card>
+      <AdminView key={getAdminSn} 
+                adminSn = {getAdminSn} 
+                adminList = {getAdminListByFetcher}
+                setAdminSn = {setAdminSn}
+                
+      />
     </div>
   );
 };
