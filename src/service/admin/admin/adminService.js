@@ -40,6 +40,7 @@ export const fetcherAdminSave = async (data) => {
     //console.log("result : ", result.data);
   } catch (error) {
     console.error('login error:', error);
+    
   }
 
 };
