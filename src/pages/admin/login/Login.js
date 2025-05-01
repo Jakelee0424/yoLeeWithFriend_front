@@ -1,7 +1,7 @@
 import { useEffect, React, useState, useRef } from "react";
 import {  Card, CardBody, CardTitle, CardSubtitle, Table, Button, } from "reactstrap";
-import loginStyle from "../../../style/login.module.css"
-import basicStyle from "../../../style/basic.module.css"
+import loginStyle from "style/login.module.css"
+import basicStyle from "style/basic.module.css"
 import Logo from "../template/Logo";
 import * as adminLoginService from "service/admin/login/adminLoginService";
 
