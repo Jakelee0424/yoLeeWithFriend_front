@@ -1,10 +1,11 @@
 import { Col, Row } from "reactstrap";
 import {  Card, CardBody, CardTitle, CardSubtitle, Table, Button, Input} from "reactstrap";
 import { useEffect, React, useState, useRef } from "react";
-import * as adminService from "service/admin/admin/adminService";
-import { useLocation, useNavigate } from 'react-router-dom';
+import * as boardMngrService from "service/admin/boardMngr/boardMngrService";
+import { useLocation, useNavigate, useParams  } from 'react-router-dom';
 import bS from "style/basic.module.css"
 import Blog from "otherLib/bootStrap/components/dashboard/Blog";
+import { getCodeNameByIdApi, getCodeListByParentIdApi } from 'utils/CodeUtil';
 
 const BoardView = () => {
   const location = useLocation();
@@ -12,11 +13,19 @@ const BoardView = () => {
   const tempImg1 = process.env.PUBLIC_URL+"/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
 
   // 관리자 정보
-  const [getAdmin, setAdmin] = useState({});
+  const [getBoard, setBoard] = useState({});
   // 일련번호
   const [getAdminSn] = useState(1);
-  // 이름
+
+  // 제품명
   const [getBoardName, setBoardName] = useState("");
+
+  // 회사명
+  const [getBrandName, setBrandName] = useState("");
+
+  // 회사명 리스트
+  const [getBrandList, setBrandList] = useState([]);
+
   // 아이디
   const [getAdminId, setAdminId] = useState("");
   // 비밀번호
@@ -24,18 +33,33 @@ const BoardView = () => {
 
   const navigate = useNavigate();
 
-  const getAdminByFetcher = async  (adminSn) => {
-    if(adminSn !=""){  // adminSn이 담겨있을때만 정보조회
+  //boardId
+  const { id } = useParams();
+
+
+  const getBoardByFetcher = async  (boardId) => {
+    if(boardId !=""){  // boardId이 담겨있을때만 정보조회
       const inputData ={
-        id:adminSn,
+        boardId:boardId,
       };
   
-      adminService.fetcherAdmin(inputData).then((outPutData) => {
-        //console.log(outPutData);
+      boardMngrService.fetcherBoard(inputData).then((outPutData) => {
+        console.log(outPutData);
+        setBoard(outPutData.data)
+        setBoardName(outPutData.data.boardName)       
       })       
+      const brandName = await getCodeNameByIdApi(getBoard.brandCodeId);
+      //console.log(brandName)
+      //setBrandName(brandName)
     }
     
   };
+
+  const getBrandListForUtil = async  () => {
+    const codeList = await getCodeListByParentIdApi("boardBrand")
+    //console.log(codeList)
+    setBrandList(codeList);
+  }
 
   const saveAdminInfo = async  () => {
 
@@ -56,28 +80,28 @@ const BoardView = () => {
 
     const inputData ={
     };
-    adminService.fetcherAdminSave(inputData).then((outPutData) => {
-      if(outPutData.result === "SUCCESS" && outPutData.data != null){
-        const adminSn = outPutData.data.sn;
-        alert("완료되었습니다.")
+    // adminService.fetcherAdminSave(inputData).then((outPutData) => {
+    //   if(outPutData.result === "SUCCESS" && outPutData.data != null){
+    //     const adminSn = outPutData.data.sn;
+    //     alert("완료되었습니다.")
         
-      }else if (outPutData.data == null){
-        alert("관리자 아이디가 중복입니다.")
-      }
-    })       
+    //   }else if (outPutData.data == null){
+    //     alert("관리자 아이디가 중복입니다.")
+    //   }
+    // })       
   } 
 
   const deleteAdmin = async  () => {
     const inputData ={
       id: getAdminSn,
     };
-    adminService.fetcherAdminDelte(inputData).then((outPutData) => {
-      if(outPutData.result === "SUCCESS"){
-        alert("완료되었습니다.")
-        //adminList();
+    // adminService.fetcherAdminDelte(inputData).then((outPutData) => {
+    //   if(outPutData.result === "SUCCESS"){
+    //     alert("완료되었습니다.")
+    //     //adminList();
         
-      }
-    })       
+    //   }
+    // })       
   } 
 
   const saveBoardName = event => {
@@ -101,7 +125,8 @@ const BoardView = () => {
   };
 
   useEffect(() => {
-    //getAdminByFetcher(getAdminSn);
+    getBoardByFetcher(id);
+    getBrandListForUtil();
   },[])
 
   return (
@@ -154,16 +179,16 @@ const BoardView = () => {
                       id="brandCodeId" 
                       style={{width:"30%", marginRight:"3%"}}
                     > 
-                      <option value="boardBrand01">마이프로틴</option>
-                      <option value="boardBrand02">신타6</option>  
-                      <option value="boardBrand03">옵티멈 뉴트리션</option>  
+                      {getBrandList.map((tdata, index) => (
+                        <option key={index} value={tdata.id}>{tdata.name}</option>
+                      ))}   
                     </Input>
                   </td>
                 </tr>
             </tbody>
           </Table>
           <div style={{marginBottom:"3%"}} >
-            {Object.keys(getAdmin).length !== 0 ? (
+            {Object.keys(getBoard).length !== 0 ? (
                           <Button style={{width:"15%", marginRight:"3%", float:"right"}} 
                           color="danger"
                           onClick={() => deleteAdmin()}

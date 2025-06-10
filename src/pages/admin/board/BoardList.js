@@ -51,7 +51,7 @@ const BoardList = () => {
               type="select"
               name="select"
               id="exampleSelect" 
-              style={{width:"10%", marginRight:"3%"}}
+              style={{width:"10%", marginRight:"1%"}}
             > 
               <option value="nomal">일반</option>
               <option value="ban">정지</option>  
@@ -61,14 +61,19 @@ const BoardList = () => {
               name="adminPwd"
               placeholder={"회사명"}
               type="text"
-              style={{width:"30%", marginRight:"3%"}}
+              style={{width:"30%", marginRight:"1%"}}
             />
-            <Button style={{width:"10%", marginRight:"3%", float:"right"}} 
+            <Button style={{width:"10%", marginRight:"5%", float:"right"}} 
+                    color="primary"
+            >
+              검색
+            </Button>
+            <Button style={{width:"8%", marginRight:"1%", float:"right"}} 
                                 color="primary"
                         >
-                          저장
+                          등록
                         </Button>
-            <Button style={{width:"10%", marginRight:"3%", float:"right"}} 
+            <Button style={{width:"8%", marginRight:"1%", float:"right"}} 
                           color="danger"
                           >
                             삭제
@@ -78,17 +83,18 @@ const BoardList = () => {
             {getBoardMngrList.map((tdata, index) => (
               <Col sm="6" lg="6" xl="3" key={index} 
                 style={{cursor:"pointer"}}
-                onClick={(e) => {
-                  e.preventDefault(); // NavLink 기본 이동 방지
-                  clickBoard(tdata.boardId);
-                }}
               >
                 <Input type="checkbox" name="boardCheckBox" />
-                <Blog
-                  image={tempImg1}
-                  title={tdata.boardName}
-                  text={`맛 : 3.5 가격 : 3.5 성분 : 3.5`}
-                />
+                <div
+                  style={{ flex: 1 }}
+                  onClick={() => clickBoard(tdata.boardId)}
+                > 
+                  <Blog
+                    image={tempImg1}
+                    title={tdata.boardName}
+                    text={`맛 : 3.5 가격 : 3.5 성분 : 3.5`}
+                  />
+                </div>
               </Col>
             ))}  
           </Row>

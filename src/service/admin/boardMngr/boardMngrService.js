@@ -14,9 +14,9 @@ export const fetcherBoardMngrList = async (data) => {
 
 };
 
-export const fetcherAdmin = async (data) => {
+export const fetcherBoard = async (data) => {
 
-  const fetcher = new Fetcher().setUrl("/admin/"+data.id)
+  const fetcher = new Fetcher().setUrl("/board/"+data.boardId)
                                      .setMethod("GET");
   try {
     const result = await fetcher.jsonFetch();
