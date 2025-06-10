@@ -8,6 +8,7 @@ import AdminView from "./pages/admin/admin/AdminView.js";
 import AuthorList from "./pages/admin/author/AuthorList.js";
 import BannerList from "./pages/admin/banner/BannerList.js";
 import BoardList from "./pages/admin/board/BoardList.js";
+import BoardView from "./pages/admin/board/BoardView.js";
 import LogList from "./pages/admin/log/LogList.js";
 import MemberList from "./pages/admin/member/MemberList.js";
 import MenuList from "./pages/admin/menu/MenuList.js";
@@ -28,6 +29,7 @@ function AppAdmin () {
               <Route path="authorMngr" element={<AuthorList />} /> {/* /Author */}
               <Route path="bannerMngr" element={<BannerList />} /> {/* /Banner */}
               <Route path="boardMngr" element={<BoardList />} /> {/* /Board */}
+              <Route path="boardView/:id" element={<BoardView />} /> {/* /Board */}
               <Route path="logMngr" element={<LogList />} /> {/* /Log */}
               <Route path="memberMngr" element={<MemberList />} /> {/* /Member */}
               <Route path="menuMngr" element={<MenuList />} /> {/* /Menu */}
