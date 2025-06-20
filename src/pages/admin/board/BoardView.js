@@ -12,7 +12,7 @@ const BoardView = () => {
 
   const tempImg1 = process.env.PUBLIC_URL+"/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
 
-  // 게시물 정보
+  // 관리자 정보
   const [getBoard, setBoard] = useState({});
   // 일련번호
   const [getAdminSn] = useState(1);
@@ -20,20 +20,11 @@ const BoardView = () => {
   // 제품명
   const [getBoardName, setBoardName] = useState("");
 
-  // 회사코드 Id
-  const [getBrandCodeId, setBrandCodeId] = useState("");
+  // 회사명
+  const [getBrandName, setBrandName] = useState("");
 
   // 회사명 리스트
   const [getBrandList, setBrandList] = useState([]);
-
-  // 영양정보 리스트
-  const [getNuinfoList, setNuinfoList] = useState([]);
-
-  // 영양정보 value 리스트
-  const [getNuinfoValueList, setNuinfoValueList] = useState([]);
-
-  // 영양정보 리스트 벨류
-  const [formData, setFormData] = useState({}); // 초기값 빈 객체
 
   // 아이디
   const [getAdminId, setAdminId] = useState("");
@@ -51,22 +42,15 @@ const BoardView = () => {
       const inputData ={
         boardId:boardId,
       };
-      boardMngrService.fetcherBoard(inputData).then(async (outPutData) => {
-        //console.log(outPutData);
-        setBoard(outPutData.data.boardMngrResDto)
-        setBoardName(outPutData.data.boardMngrResDto.boardName)
-        setBrandCodeId(outPutData.data.boardMngrResDto.brandCodeId)
-        setNuinfoList(await getCodeListByParentIdApi(outPutData.data.boardMngrResDto.nuinfoId))
-        const updatedFormData = { ...formData };
-        for(let i=0; i<outPutData.data.nuinfoResDtoList.length; i++){
-            console.log(outPutData.data.nuinfoResDtoList[i].value)
-            updatedFormData[`nuinfo${i}`] = {
-              ...updatedFormData[`nuinfo${i}`],
-              value: outPutData.data.nuinfoResDtoList[i].value
-            };
-        }
-        setFormData(updatedFormData);
-      })
+  
+      boardMngrService.fetcherBoard(inputData).then((outPutData) => {
+        console.log(outPutData);
+        setBoard(outPutData.data)
+        setBoardName(outPutData.data.boardName)       
+      })       
+      const brandName = await getCodeNameByIdApi(getBoard.brandCodeId);
+      //console.log(brandName)
+      //setBrandName(brandName)
     }
     
   };
@@ -124,28 +108,21 @@ const BoardView = () => {
     setBoardName(event.target.value);
   };
 
+  const saveAdminPwd = event => {
+    setAdminPwd(event.target.value);
+  };
+
+  const saveAdminId = event => {
+    setAdminId(event.target.value);
+  };
+
   const goBack = () => {
-    navigate(`/admin/boardMngr`);
+    navigate(`/admin/adminMngr`);
   };
 
   const clickBoardImg = (boardId) => {
     alert("개발중 boardId: " + boardId);
   };
-
-  const saveBoardBrandCodeId = event => {
-    setBrandCodeId(event.target.value);
-  };
-
-const handleChange = (e) => {
-  const { name, value } = e.target;
-  setFormData((prevData) => ({
-    ...prevData,
-    [name]: {
-      ...prevData[name],   // 혹시 모를 다른 필드 유지
-      value: value          // value 필드만 업데이트
-    }
-  }));
-};
 
   useEffect(() => {
     getBoardByFetcher(id);
@@ -201,8 +178,6 @@ const handleChange = (e) => {
                       name="brandCodeId"
                       id="brandCodeId" 
                       style={{width:"30%", marginRight:"3%"}}
-                      value={getBrandCodeId}
-                      onChange={(e) => saveBoardBrandCodeId(e)}
                     > 
                       {getBrandList.map((tdata, index) => (
                         <option key={index} value={tdata.id}>{tdata.name}</option>
@@ -210,33 +185,9 @@ const handleChange = (e) => {
                     </Input>
                   </td>
                 </tr>
-                {getNuinfoList.map((tdata, index) => (
-                        <tr key={index} className="border-top">
-                            <td>
-                              {tdata.name}
-                            </td>
-                            <td style={{display:"flex"}}>
-                              <Input
-                                id={`nuinfo${index}`}
-                                name={`nuinfo${index}`}
-                                value={formData[`nuinfo${index}`]?.value ?? ""}
-                                onChange={handleChange}
-                                type="text"
-                                style={{width:"30%"}}
-                              />
-                              <div style={{marginLeft:"3%"}}>g</div>
-                            </td>
-                        </tr>
-                ))}
             </tbody>
           </Table>
           <div style={{marginBottom:"3%"}} >
-            <Button style={{width:"15%", marginRight:"3%", float:"right"}} 
-                    color="primary"
-                    onClick={() => goBack()}
-            >
-              목록
-            </Button>
             {Object.keys(getBoard).length !== 0 ? (
                           <Button style={{width:"15%", marginRight:"3%", float:"right"}} 
                           color="danger"
@@ -253,7 +204,7 @@ const handleChange = (e) => {
                     onClick={() => saveAdminInfo()}
             >
               저장
-            </Button>  
+            </Button> 
           </div>
         </CardBody>
       </Card>
