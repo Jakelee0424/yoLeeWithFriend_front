@@ -28,25 +28,37 @@ export const fetcherBoard = async (data) => {
 
 };
 
-export const fetcherAdminSave = async (data) => {
+export const fetcherBoardSave = async (data) => {
 
-  const fetcher = new Fetcher().setUrl("/admin/"+data.id)
-                                     .setMethod("POST")
-                                     .setData(JSON.stringify(data));
+  // const fetcher = new Fetcher().setUrl("/board")
+  //                                    .setMethod("POST")
+  //                                    .setData(JSON.stringify(data));
+  // try {
+  //   const result = await fetcher.jsonFetch();
+  //   return result;
+  //   //console.log("result : ", result.data);
+  // } catch (error) {
+  //   console.error('login error:', error);
+    
+  // }
+  //console.log(data)
   try {
-    const result = await fetcher.jsonFetch();
-    return result;
-    //console.log("result : ", result.data);
+      const response = await fetch(process.env.REACT_APP_API_URI+"/board", {
+        method: "POST",
+        body: data
+      });
+      const result = await response.json();
+      return result;
   } catch (error) {
     console.error('login error:', error);
-    
   }
+
 
 };
 
-export const fetcherAdminDelte = async (data) => {
+export const fetcherBoardDelte = async (data) => {
 
-  const fetcher = new Fetcher().setUrl("/admin/"+data.id)
+  const fetcher = new Fetcher().setUrl("/board?ids="+data.ids)
                                      .setMethod("DELETE");
   try {
     const result = await fetcher.jsonFetch();
