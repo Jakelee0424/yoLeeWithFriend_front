@@ -16,6 +16,16 @@ const BoardList = () => {
   // 게시물 목록
   const [getBoardMngrList, setBoardMngrList] = useState([]);
 
+    // 체크 상태 배열
+  const [checkedStates, setCheckedStates] = useState(
+    Array(getBoardMngrList.length).fill(false)
+  );
+
+  // 선택된 ID 리스트
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  const isAllChecked = checkedStates.every((checked) => checked);
+
   const getBoardMngrListByFetcher = async  () => {
       const inputData ={
       
@@ -31,6 +41,46 @@ const BoardList = () => {
     navigate(`/admin/boardView/${boardId}`);
   };
 
+  const deleteBoard = async  () => {
+    
+    if(selectedIds.length < 1){
+      alert("삭제할 게시물을 선택해주세요!")
+      return false;
+    }
+
+    const inputData ={
+      ids: selectedIds,
+    };
+    
+    boardMngrService.fetcherBoardDelte(inputData).then((outPutData) => {
+       if(outPutData.result === "SUCCESS"){
+         alert("완료되었습니다.")
+         getBoardMngrListByFetcher();       
+       }
+    })       
+  } 
+
+  // 전체 선택 체크박스 클릭
+  const handleAllCheck = (e) => {
+    const checked = e.target.checked;
+    setCheckedStates(Array(getBoardMngrList.length).fill(checked));
+    setSelectedIds(checked ? getBoardMngrList.map((item) => item.boardId) : []);
+  };
+
+  // 개별 체크박스 클릭
+  const handleCheckboxChange = (index) => {
+    const newCheckedStates = [...checkedStates];
+    newCheckedStates[index] = !newCheckedStates[index];
+    setCheckedStates(newCheckedStates);
+
+    const id = getBoardMngrList[index].boardId;
+    if (newCheckedStates[index]) {
+      setSelectedIds((prev) => [...prev, id]);
+    } else {
+      setSelectedIds((prev) => prev.filter((itemId) => itemId !== id));
+    }
+  };
+
   useEffect(() => {
     getBoardMngrListByFetcher();
   },[])
@@ -42,9 +92,9 @@ const BoardList = () => {
           <CardTitle tag="h5">게시물 관리</CardTitle>
           <CardSubtitle className="mb-2 text-muted" tag="h6" style={{display: "flex"}}>
             <Input
-              id="adminPwd"
-              name="adminPwd"
               type="checkbox"
+              checked={checkedStates.length > 0 && checkedStates.every((c) => c)}
+              onChange={handleAllCheck}
               style={{marginRight:"3%"}}
             />
             <Input
@@ -70,11 +120,13 @@ const BoardList = () => {
             </Button>
             <Button style={{width:"8%", marginRight:"1%", float:"right"}} 
                                 color="primary"
+                    onClick={() => clickBoard()}            
                         >
                           등록
                         </Button>
             <Button style={{width:"8%", marginRight:"1%", float:"right"}} 
                           color="danger"
+                    onClick={() => deleteBoard()}     
                           >
                             삭제
                           </Button>
@@ -84,13 +136,19 @@ const BoardList = () => {
               <Col sm="6" lg="6" xl="3" key={index} 
                 style={{cursor:"pointer"}}
               >
-                <Input type="checkbox" name="boardCheckBox" />
+                <Input type="checkbox" 
+                       name="boardCheckBox"
+                       checked={!!checkedStates[index]}
+                       onChange={() => handleCheckboxChange(index)}
+                       />
                 <div
                   style={{ flex: 1 }}
                   onClick={() => clickBoard(tdata.boardId)}
                 > 
                   <Blog
-                    image={tempImg1}
+                    image={tdata.imgUrl
+                    ? process.env.PUBLIC_URL + tdata.imgUrl.split("public")[1].replace(/\\/g, "/")
+                    : tempImg1}
                     title={tdata.boardName}
                     text={`맛 : 3.5 가격 : 3.5 성분 : 3.5`}
                   />
