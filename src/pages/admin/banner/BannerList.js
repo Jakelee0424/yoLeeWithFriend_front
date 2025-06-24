@@ -2,27 +2,8 @@ import { Col, Row } from "reactstrap";
 import { Card, CardBody, CardTitle, CardSubtitle, Table, Button, Form, FormGroup, Label, Input } from "reactstrap";
 import React, { useState, useEffect } from 'react';
 import { endOfDay } from "date-fns";
-
-const tableData = [
-  {
-    id :"1",
-    bannerNm : "테스트 배너 1",
-    dueDate : "7",
-    endDay : "2025-07-01"
-  },
-  {
-    id :"2",
-    bannerNm : "테스트 배너 2",
-    dueDate : "5",
-    endDay : "2025-08-01"
-  },
-  {
-    id :"3",
-    bannerNm : "테스트 배너 3",
-    dueDate : "3",
-    endDay : "2025-06-01"
-  }
-];
+import { motion, AnimatePresence } from 'framer-motion';
+import * as bannerService from "service/admin/banner/bannerService";
 
 const BannerList = () => {
   const [selectedBannerId, setSelectedBannerId] = useState(null);
@@ -50,6 +31,66 @@ const BannerList = () => {
 
   };
 
+  const getBannerList = async  () => {
+      const inputData ={
+      
+      };
+
+      bannerService.fetcherbannerList(inputData).then((outPutData) => {
+        console.log(outPutData.data)
+      })
+  };
+
+useEffect(() => {
+  getBannerList();
+},[])
+
+const [tableData, setTableData] = useState([
+  {
+    id: "1",
+    bannerNm: "테스트 배너 1",
+    dueDate: "7",
+    endDay: "2025-07-01",
+    level: "1"
+  },
+  {
+    id: "2",
+    bannerNm: "테스트 배너 2",
+    dueDate: "5",
+    endDay: "2025-08-01",
+    level: "2"
+  },
+  {
+    id: "3",
+    bannerNm: "테스트 배너 3",
+    dueDate: "3",
+    endDay: "2025-06-01",
+    level: "3"
+  }
+]);
+
+const handleLevelChange = (id, direction) => {
+  setTableData(prev => {
+    const dataCopy = [...prev];
+
+    // level 기준으로 정렬
+    const sorted = dataCopy.sort((a, b) => Number(a.level) - Number(b.level));
+    const index = sorted.findIndex(item => item.id === id);
+    if (index === -1) return prev;
+
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+
+    if (targetIndex < 0 || targetIndex >= sorted.length) return prev;
+
+    // level 스왑
+    const temp = sorted[index].level;
+    sorted[index].level = sorted[targetIndex].level;
+    sorted[targetIndex].level = temp;
+
+    return [...sorted];
+  });
+};
+
   return (
     <div style={{display:"flex",width:"100%"}}>
       <Card style={{width:"100%"}}>
@@ -69,17 +110,26 @@ const BannerList = () => {
                 </tr>
               </thead>
               <tbody>
-                {tableData.map((tdata) => (
-                  <tr key={tdata.id} 
-                      className={`border-top ${tdata.id === selectedBannerId ? 'table-primary' : ''}`}
+                  {[...tableData]
+                  .sort((a, b) => Number(a.level) - Number(b.level))
+                  .map((tdata) => (
+                    <motion.tr
+                      key={tdata.id}
+                      layout
+                      transition={{ duration: 0.3 }}
+                      className={`table-row ${tdata.id === selectedBannerId ? 'selected' : ''}`}
                       onClick={() => handleRowClick(tdata)}
-                      style={{ cursor: 'pointer' }}
-                      >
-                    <td>{tdata.id}</td>
-                    <td>{tdata.bannerNm}</td>
-                    <td>{tdata.dueDate} 일 ( 종료일자 : {tdata.endDay})</td>
-                  </tr>
-                ))}
+                    >
+                      <td className="cell">{tdata.id}</td>
+                      <td className="cell">{tdata.bannerNm}</td>
+                      <td className="cell">{tdata.dueDate}일 (종료일자 : {tdata.endDay})</td>
+                      <td className="cell">
+                        <Button onClick={(e) => { e.stopPropagation(); handleLevelChange(tdata.id, 'up'); }}>Up</Button>
+                        &nbsp;
+                        <Button onClick={(e) => { e.stopPropagation(); handleLevelChange(tdata.id, 'down'); }}>Down</Button>
+                      </td>
+                    </motion.tr>
+                  ))}
               </tbody>
             </Table>
           </div>
