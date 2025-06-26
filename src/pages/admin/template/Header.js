@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Navbar,
   Collapse,
@@ -18,17 +18,30 @@ import { ReactComponent as LogoWhite } from "../../../otherLib/bootStrap/assets/
 import user1 from "../../../otherLib/bootStrap/assets/images/users/user4.jpg";
 
 const Header = () => {
+
+  const navigate = useNavigate();
+
   const [isOpen, setIsOpen] = React.useState(false);
 
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
 
   const toggle = () => setDropdownOpen((prevState) => !prevState);
+  
   const Handletoggle = () => {
     setIsOpen(!isOpen);
   };
+
   const showMobilemenu = () => {
     document.getElementById("sidebarArea").classList.toggle("showSidebar");
   };
+
+  const token = sessionStorage.getItem("accessToken");
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("accessToken"); // 토큰 삭제
+    navigate("/admin/login"); // 로그인 페이지로 이동
+  };
+  
   return (
     <Navbar style={{backgroundColor:"#495057"}} dark expand="md" className="fix-header">
       <div className="d-flex align-items-center">
@@ -61,7 +74,15 @@ const Header = () => {
         </Button>
       </div>
       <div>
-          <Link to={"/admin/login"} style={{color:"black"}}>로그인</Link>
+          {!token ? (
+            <Link to="/admin/login" style={{ color: "black" }}>
+              로그인
+            </Link>
+          ) : (
+            <button onClick={handleLogout} style={{ color: "black", background: "none", border: "none", cursor: "pointer" }}>
+              로그아웃
+            </button>
+          )}
       </div>
       {/* <Collapse navbar isOpen={isOpen}>
         <Nav className="me-auto" navbar>

@@ -35,7 +35,7 @@ const BoardView = () => {
   // 영양정보 리스트 벨류
   const [formData, setFormData] = useState({}); // 초기값 빈 객체
 
-  const [getProfileImg, setProfileImg] = useState("");
+  const [getProfileImg, setProfileImg] = useState(tempImg1);
   const [getfileImg, setfileImg] = useState("");
   const fileInput = useRef(null);
 
