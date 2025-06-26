@@ -13,3 +13,17 @@ export const fetcherbannerList = async (data) => {
       }
 
 };
+
+export const fetcherExpiredbannerList = async (data) => {
+
+      const fetcher = new Fetcher().setUrl("/bannerMngr/expired")
+                                         .setMethod("GET");
+      try {
+        const result = await fetcher.jsonFetch();
+        console.log(result);
+        return result;
+      } catch (error) {
+        console.error('login error:', error);
+      }
+
+};
