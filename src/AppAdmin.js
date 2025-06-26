@@ -14,6 +14,7 @@ import MemberList from "./pages/admin/member/MemberList.js";
 import MenuList from "./pages/admin/menu/MenuList.js";
 import Login from "./pages/admin/login/Login.js";
 import { lazy } from "react";
+import ProtectedRoute from "utils/login/ProtectedRoute.jsx";
 
 /****Layouts*****/
 const FullLayout = lazy(() => import("./pages/admin/template/FullLayout.js"));
@@ -22,7 +23,11 @@ function AppAdmin () {
   return (
       <div className="AppAdmin">  
           <Routes> 
-            <Route path="/" element={<FullLayout />} >
+            <Route path="/" element={
+              <ProtectedRoute>
+                <FullLayout />
+              </ProtectedRoute>
+              } >
               <Route index element={<Main />} /> {/* 기본 경로 */}
               <Route path="adminMngr" element={<AdminList />} /> {/* /Admin */}
               <Route path="adminView" element={<AdminView />} /> {/* /Admin */}
@@ -34,6 +39,7 @@ function AppAdmin () {
               <Route path="memberMngr" element={<MemberList />} /> {/* /Member */}
               <Route path="menuMngr" element={<MenuList />} /> {/* /Menu */}
             </Route>
+            {/* 로그인 안 해도 접근 가능 */}
             <Route path="login" element={<Login />} /> {/* /Login */}
           </Routes>
       </div> 
