@@ -1,0 +1,8 @@
+.table-row {
+  cursor: pointer;
+}
+
+.selected {
+  background-color: #a3a8aa;
+  border: 4px solid hsl(215, 100%, 54%);
+}
