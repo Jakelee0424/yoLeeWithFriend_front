@@ -1,15 +1,18 @@
 import { Col, Row } from "reactstrap";
-import { Card, CardBody, CardTitle, CardSubtitle, Table, Button, Form, FormGroup, Label, Input } from "reactstrap";
+import { Card, CardBody, CardTitle, CardSubtitle, Table, Button, Form, FormGroup, Label, Input, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as bannerService from "service/admin/banner/bannerService";
 import dayjs from 'dayjs';
 import bannerStyle from "style/banner.module.css"
 
-const BannerList = () => {
+const BannerList = (args) => {
   const [selectedBannerIds, setSelectedBannerIds] = useState([]);
   const [selectedBanner, setSelectedBanner] = useState([]);
+  const [modal, setModal] = useState(false);
   const [btnToggleFlg, setBtnToggleFlg] = useState(true);
+
+  const toggle = () => setModal(!modal);
 
   const toggleBtnFlg = () => {
     if(btnToggleFlg){
@@ -20,10 +23,17 @@ const BannerList = () => {
   }
 
   const handleCheckboxChange = (id, checked) => {
-  setSelectedBannerIds((prev) =>
-    checked ? [...prev, id] : prev.filter((bid) => bid !== id)
-  );
-};
+    setSelectedBannerIds((prev) =>
+      checked ? [...prev, id] : prev.filter((bid) => bid !== id)
+    );
+} ;
+
+  const bannerDelete = (selectedBannerIds) => {
+      bannerService.fetcherDeleteBanner(selectedBannerIds).then((outPutData) => {
+        setTableData(outPutData.data)
+          console.log(outPutData.data)
+      })
+  }
 
 const toggleCheckbox = (id) => {
   setSelectedBannerIds((prev) =>
@@ -74,14 +84,14 @@ const toggleCheckbox = (id) => {
   };
 
   const getBannerList = async  () => {
-      bannerService.fetcherbannerList().then((outPutData) => {
+      bannerService.fetcherBannerList().then((outPutData) => {
       setTableData(outPutData.data)
         console.log(outPutData.data)
     })
   };
 
   const getExpiredBannerList = async  () => {
-      bannerService.fetcherExpiredbannerList().then((outPutData) => {
+      bannerService.fetcherExpiredBannerList().then((outPutData) => {
       setTableData(outPutData.data)
         console.log(outPutData.data)
     })
@@ -239,7 +249,13 @@ const handleLevelChange = (level, direction) => {
                   <Button color="secondary" outline className="bannerUpdateBtn" disabled={selectedBannerIds.length !== 1}> 변경 </Button>
                 </Col>
                 <Col md={1}> 
-                  <Button color="danger" outline className="bannerDeleteBtn" disabled={selectedBannerIds.length < 1}> 삭제 </Button>
+                  <Button 
+                    color="danger" 
+                    outline 
+                    className="bannerDeleteBtn" 
+                    disabled={selectedBannerIds.length < 1}
+                    onClick={() => {bannerDelete(selectedBannerIds); {toggle()}}}
+                  > 삭제 </Button>
                 </Col>
               </Row>
               <FormGroup>
@@ -262,6 +278,18 @@ const handleLevelChange = (level, direction) => {
           </div>
         </CardBody>
       </Card>
+
+      <Modal isOpen={modal} toggle={toggle} {...args}>
+        <ModalBody>
+          삭제 완료
+        </ModalBody>
+        <ModalFooter>
+          <Button color="secondary" onClick={toggle}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
+
     </div>
   );
 };
