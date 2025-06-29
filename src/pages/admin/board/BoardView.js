@@ -15,7 +15,7 @@ const BoardView = () => {
   // 게시물 정보
   const [getBoard, setBoard] = useState({});
   // 일련번호
-  const [getAdminSn] = useState(1);
+  const [getBoardSn, setBoardSn] = useState(1);
 
   // 제품명
   const [getBoardName, setBoardName] = useState("");
@@ -35,7 +35,7 @@ const BoardView = () => {
   // 영양정보 리스트 벨류
   const [formData, setFormData] = useState({}); // 초기값 빈 객체
 
-  const [getProfileImg, setProfileImg] = useState(tempImg1);
+  const [getProfileImg, setProfileImg] = useState("");
   const [getfileImg, setfileImg] = useState("");
   const fileInput = useRef(null);
 
@@ -46,7 +46,7 @@ const BoardView = () => {
 
 
   const getBoardByFetcher = async  (boardId) => {
-    if(boardId !=""){  // boardId이 담겨있을때만 정보조회
+    if(boardId != null && boardId !== ""){  // boardId이 담겨있을때만 정보조회
       const inputData ={
         boardId:boardId,
       };
@@ -76,53 +76,93 @@ const BoardView = () => {
     
   };
 
+  const setRegPage = async  () => {
+    setNuinfoList(await getCodeListByParentIdApi("nutritionInformation01"))
+  };
+
   const getBrandListForUtil = async  () => {
     const codeList = await getCodeListByParentIdApi("boardBrand")
     //console.log(codeList)
     setBrandList(codeList);
   }
 
-  const saveAdminInfo = async  () => {
+  const saveBoardInfo = async  () => {
 
-    if(getAdminId ==""){
-      alert("아이디를 입력해주세요!");
-      return false;
-    }
-
-    if(getAdminPwd ==""){
-      alert("비밀번호를 입력해주세요!");
-      return false;
-    }
-
+    // validation
     if(getBoardName==""){
       alert("제품명을 입력해주세요!");
       return false;
     }
 
+    if(getBrandCodeId==""){
+      alert("회사명을 선택해주세요!");
+      return false;
+    }
+
+    const nuinfoReqDtoList = [];
+    const keys = Object.keys(formData);
+    const values = Object.values(formData);
+    //console.log(keys)
+    for(let i=0; i<getNuinfoList.length; i++){
+      let inputTrigger = false;
+      for(let j=0; j<keys.length; j++){
+        if(keys[j] == "nuinfo" + i ){
+          let nuinfoCodeId = "nutritionInformation010" + (Number(keys[j].replace("nuinfo",""))+1);
+          let nuinfoObject ={};
+          nuinfoObject.codeId = nuinfoCodeId;
+          nuinfoObject.value = values[j].value;
+          nuinfoObject.sn = values[j].sn;
+          nuinfoReqDtoList.push(nuinfoObject);
+          inputTrigger = true;
+        }
+      }
+      if(inputTrigger == false){
+        let nuinfoObject ={
+          codeId: "nutritionInformation010" +(i+1),
+          value: "",
+        };
+        nuinfoReqDtoList.push(nuinfoObject)
+      }
+    }
+
     const inputData ={
+      boardMngrReqDto : {
+          boardId: (id === undefined || id === null || id === 'undefined') ? 0 : id,
+          boardName: getBoardName,
+          brandCodeId : getBrandCodeId,
+      },
+      nuinfoReqDtoList : nuinfoReqDtoList
     };
-    // adminService.fetcherAdminSave(inputData).then((outPutData) => {
-    //   if(outPutData.result === "SUCCESS" && outPutData.data != null){
-    //     const adminSn = outPutData.data.sn;
-    //     alert("완료되었습니다.")
-        
-    //   }else if (outPutData.data == null){
-    //     alert("관리자 아이디가 중복입니다.")
-    //   }
-    // })       
+
+    const formFileData = new FormData();
+    formFileData.append('multipartFile', getfileImg); // formData에 파일 추가
+    formFileData.append('data', JSON.stringify(inputData));
+    
+    //console.log(inputData)
+    boardMngrService.fetcherBoardSave(formFileData).then((outPutData) => {
+      console.log(outPutData)
+      if(outPutData.result === "SUCCESS" && outPutData.data != null){
+        const adminSn = outPutData.data.sn;
+        alert("완료되었습니다.")
+        goBack();
+      }else if (outPutData.data == null){
+        alert("오류입니다.")
+      }
+    })       
   } 
 
-  const deleteAdmin = async  () => {
+  const deleteBoard = async  () => {
+
     const inputData ={
-      id: getAdminSn,
+      ids: getBoardSn,
     };
-    // adminService.fetcherAdminDelte(inputData).then((outPutData) => {
-    //   if(outPutData.result === "SUCCESS"){
-    //     alert("완료되었습니다.")
-    //     //adminList();
+    boardMngrService.fetcherBoardDelte(inputData).then((outPutData) => {
+      if(outPutData.result === "SUCCESS"){
+        alert("완료되었습니다.")
+        goBack();
         
-    //   }
-    // })       
+      }
+    })       
   } 
 
   const saveBoardName = event => {
@@ -164,7 +204,11 @@ const changeProfileImage = async (e) =>{
 }
 
   useEffect(() => {
-    getBoardByFetcher(id);
+    if(id != null && id !== "" && id !== undefined && id !== "undefined"){
+      getBoardByFetcher(id);
+    }else{
+      setRegPage();
+    }
     getBrandListForUtil();
   },[])
 
@@ -175,15 +219,13 @@ const changeProfileImage = async (e) =>{
           <Row>
              <Col sm="6" lg="6" xl="3"
                 style={{cursor:"pointer", width:"100%"}}
-                onClick={(e) => {
-                  e.preventDefault(); // NavLink 기본 이동 방지
-                  clickBoardImg(1);
-                }}
+                onClick={()=>{fileInput.current.click()}}
               >
                 <Blog
-                  image={tempImg1}
+                  image={getProfileImg}
                   text={`맛 : 3.5 가격 : 3.5 성분 : 3.5`}
                 />
+                <input accept="image/*" type="file" hidden value={""}  ref={fileInput}  onChange={changeProfileImage}/>
               </Col>
           </Row>
         </CardBody>
@@ -220,6 +262,7 @@ const changeProfileImage = async (e) =>{
                       value={getBrandCodeId}
                       onChange={(e) => saveBoardBrandCodeId(e)}
                     > 
+                      <option value={""}>선택</option>
                       {getBrandList.map((tdata, index) => (
                         <option key={index} value={tdata.id}>{tdata.name}</option>
                       ))}   
@@ -256,7 +299,7 @@ const changeProfileImage = async (e) =>{
             {Object.keys(getBoard).length !== 0 ? (
                           <Button style={{width:"15%", marginRight:"3%", float:"right"}} 
                           color="danger"
-                          onClick={() => deleteAdmin()}
+                          onClick={() => deleteBoard()}
                           >
                             삭제
                           </Button>
@@ -266,7 +309,7 @@ const changeProfileImage = async (e) =>{
             }
             <Button style={{width:"15%", marginRight:"3%", float:"right"}} 
                     color="primary"
-                    onClick={() => saveAdminInfo()}
+                    onClick={() => saveBoardInfo()}
             >
               저장
             </Button>  
