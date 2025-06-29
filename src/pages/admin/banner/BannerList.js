@@ -1,49 +1,151 @@
 import { Col, Row } from "reactstrap";
-import { Card, CardBody, CardTitle, CardSubtitle, Table, Button, Form, FormGroup, Label, Input } from "reactstrap";
+import { Card, CardBody, CardTitle, CardSubtitle, Table, Button, Form, FormGroup, Label, Input, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as bannerService from "service/admin/banner/bannerService";
 import dayjs from 'dayjs';
 import bannerStyle from "style/banner.module.css"
 
-const BannerList = () => {
-  const [selectedBannerId, setSelectedBannerId] = useState(null);
-  const [selectedBanner, setSelectedBanner] = useState([]);
+const BannerList = (args) => {
+  const [selectedBannerIds, setSelectedBannerIds] = useState([]);
+  const [bannerInfo, setBannerInfo] = useState([]);
+  const [modal, setModal] = useState(false);
+  const [modalMsg, setModalMsg] = useState("");
+  const [btnToggleFlg, setBtnToggleFlg] = useState(true);
+  const [levelData, setLevelData] = useState([]);
+  const [tableData, setTableData] = useState([]);
+
+  const toggle = () => {
+    setModal(!modal);
+  }
+
+  const toggleBtnFlg = () => {
+    if(btnToggleFlg){
+      setBtnToggleFlg(false);
+    }else{
+      setBtnToggleFlg(true);
+    }
+  }
+
+  const handleCheckboxChange = (id, checked) => {
+    setSelectedBannerIds((prev) =>
+      checked ? [...prev, id] : prev.filter((bid) => bid !== id)
+    );
+} ;
+
+  const bannerDelete = (selectedBannerIds) => {
+    bannerService.fetcherDeleteBanner(selectedBannerIds).then((outPutData) => {
+      setTableData(outPutData.data)
+    })
+      setSelectedBannerIds([]);
+      setModalMsg(selectedBannerIds.length + " 건이 삭제 되었습니다.")
+      toggle();
+  }
+
+    const bannerRestore = (selectedBannerIds) => {
+    bannerService.fetcherRestoreBanner(selectedBannerIds).then((outPutData) => {
+      setTableData(outPutData.data)
+    })
+      setSelectedBannerIds([]);
+      setModalMsg(selectedBannerIds.length + " 건이 복구 되었습니다.")
+      toggle();
+  }
+
+  const bannerInsert = (bannerInfo) => {
+
+    if(!bannerInfo.bannerName || bannerInfo.bannerName.trim() === ""){
+      setModalMsg("배너명을 입력하세요")
+      toggle();
+      return;
+    }else if(bannerInfo.createdAt == null) {
+      setModalMsg("배너 시작일을 입력하세요")
+      toggle();
+      return;
+    }else if(!bannerInfo.validDays || bannerInfo.validDays.trim() === ""){
+      setModalMsg("유효 기간을 입력하세요")
+      toggle();
+      return;
+    }
+    
+    bannerService.fetcherInsertBanner(bannerInfo).then((outPutData) => {
+      setTableData(outPutData.data)
+    })
+
+    if(tableData != null){
+      setSelectedBannerIds([]);
+      setModalMsg("배너가 등록되었습니다.")
+      toggle();
+    }
+  }
+
+  const bannerUpdate = (bannerInfo) => {
+
+    if(!bannerInfo.bannerName || bannerInfo.bannerName.trim() === ""){
+      setModalMsg("배너명을 입력하세요")
+      toggle();
+      return;
+    }else if(bannerInfo.createdAt == null) {
+      setModalMsg("배너 시작일을 입력하세요")
+      toggle();
+      return;
+    }else if(!bannerInfo.validDays || bannerInfo.validDays.trim === ""){
+      setModalMsg("유효 기간을 입력하세요")
+      toggle();
+      return;
+    }
+    
+    bannerService.fetcherBannerUpdate(bannerInfo).then((outPutData) => {
+      setTableData(outPutData.data)
+    })
+
+    if(tableData != null){
+      setSelectedBannerIds([]);
+      setModalMsg("배너가 수정되었습니다.")
+      toggle();
+    }
+  }
+
+const toggleCheckbox = (id) => {
+  setSelectedBannerIds((prev) =>
+    prev.includes(id) ? prev.filter((bid) => bid !== id) : [...prev, id]
+  );
+};
 
   const handleBannerNameChange = (e) => {
-    setSelectedBanner({
-      bannerName: e.target.value
-      }
-    );
+    setBannerInfo(prev => ({
+      ...prev,
+      bannerName: e.target.value,
+    }));
   };
 
   const handleCreateDateChange = (e) => {
-    setSelectedBanner({
-      createdAt: e.target.value
-      }
-    );
+    const dateOnly = e.target.value;
+    const fullDateTime = `${dateOnly}T00:00:00`;
+
+    setBannerInfo(prev => ({
+      ...prev,
+      createdAt: fullDateTime,
+    }));
   };
 
   const handleValidDaysChange = (e) => {
-    setSelectedBanner({
-      validDays: e.target.value
-      }
-    );
+    setBannerInfo(prev => ({
+      ...prev,
+      validDays: e.target.value,
+    }));
   };
 
   const handleRowClick = (tdata) => {
 
-    if(selectedBannerId == null || selectedBannerId !== tdata.bannerId){
-      setSelectedBannerId(tdata.bannerId);
-      setSelectedBanner({
+    if(selectedBannerIds == null || selectedBannerIds !== tdata.bannerId){
+      setBannerInfo({
         bannerId: tdata.bannerId,
         bannerName: tdata.bannerName,
-        createdAt: dayjs(tdata.createdAt).add(tdata.validDays, 'day').format('YYYY-MM-DD'),
+        createdAt: dayjs(tdata.createdAt).format('YYYY-MM-DDT00:00:00'),
         validDays: tdata.validDays,
       });
     }else{
-      setSelectedBannerId(null);
-      setSelectedBanner({
+      setBannerInfo({
         bannerId: "",
         bannerName: "",
         createdAt: "",
@@ -53,9 +155,14 @@ const BannerList = () => {
   };
 
   const getBannerList = async  () => {
-      bannerService.fetcherbannerList().then((outPutData) => {
+      bannerService.fetcherBannerList().then((outPutData) => {
       setTableData(outPutData.data)
-        console.log(outPutData.data)
+    })
+  };
+
+  const getExpiredBannerList = async  () => {
+      bannerService.fetcherExpiredBannerList().then((outPutData) => {
+      setTableData(outPutData.data)
     })
   };
 
@@ -63,9 +170,7 @@ useEffect(() => {
   getBannerList();
 },[])
 
-const [tableData, setTableData] = useState([]);
-
-const handleLevelChange = (level, direction) => {
+const handleLevelChange = (level, bannerId, direction) => {
   setTableData(prev => {
     const dataCopy = [...prev];
 
@@ -75,7 +180,6 @@ const handleLevelChange = (level, direction) => {
     if (index === -1) return prev;
 
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
-
     if (targetIndex < 0 || targetIndex >= sorted.length) return prev;
 
     // level 스왑
@@ -83,9 +187,19 @@ const handleLevelChange = (level, direction) => {
     sorted[index].level = sorted[targetIndex].level;
     sorted[targetIndex].level = temp;
 
+    // bannerId 기준으로 levelData 구성
+    const newLevelData = [
+      { bannerId: sorted[index].bannerId, level: sorted[index].level },
+      { bannerId: sorted[targetIndex].bannerId, level: sorted[targetIndex].level }
+    ];
+
+    setLevelData(newLevelData);
+    bannerService.fetcherBannerLevelChange(newLevelData); // API 호출
+
     return [...sorted];
   });
 };
+
 
   return (
     <div style={{display:"flex",width:"100%"}} >
@@ -96,10 +210,28 @@ const handleLevelChange = (level, direction) => {
             배너 현황 확인 및 등록,삭제
           </CardSubtitle>
           <hr/>
+
+          <div>
+            <Button 
+            color={btnToggleFlg ? "primary" : "secondary"} 
+            outline={!btnToggleFlg} 
+            onClick={(btnToggleFlg) => {getBannerList(); toggleBtnFlg(btnToggleFlg)}} > 
+              활성 배너
+            </Button>
+            &nbsp;
+            <Button 
+            color={btnToggleFlg ? "secondary" : "primary"} 
+            outline={btnToggleFlg} 
+            onClick={(btnToggleFlg) => {getExpiredBannerList(); toggleBtnFlg(btnToggleFlg)}}> 
+              만료 배너 
+            </Button>
+          </div>
+
           <div>
             <Table className="no-wrap mt-3 align-middle" responsive borderless hover>
               <thead>
                 <tr>
+                  <th></th>
                   <th>ID</th>
                   <th>배너명</th>
                   <th>시작 일시</th>
@@ -107,27 +239,63 @@ const handleLevelChange = (level, direction) => {
                 </tr>
               </thead>
               <tbody>
-                  {[...tableData]
+                {[...tableData]
                   .sort((a, b) => Number(a.level) - Number(b.level))
-                  .map((tdata) => (
-                    <motion.tr
-                      key={tdata.bannerId}
-                      layout
-                      transition={{ duration: 0.3 }}
-                      className={`${bannerStyle['table-row']} ${tdata.bannerId === selectedBannerId ? bannerStyle.selected : ''}`}
-                      onClick={() => handleRowClick(tdata)}
-                    >
-                      <td className="cell">{tdata.bannerId}</td>
-                      <td className="cell">{tdata.bannerName}</td>
-                      <td className="cell">{dayjs(tdata.createdAt).format('YYYY-MM-DD HH:mm')} ( 계약 기간: {tdata.validDays}일 )</td>
-                      <td className="cell">{dayjs(tdata.createdAt).add(tdata.validDays, 'day').format('YYYY-MM-DD HH:mm')}</td>
-                      <td className="cell">
-                        <Button onClick={(e) => { e.stopPropagation(); handleLevelChange(tdata.level, 'up'); }}>Up</Button>
-                        &nbsp;
-                        <Button onClick={(e) => { e.stopPropagation(); handleLevelChange(tdata.level, 'down'); }}>Down</Button>
-                      </td>
-                    </motion.tr>
-                  ))}
+                  .map((tdata) => {
+                    const isChecked = selectedBannerIds.includes(tdata.bannerId);
+
+                    return (
+                      <motion.tr
+                        key={tdata.bannerId}
+                        layout
+                        transition={{ duration: 0.3 }}
+                        onClick={() => {
+                          handleCheckboxChange(tdata.bannerId, !isChecked);
+                          handleRowClick(tdata);
+                        }}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <td className="chekbox">
+                          <Input
+                            type="checkbox"
+                            checked={isChecked}
+                            onClick={(e) => e.stopPropagation()} // ✅ 체크박스 클릭 시 row 클릭 막음
+                            onChange={(e) => {
+                              handleCheckboxChange(tdata.bannerId, e.target.checked);
+                              handleRowClick(tdata);
+                            }}
+                          />
+                        </td>
+                        <td className="cell">{tdata.bannerId}</td>
+                        <td className="cell">{tdata.bannerName}</td>
+                        <td className="cell">
+                          {dayjs(tdata.createdAt).format('YYYY-MM-DD')} ( 계약 기간: {tdata.validDays}일 )
+                        </td>
+                        <td className="cell">
+                          {dayjs(tdata.createdAt).add(tdata.validDays, 'day').format('YYYY-MM-DD')}
+                        </td>
+                        <td className="cell">
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleLevelChange(tdata.level, tdata.bannerId, 'up');
+                            }}
+                          >
+                            Up
+                          </Button>
+                          &nbsp;
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleLevelChange(tdata.level, tdata.bannerId, 'down');
+                            }}
+                          >
+                            Down
+                          </Button>
+                        </td>
+                      </motion.tr>
+                    );
+                  })}
               </tbody>
             </Table>
           </div>
@@ -147,8 +315,9 @@ const handleLevelChange = (level, direction) => {
                       name="bannerName"
                       placeholder="배너명 입력"
                       type="text"
-                      value={selectedBanner.bannerName}
+                      value={bannerInfo.bannerName}
                       onChange={handleBannerNameChange}
+                      disabled={selectedBannerIds.length > 1}
                     />
                   </FormGroup>
                 </Col>
@@ -161,8 +330,9 @@ const handleLevelChange = (level, direction) => {
                       id="createdAt"
                       name="createdAt"
                       type="date"
-                      value={selectedBanner.createdAt}
+                      value={bannerInfo.createdAt ? bannerInfo.createdAt.split('T')[0] : ''}
                       onChange={handleCreateDateChange}
+                      disabled={selectedBannerIds.length > 1}
                     />
                   </FormGroup>
                 </Col>
@@ -175,21 +345,65 @@ const handleLevelChange = (level, direction) => {
                       id="validDays"
                       name="validDays"
                       type="text"
-                      value={selectedBanner.validDays}
+                      value={bannerInfo.validDays}
                       onChange={handleValidDaysChange}
+                      disabled={selectedBannerIds.length > 1}
                     />
                   </FormGroup>
                 </Col>
                 <Col></Col>
                 <Col md={1}> 
-                  <Button color="secondary" outline className="bannerInsertBtn" disabled={selectedBanner.bannerName === "" || selectedBannerId != null}> 등록 </Button>
+                  <Button 
+                    color="secondary" 
+                    outline 
+                    className="bannerInsertBtn" 
+                    disabled={selectedBannerIds.length !== 0}
+                    onClick={() => {bannerInsert(bannerInfo);}}
+                    > 등록 
+                  </Button>
                 </Col>
                 <Col md={1}> 
-                  <Button color="secondary" outline className="bannerUpdateBtn" disabled={selectedBannerId == null}> 변경 </Button>
+                  <Button 
+                    color="secondary" 
+                    outline 
+                    className="bannerUpdateBtn" 
+                    disabled={selectedBannerIds.length !== 1}
+                    onClick={() => {bannerUpdate(bannerInfo);}}
+                    > 변경 
+                  </Button>
                 </Col>
-                <Col md={1}> 
-                  <Button color="danger" outline className="bannerDeleteBtn" disabled={selectedBannerId == null}> 삭제 </Button>
-                </Col>
+                {btnToggleFlg && (
+                  <Col md={1}> 
+                    <Button 
+                      color="danger" 
+                      outline 
+                      className="bannerDeleteBtn" 
+                      disabled={selectedBannerIds.length < 1}
+                      onClick={() => {
+                        bannerDelete(selectedBannerIds);
+                        toggle();
+                      }}
+                    >
+                      삭제
+                    </Button>
+                  </Col>
+                )}
+                {!btnToggleFlg && (
+                  <Col md={1}> 
+                    <Button 
+                      color="danger" 
+                      outline 
+                      className="bannerDeleteBtn" 
+                      disabled={selectedBannerIds.length < 1}
+                      onClick={() => {
+                        bannerRestore(selectedBannerIds);
+                        toggle();
+                      }}
+                    >
+                      복구
+                    </Button>
+                  </Col>
+                )}
               </Row>
               <FormGroup>
                 <Label for="bannerFile">
@@ -202,7 +416,9 @@ const handleLevelChange = (level, direction) => {
                 />
               </FormGroup>
               <Row>
-                
+                <Label>
+                  배너 사진 미리보기
+                </Label>
 
               </Row>
             </Form>
@@ -211,6 +427,18 @@ const handleLevelChange = (level, direction) => {
           </div>
         </CardBody>
       </Card>
+
+      <Modal isOpen={modal} toggle={toggle} {...args}>
+        <ModalBody>
+          {modalMsg}
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={toggle}>
+            확인
+          </Button>
+        </ModalFooter>
+      </Modal>
+
     </div>
   );
 };
