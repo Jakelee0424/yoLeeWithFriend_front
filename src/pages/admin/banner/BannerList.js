@@ -1,14 +1,45 @@
 import { Col, Row } from "reactstrap";
-import { Card, CardBody, CardTitle, CardSubtitle, Table, Button, Form, FormGroup, Label, Input } from "reactstrap";
+import { Card, CardBody, CardTitle, CardSubtitle, Table, Button, Form, FormGroup, Label, Input, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as bannerService from "service/admin/banner/bannerService";
 import dayjs from 'dayjs';
 import bannerStyle from "style/banner.module.css"
 
-const BannerList = () => {
-  const [selectedBannerId, setSelectedBannerId] = useState(null);
+const BannerList = (args) => {
+  const [selectedBannerIds, setSelectedBannerIds] = useState([]);
   const [selectedBanner, setSelectedBanner] = useState([]);
+  const [modal, setModal] = useState(false);
+  const [btnToggleFlg, setBtnToggleFlg] = useState(true);
+
+  const toggle = () => setModal(!modal);
+
+  const toggleBtnFlg = () => {
+    if(btnToggleFlg){
+      setBtnToggleFlg(false);
+    }else{
+      setBtnToggleFlg(true);
+    }
+  }
+
+  const handleCheckboxChange = (id, checked) => {
+    setSelectedBannerIds((prev) =>
+      checked ? [...prev, id] : prev.filter((bid) => bid !== id)
+    );
+} ;
+
+  const bannerDelete = (selectedBannerIds) => {
+      bannerService.fetcherDeleteBanner(selectedBannerIds).then((outPutData) => {
+        setTableData(outPutData.data)
+          console.log(outPutData.data)
+      })
+  }
+
+const toggleCheckbox = (id) => {
+  setSelectedBannerIds((prev) =>
+    prev.includes(id) ? prev.filter((bid) => bid !== id) : [...prev, id]
+  );
+};
 
   const handleBannerNameChange = (e) => {
     setSelectedBanner({
@@ -33,8 +64,8 @@ const BannerList = () => {
 
   const handleRowClick = (tdata) => {
 
-    if(selectedBannerId == null || selectedBannerId !== tdata.bannerId){
-      setSelectedBannerId(tdata.bannerId);
+    if(selectedBannerIds == null || selectedBannerIds !== tdata.bannerId){
+      setSelectedBannerIds(tdata.bannerId);
       setSelectedBanner({
         bannerId: tdata.bannerId,
         bannerName: tdata.bannerName,
@@ -42,7 +73,7 @@ const BannerList = () => {
         validDays: tdata.validDays,
       });
     }else{
-      setSelectedBannerId(null);
+      setSelectedBannerIds(null);
       setSelectedBanner({
         bannerId: "",
         bannerName: "",
@@ -53,7 +84,14 @@ const BannerList = () => {
   };
 
   const getBannerList = async  () => {
-      bannerService.fetcherbannerList().then((outPutData) => {
+      bannerService.fetcherBannerList().then((outPutData) => {
+      setTableData(outPutData.data)
+        console.log(outPutData.data)
+    })
+  };
+
+  const getExpiredBannerList = async  () => {
+      bannerService.fetcherExpiredBannerList().then((outPutData) => {
       setTableData(outPutData.data)
         console.log(outPutData.data)
     })
@@ -96,10 +134,28 @@ const handleLevelChange = (level, direction) => {
             배너 현황 확인 및 등록,삭제
           </CardSubtitle>
           <hr/>
+
+          <div>
+            <Button 
+            color={btnToggleFlg ? "primary" : "secondary"} 
+            outline={!btnToggleFlg} 
+            onClick={(btnToggleFlg) => {getBannerList(); toggleBtnFlg(btnToggleFlg)}} > 
+              활성 배너
+            </Button>
+            &nbsp;
+            <Button 
+            color={btnToggleFlg ? "secondary" : "primary"} 
+            outline={btnToggleFlg} 
+            onClick={(btnToggleFlg) => {getExpiredBannerList(); toggleBtnFlg(btnToggleFlg)}}> 
+              만료 배너 
+            </Button>
+          </div>
+
           <div>
             <Table className="no-wrap mt-3 align-middle" responsive borderless hover>
               <thead>
                 <tr>
+                  <th></th>
                   <th>ID</th>
                   <th>배너명</th>
                   <th>시작 일시</th>
@@ -114,9 +170,14 @@ const handleLevelChange = (level, direction) => {
                       key={tdata.bannerId}
                       layout
                       transition={{ duration: 0.3 }}
-                      className={`${bannerStyle['table-row']} ${tdata.bannerId === selectedBannerId ? bannerStyle.selected : ''}`}
-                      onClick={() => handleRowClick(tdata)}
+                      // className={`${bannerStyle['table-row']} ${tdata.bannerId === selectedBannerId ? bannerStyle.selected : ''}`}
                     >
+                      <td className="chekbox">
+                        <Input type="checkbox"
+                          checked={selectedBannerIds.includes(tdata.bannerId)}
+                          onChange={(e) => handleCheckboxChange(tdata.bannerId, e.target.checked)}
+                        />
+                      </td>
                       <td className="cell">{tdata.bannerId}</td>
                       <td className="cell">{tdata.bannerName}</td>
                       <td className="cell">{dayjs(tdata.createdAt).format('YYYY-MM-DD HH:mm')} ( 계약 기간: {tdata.validDays}일 )</td>
@@ -182,13 +243,19 @@ const handleLevelChange = (level, direction) => {
                 </Col>
                 <Col></Col>
                 <Col md={1}> 
-                  <Button color="secondary" outline className="bannerInsertBtn" disabled={selectedBanner.bannerName === "" || selectedBannerId != null}> 등록 </Button>
+                  <Button color="secondary" outline className="bannerInsertBtn" disabled={selectedBannerIds.length !== 0}> 등록 </Button>
                 </Col>
                 <Col md={1}> 
-                  <Button color="secondary" outline className="bannerUpdateBtn" disabled={selectedBannerId == null}> 변경 </Button>
+                  <Button color="secondary" outline className="bannerUpdateBtn" disabled={selectedBannerIds.length !== 1}> 변경 </Button>
                 </Col>
                 <Col md={1}> 
-                  <Button color="danger" outline className="bannerDeleteBtn" disabled={selectedBannerId == null}> 삭제 </Button>
+                  <Button 
+                    color="danger" 
+                    outline 
+                    className="bannerDeleteBtn" 
+                    disabled={selectedBannerIds.length < 1}
+                    onClick={() => {bannerDelete(selectedBannerIds); {toggle()}}}
+                  > 삭제 </Button>
                 </Col>
               </Row>
               <FormGroup>
@@ -211,6 +278,18 @@ const handleLevelChange = (level, direction) => {
           </div>
         </CardBody>
       </Card>
+
+      <Modal isOpen={modal} toggle={toggle} {...args}>
+        <ModalBody>
+          삭제 완료
+        </ModalBody>
+        <ModalFooter>
+          <Button color="secondary" onClick={toggle}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
+
     </div>
   );
 };
