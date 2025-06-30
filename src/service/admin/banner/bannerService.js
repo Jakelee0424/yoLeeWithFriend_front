@@ -51,16 +51,17 @@ export const fetcherRestoreBanner = (data) => {
 
 };
 
-export const fetcherInsertBanner = (data) => {
-  const fetcher = new Fetcher().setUrl("/bannerMngr/insert")
-                                .setMethod("POST")
-                                .setData(JSON.stringify(data)); 
+export const fetcherInsertBanner = async (data) => {
+
   try {
-    const result = fetcher.jsonFetch();
-    console.log(result);
-    return result;
+      const response = await fetch(process.env.REACT_APP_API_URI+"/bannerMngr/insert", {
+        method: "POST",
+        body: data
+      });
+      const result = await response.json();
+      return result;
   } catch (error) {
-    console.error(error);
+    console.error('login error:', error);
   }
 
 };
