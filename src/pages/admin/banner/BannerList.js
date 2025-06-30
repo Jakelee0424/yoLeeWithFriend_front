@@ -17,18 +17,6 @@ const BannerList = (args) => {
   const [fileImg, setfileImg] = useState(null);
   const [previewImg, setPreviewImg] = useState("");
 
-  const handelImage = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setfileImg(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImg(reader.result); 
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
   const toggle = () => {
     setModal(!modal);
   }
@@ -45,25 +33,7 @@ const BannerList = (args) => {
     setSelectedBannerIds((prev) =>
       checked ? [...prev, id] : prev.filter((bid) => bid !== id)
     );
-} ;
-
-  const bannerDelete = (selectedBannerIds) => {
-    bannerService.fetcherDeleteBanner(selectedBannerIds).then((outPutData) => {
-      setTableData(outPutData.data)
-    })
-      setSelectedBannerIds([]);
-      setModalMsg(selectedBannerIds.length + " 건이 삭제 되었습니다.")
-      toggle();
-  }
-
-    const bannerRestore = (selectedBannerIds) => {
-    bannerService.fetcherRestoreBanner(selectedBannerIds).then((outPutData) => {
-      setTableData(outPutData.data)
-    })
-      setSelectedBannerIds([]);
-      setModalMsg(selectedBannerIds.length + " 건이 복구 되었습니다.")
-      toggle();
-  }
+  } ;
 
   const bannerInsert = (bannerInfo) => {
 
@@ -90,7 +60,7 @@ const BannerList = (args) => {
     formFileData.append('data', JSON.stringify(bannerInfo));
     
     bannerService.fetcherInsertBanner(formFileData).then((outPutData) => {
-      // setTableData(outPutData.data)
+      setTableData(outPutData.data)
     })
 
     if(tableData != null){
@@ -120,7 +90,11 @@ const BannerList = (args) => {
       return;
     }
     
-    bannerService.fetcherBannerUpdate(bannerInfo).then((outPutData) => {
+    const formFileData = new FormData();
+    formFileData.append('multipartFile', fileImg); // formData에 파일 추가
+    formFileData.append('data', JSON.stringify(bannerInfo));
+    
+    bannerService.fetcherBannerUpdate(formFileData).then((outPutData) => {
       setTableData(outPutData.data)
     })
 
@@ -131,11 +105,23 @@ const BannerList = (args) => {
     }
   }
 
-const toggleCheckbox = (id) => {
-  setSelectedBannerIds((prev) =>
-    prev.includes(id) ? prev.filter((bid) => bid !== id) : [...prev, id]
-  );
-};
+  const bannerDelete = (selectedBannerIds) => {
+    bannerService.fetcherDeleteBanner(selectedBannerIds).then((outPutData) => {
+      setTableData(outPutData.data)
+    })
+      setSelectedBannerIds([]);
+      setModalMsg(selectedBannerIds.length + " 건이 삭제 되었습니다.")
+      toggle();
+  }
+
+  const bannerRestore = (selectedBannerIds) => {
+    bannerService.fetcherRestoreBanner(selectedBannerIds).then((outPutData) => {
+      setTableData(outPutData.data)
+    })
+      setSelectedBannerIds([]);
+      setModalMsg(selectedBannerIds.length + " 건이 복구 되었습니다.")
+      toggle();
+  }
 
   const handleBannerNameChange = (e) => {
     setBannerInfo(prev => ({
@@ -160,25 +146,18 @@ const toggleCheckbox = (id) => {
       validDays: e.target.value,
     }));
   };
-
-  const handleRowClick = (tdata) => {
-
-    if(selectedBannerIds == null || selectedBannerIds !== tdata.bannerId){
-      setBannerInfo({
-        bannerId: tdata.bannerId,
-        bannerName: tdata.bannerName,
-        createdAt: dayjs(tdata.createdAt).format('YYYY-MM-DDT00:00:00'),
-        validDays: tdata.validDays,
-      });
-    }else{
-      setBannerInfo({
-        bannerId: "",
-        bannerName: "",
-        createdAt: "",
-        validDays: "",
-      });
+  
+  const handelImage = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setfileImg(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImg(reader.result); 
+      };
+      reader.readAsDataURL(file);
     }
-  };
+  }
 
   const getBannerList = async  () => {
       bannerService.fetcherBannerList().then((outPutData) => {
@@ -191,6 +170,29 @@ const toggleCheckbox = (id) => {
       setTableData(outPutData.data)
     })
   };
+
+useEffect(() => {
+   if(selectedBannerIds.length === 1){
+    const selected = tableData.find(t => t.bannerId === selectedBannerIds[0]);
+    setBannerInfo({
+      bannerId: selected.bannerId,
+      bannerName: selected.bannerName,
+      createdAt: dayjs(selected.createdAt).format('YYYY-MM-DDT00:00:00'),
+      validDays: selected.validDays,
+    });
+    if(selected.imgUrl){
+      setPreviewImg(process.env.PUBLIC_URL + selected.imgUrl.split("public")[1].replace(/\\/g, "/"));
+    }
+  }else{
+    setBannerInfo({
+      bannerId: "",
+      bannerName: "",
+      createdAt: "",
+      validDays: "",
+    });
+    setPreviewImg("");
+  }
+},[selectedBannerIds])
 
 useEffect(() => {
   getBannerList();
@@ -277,7 +279,6 @@ const handleLevelChange = (level, bannerId, direction) => {
                         transition={{ duration: 0.3 }}
                         onClick={() => {
                           handleCheckboxChange(tdata.bannerId, !isChecked);
-                          handleRowClick(tdata);
                         }}
                         style={{ cursor: 'pointer' }}
                       >
@@ -288,7 +289,6 @@ const handleLevelChange = (level, bannerId, direction) => {
                             onClick={(e) => e.stopPropagation()} 
                             onChange={(e) => {
                               handleCheckboxChange(tdata.bannerId, e.target.checked);
-                              handleRowClick(tdata);
                             }}
                           />
                         </td>
