@@ -14,6 +14,20 @@ const BannerList = (args) => {
   const [btnToggleFlg, setBtnToggleFlg] = useState(true);
   const [levelData, setLevelData] = useState([]);
   const [tableData, setTableData] = useState([]);
+  const [fileImg, setfileImg] = useState(null);
+  const [previewImg, setPreviewImg] = useState("");
+
+  const handelImage = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setfileImg(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImg(reader.result); 
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
   const toggle = () => {
     setModal(!modal);
@@ -65,10 +79,18 @@ const BannerList = (args) => {
       setModalMsg("유효 기간을 입력하세요")
       toggle();
       return;
+    }else if(!fileImg){
+      setModalMsg("배너 사진을 업로드하세요")
+      toggle();
+      return;
     }
+
+    const formFileData = new FormData();
+    formFileData.append('multipartFile', fileImg); // formData에 파일 추가
+    formFileData.append('data', JSON.stringify(bannerInfo));
     
-    bannerService.fetcherInsertBanner(bannerInfo).then((outPutData) => {
-      setTableData(outPutData.data)
+    bannerService.fetcherInsertBanner(formFileData).then((outPutData) => {
+      // setTableData(outPutData.data)
     })
 
     if(tableData != null){
@@ -90,6 +112,10 @@ const BannerList = (args) => {
       return;
     }else if(!bannerInfo.validDays || bannerInfo.validDays.trim === ""){
       setModalMsg("유효 기간을 입력하세요")
+      toggle();
+      return;
+    }else if(!fileImg){
+      setModalMsg("배너 사진을 업로드하세요")
       toggle();
       return;
     }
@@ -259,7 +285,7 @@ const handleLevelChange = (level, bannerId, direction) => {
                           <Input
                             type="checkbox"
                             checked={isChecked}
-                            onClick={(e) => e.stopPropagation()} // ✅ 체크박스 클릭 시 row 클릭 막음
+                            onClick={(e) => e.stopPropagation()} 
                             onChange={(e) => {
                               handleCheckboxChange(tdata.bannerId, e.target.checked);
                               handleRowClick(tdata);
@@ -413,13 +439,23 @@ const handleLevelChange = (level, bannerId, direction) => {
                   id="bannerFile"
                   name="bannerFile"
                   type="file"
+                  accept="image/*" 
+                  onChange={handelImage}
                 />
               </FormGroup>
               <Row>
                 <Label>
                   배너 사진 미리보기
                 </Label>
-
+                {previewImg  && (
+                  <div className="mt-2">
+                    <img
+                      src={previewImg}
+                      alt="배너 미리보기"
+                      className="w-full max-w-md rounded-lg shadow"
+                    />
+                  </div>
+                )}
               </Row>
             </Form>
             
