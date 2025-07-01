@@ -85,7 +85,6 @@ export const fetcherBannerLevelChange = async (data) => {
 
   try {
     const result = await fetcher.jsonFetch(); 
-    console.log(result);
     return result;
   } catch (error) {
     console.error(error);
