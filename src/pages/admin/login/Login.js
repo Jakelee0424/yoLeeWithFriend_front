@@ -4,6 +4,7 @@ import loginStyle from "style/login.module.css"
 import basicStyle from "style/basic.module.css"
 import Logo from "../template/Logo";
 import * as adminLoginService from "service/admin/login/adminLoginService";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   
@@ -21,6 +22,8 @@ const Login = () => {
     setAdminPassWord(event.target.value);
   };
 
+  const navigate = useNavigate();
+
 
   const adminLogin = async  () => {
     const inputData ={
@@ -31,7 +34,8 @@ const Login = () => {
     adminLoginService.fetcherAdminLogin(inputData).then((outPutData) => {
 
         if(outPutData.data != null){
-          alert("성공");
+          sessionStorage.setItem("accessToken", outPutData.data.accessToken);
+          navigate(`/admin`);
         }else{
           alert("로그인에 실패했습니다. 아이디 또는 비밀번호를 확인하세요.")
         }
