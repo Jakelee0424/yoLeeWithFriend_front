@@ -39,6 +39,7 @@ function AppAdmin () {
               <Route path="memberMngr" element={<MemberList />} /> {/* /Member */}
               <Route path="menuMngr" element={<MenuList />} /> {/* /Menu */}
             </Route>
+            {/* 로그인 안 해도 접근 가능 */}
             <Route path="login" element={<Login />} /> {/* /Login */}
           </Routes>
       </div> 

@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { isAuthenticated } from "./auth";
+
 import * as logsService from "service/admin/logs/logsService";
 
 const ProtectedRoute = ({ children }) => {
