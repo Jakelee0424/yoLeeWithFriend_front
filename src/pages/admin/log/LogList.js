@@ -6,6 +6,8 @@ import bS from "style/basic.module.css"
 import LogMenuView from "./LogMenuView";
 import LogMenuList from "./LogMenuList";
 import dayjs from 'dayjs';
+import PaginationComponet from 'components/common/PaginationComponet';
+import {search} from 'data/search';
 
 const LogList = () => {
 
@@ -15,6 +17,8 @@ const LogList = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [getIpAddress, setIpAddress] =  useState("");
+  const [getTotalCount, setTotalCount] =  useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleRightClick = (e, ip) => {
     e.preventDefault(); // 기본 우클릭 방지
@@ -29,12 +33,15 @@ const LogList = () => {
 
   const getLogsListByFetcher = async  () => {
       const inputData ={
-      
+        currentPage : currentPage,
+        itemsPerPage : 10,
+        pageBlockSize : 10,
       };
 
       logsService.fetcherLogsList(inputData).then((outPutData) => {
         //console.log(outPutData.data)
-        setLogList(outPutData.data);
+        setLogList(outPutData.data.content);
+        setTotalCount(outPutData.data.totalCount);
       })
   };
 
@@ -94,7 +101,7 @@ const LogList = () => {
 
   useEffect(() => {
     getLogsListByFetcher();
-  },[])
+  },[currentPage])
 
   return (
     <div style={{width:"100%"}}>
@@ -140,6 +147,13 @@ const LogList = () => {
           </Table>
         </CardBody>
       </Card>
+      <PaginationComponet  
+        itemsPerPage={10}
+        totalCount={getTotalCount}
+        pageBlockSize={10}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
       {menuVisible && (
         <div
           style={{
