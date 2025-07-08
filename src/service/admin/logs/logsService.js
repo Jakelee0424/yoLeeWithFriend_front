@@ -2,7 +2,7 @@ import Fetcher from 'utils/Fetcher';
 
 export const fetcherLogsList = async (data) => {
 
-      const fetcher = new Fetcher().setUrl("/logs/all")
+      const fetcher = new Fetcher().setUrl(`/logs/all?itemsPerPage=${data.itemsPerPage}&pageBlockSize=${data.pageBlockSize}&currentPage=${data.currentPage}`)
                                          .setMethod("GET");
       try {
         const result = await fetcher.jsonFetch();

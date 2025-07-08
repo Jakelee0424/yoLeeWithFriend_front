@@ -4,6 +4,8 @@ import Blog from "../../../otherLib/bootStrap/components/dashboard/Blog";
 import { useEffect, useState } from "react";
 import * as boardMngrService from "service/admin/boardMngr/boardMngrService";
 import { useNavigate } from "react-router-dom";
+import SearchForm from "components/common/SearchForm";
+import { search } from "data/search";
 
 const logo = process.env.PUBLIC_URL+"/asset/images/title.png";
 const tempImg1 = process.env.PUBLIC_URL+"/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
@@ -24,11 +26,14 @@ const BoardList = () => {
   // 선택된 ID 리스트
   const [selectedIds, setSelectedIds] = useState([]);
 
+  // 쿼리파라미터
+  const [queryParam, setQueryParam] = useState("");
+
   const isAllChecked = checkedStates.every((checked) => checked);
 
   const getBoardMngrListByFetcher = async  () => {
       const inputData ={
-      
+        queryParam :queryParam
       };
 
       boardMngrService.fetcherBoardMngrList(inputData).then((outPutData) => {
@@ -97,27 +102,17 @@ const BoardList = () => {
               onChange={handleAllCheck}
               style={{marginRight:"3%"}}
             />
-            <Input
-              type="select"
-              name="select"
-              id="exampleSelect" 
-              style={{width:"10%", marginRight:"1%"}}
-            > 
-              <option value="nomal">일반</option>
-              <option value="ban">정지</option>  
-            </Input>
-            <Input
-              id="adminPwd"
-              name="adminPwd"
-              placeholder={"회사명"}
-              type="text"
-              style={{width:"30%", marginRight:"1%"}}
+            <SearchForm 
+                        selectList={[
+                          {value:"all",name:"전체"},
+                          {value:"searchField1",name:"회사명"},
+                          {value:"searchField2",name:"제목"}
+                        ]}
+                        setQueryParam={setQueryParam}
+                        placeholder={"검색어 입력"}
+                        paramType={1} // 1: 쿼리파라미터 미존재시, 2: 쿼리파라미터 존재시
+                        getListEvent={getBoardMngrListByFetcher}
             />
-            <Button style={{width:"10%", marginRight:"5%", float:"right"}} 
-                    color="primary"
-            >
-              검색
-            </Button>
             <Button style={{width:"8%", marginRight:"1%", float:"right"}} 
                                 color="primary"
                     onClick={() => clickBoard()}            
