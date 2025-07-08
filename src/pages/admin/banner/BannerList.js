@@ -1,6 +1,6 @@
 import { Col, Row } from "reactstrap";
 import { Card, CardBody, CardTitle, CardSubtitle, Table, Button, Form, FormGroup, Label, Input, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as bannerService from "service/admin/banner/bannerService";
 import dayjs from 'dayjs';
@@ -14,6 +14,9 @@ const BannerList = (args) => {
   const [btnToggleFlg, setBtnToggleFlg] = useState(true);
   const [levelData, setLevelData] = useState([]);
   const [tableData, setTableData] = useState([]);
+  const [fileImg, setfileImg] = useState(null);
+  const [previewImg, setPreviewImg] = useState("");
+  const fileInputRef = useRef(null);
 
   const toggle = () => {
     setModal(!modal);
@@ -25,33 +28,18 @@ const BannerList = (args) => {
     }else{
       setBtnToggleFlg(true);
     }
+    setSelectedBannerIds([]);
   }
 
   const handleCheckboxChange = (id, checked) => {
     setSelectedBannerIds((prev) =>
       checked ? [...prev, id] : prev.filter((bid) => bid !== id)
     );
-} ;
-
-  const bannerDelete = (selectedBannerIds) => {
-    bannerService.fetcherDeleteBanner(selectedBannerIds).then((outPutData) => {
-      setTableData(outPutData.data)
-    })
-      setSelectedBannerIds([]);
-      setModalMsg(selectedBannerIds.length + " 건이 삭제 되었습니다.")
-      toggle();
-  }
-
-    const bannerRestore = (selectedBannerIds) => {
-    bannerService.fetcherRestoreBanner(selectedBannerIds).then((outPutData) => {
-      setTableData(outPutData.data)
-    })
-      setSelectedBannerIds([]);
-      setModalMsg(selectedBannerIds.length + " 건이 복구 되었습니다.")
-      toggle();
-  }
+  } ;
 
   const bannerInsert = (bannerInfo) => {
+
+    console.log(bannerInfo)
 
     if(!bannerInfo.bannerName || bannerInfo.bannerName.trim() === ""){
       setModalMsg("배너명을 입력하세요")
@@ -65,9 +53,21 @@ const BannerList = (args) => {
       setModalMsg("유효 기간을 입력하세요")
       toggle();
       return;
+    }else if(isNaN(bannerInfo.validDays)){
+      setModalMsg("유효 기간은 숫자만 입력가능합니다")
+      toggle();
+      return;
+    }else if(!fileImg){
+      setModalMsg("배너 사진을 업로드하세요")
+      toggle();
+      return;
     }
+
+    const formFileData = new FormData();
+    formFileData.append('multipartFile', fileImg); // formData에 파일 추가
+    formFileData.append('data', JSON.stringify(bannerInfo));
     
-    bannerService.fetcherInsertBanner(bannerInfo).then((outPutData) => {
+    bannerService.fetcherInsertBanner(formFileData).then((outPutData) => {
       setTableData(outPutData.data)
     })
 
@@ -75,6 +75,13 @@ const BannerList = (args) => {
       setSelectedBannerIds([]);
       setModalMsg("배너가 등록되었습니다.")
       toggle();
+
+      setfileImg(null);
+      setPreviewImg("");
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+  }
     }
   }
 
@@ -92,9 +99,16 @@ const BannerList = (args) => {
       setModalMsg("유효 기간을 입력하세요")
       toggle();
       return;
+    }else if(isNaN(bannerInfo.validDays)){
+      setModalMsg("유효 기간은 숫자만 입력가능합니다")
+      toggle();
+      return;
     }
+    const formFileData = new FormData();
+    formFileData.append('multipartFile', fileImg); // formData에 파일 추가
+    formFileData.append('data', JSON.stringify(bannerInfo));
     
-    bannerService.fetcherBannerUpdate(bannerInfo).then((outPutData) => {
+    bannerService.fetcherBannerUpdate(formFileData).then((outPutData) => {
       setTableData(outPutData.data)
     })
 
@@ -102,14 +116,33 @@ const BannerList = (args) => {
       setSelectedBannerIds([]);
       setModalMsg("배너가 수정되었습니다.")
       toggle();
+
+      setfileImg(null);
+      setPreviewImg("");
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   }
 
-const toggleCheckbox = (id) => {
-  setSelectedBannerIds((prev) =>
-    prev.includes(id) ? prev.filter((bid) => bid !== id) : [...prev, id]
-  );
-};
+  const bannerDelete = (selectedBannerIds) => {
+    bannerService.fetcherDeleteBanner(selectedBannerIds).then((outPutData) => {
+      setTableData(outPutData.data)
+    })
+      setSelectedBannerIds([]);
+      setModalMsg("배너 " + selectedBannerIds.length + " 건이 삭제 되었습니다.")
+      toggle();
+  }
+
+  const bannerRestore = (selectedBannerIds) => {
+    bannerService.fetcherRestoreBanner(selectedBannerIds).then((outPutData) => {
+      setTableData(outPutData.data)
+    })
+      setSelectedBannerIds([]);
+      setModalMsg("배너 " + selectedBannerIds.length + " 건이 복구 되었습니다.")
+      toggle();
+  }
 
   const handleBannerNameChange = (e) => {
     setBannerInfo(prev => ({
@@ -134,25 +167,18 @@ const toggleCheckbox = (id) => {
       validDays: e.target.value,
     }));
   };
-
-  const handleRowClick = (tdata) => {
-
-    if(selectedBannerIds == null || selectedBannerIds !== tdata.bannerId){
-      setBannerInfo({
-        bannerId: tdata.bannerId,
-        bannerName: tdata.bannerName,
-        createdAt: dayjs(tdata.createdAt).format('YYYY-MM-DDT00:00:00'),
-        validDays: tdata.validDays,
-      });
-    }else{
-      setBannerInfo({
-        bannerId: "",
-        bannerName: "",
-        createdAt: "",
-        validDays: "",
-      });
+  
+  const handelImage = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setfileImg(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImg(reader.result); 
+      };
+      reader.readAsDataURL(file);
     }
-  };
+  }
 
   const getBannerList = async  () => {
       bannerService.fetcherBannerList().then((outPutData) => {
@@ -165,6 +191,31 @@ const toggleCheckbox = (id) => {
       setTableData(outPutData.data)
     })
   };
+
+useEffect(() => {
+  if(selectedBannerIds.length === 1){
+    const selected = tableData.find(t => t.bannerId === selectedBannerIds[0]);
+    setBannerInfo({
+      bannerId: selected.bannerId,
+      bannerName: selected.bannerName,
+      createdAt: dayjs(selected.createdAt).format('YYYY-MM-DDT00:00:00'),
+      validDays: selected.validDays,
+      fileGroupId: selected.fileGroupId
+    });
+    if(selected.imgUrl){
+      setPreviewImg(process.env.PUBLIC_URL + selected.imgUrl.split("public")[1].replace(/\\/g, "/"));
+      setfileImg(selected.imgUrl);
+    }
+  }else{
+    setBannerInfo({
+      bannerName: "",
+      createdAt: "",
+      validDays: "",
+      fileGroupId: ""
+    });
+    setPreviewImg("");
+  }
+},[selectedBannerIds])
 
 useEffect(() => {
   getBannerList();
@@ -251,7 +302,6 @@ const handleLevelChange = (level, bannerId, direction) => {
                         transition={{ duration: 0.3 }}
                         onClick={() => {
                           handleCheckboxChange(tdata.bannerId, !isChecked);
-                          handleRowClick(tdata);
                         }}
                         style={{ cursor: 'pointer' }}
                       >
@@ -259,10 +309,9 @@ const handleLevelChange = (level, bannerId, direction) => {
                           <Input
                             type="checkbox"
                             checked={isChecked}
-                            onClick={(e) => e.stopPropagation()} // ✅ 체크박스 클릭 시 row 클릭 막음
+                            onClick={(e) => e.stopPropagation()} 
                             onChange={(e) => {
                               handleCheckboxChange(tdata.bannerId, e.target.checked);
-                              handleRowClick(tdata);
                             }}
                           />
                         </td>
@@ -413,22 +462,34 @@ const handleLevelChange = (level, bannerId, direction) => {
                   id="bannerFile"
                   name="bannerFile"
                   type="file"
+                  accept="image/*" 
+                  onChange={handelImage}
                 />
               </FormGroup>
               <Row>
                 <Label>
                   배너 사진 미리보기
                 </Label>
-
+                {previewImg  && (
+                  <div className="mt-2">
+                    <img
+                      src={previewImg}
+                      alt="배너 미리보기"
+                      className="w-full max-w-md rounded-lg shadow"
+                      ref={fileInputRef}
+                    />
+                  </div>
+                )}
               </Row>
             </Form>
-            
-
           </div>
         </CardBody>
       </Card>
 
       <Modal isOpen={modal} toggle={toggle} {...args}>
+        <ModalHeader>
+          알림
+        </ModalHeader>
         <ModalBody>
           {modalMsg}
         </ModalBody>
