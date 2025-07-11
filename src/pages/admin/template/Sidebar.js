@@ -21,11 +21,6 @@ const navigation = [
     icon: "bi bi-patch-check",
   },
   {
-    title: "권한관리",
-    href: "/admin/authorMngr",
-    icon: "bi bi-columns",
-  },
-  {
     title: "게시물관리",
     href: "/admin/boardMngr",
     icon: "bi bi-hdd-stack",

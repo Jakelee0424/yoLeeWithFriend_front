@@ -2,7 +2,7 @@ import Fetcher from 'utils/Fetcher';
 
 export const fetcherUserList = async (data) => {
 
-      const fetcher = new Fetcher().setUrl("/user/all")
+      const fetcher = new Fetcher().setUrl(`/user/all`)
                                          .setMethod("POST")
                                          .setData(JSON.stringify(data));
       try {

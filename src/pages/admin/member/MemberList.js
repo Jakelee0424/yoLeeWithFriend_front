@@ -4,6 +4,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, React, useState, useRef } from "react";
 import * as userService from "service/user/user/userService";
 import bS from "style/basic.module.css"
+import SearchForm from "components/common/SearchForm";
+import PaginationComponet from "components/common/PaginationComponet";
 
 const MemberList = () => {
 
@@ -14,15 +16,26 @@ const MemberList = () => {
 
   // 네비게이터
   const navigate = useNavigate(); 
+  const [getTotalCount, setTotalCount] =  useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  // 쿼리파라미터
+  const [queryParam, setQueryParam] = useState("");
 
   const getUserListByFetcher = async  () => {
+      console.log(queryParam)
+      const params = new URLSearchParams(queryParam);
       const inputData ={
-      
+        currentPage : currentPage,
+        itemsPerPage : 10,
+        pageBlockSize : 10,
+        searchText: params.get("searchText"),
+        searchField: params.get("searchField"),
       };
 
       userService.fetcherUserList(inputData).then((outPutData) => {
         console.log(outPutData.data)
-        setUserList(outPutData.data);
+        setUserList(outPutData.data.content);
+        setTotalCount(outPutData.data.totalCount);
       })
   };
 
@@ -33,7 +46,7 @@ const MemberList = () => {
     userService.fetcherUserDelte(inputData).then((outPutData) => {
       if(outPutData.result === "SUCCESS"){
         alert("완료되었습니다.")
-        navigate(`/admin/memberMngr`);
+        getUserListByFetcher();
       }
     })       
   };
@@ -59,13 +72,25 @@ const MemberList = () => {
 
   useEffect(() => {
     getUserListByFetcher();
-  },[])
+  },[currentPage])
 
   return (
     <div style={{display:"flex",width:"100%"}}>
       <Card style={{width:"100%"}}>
         <CardBody>
           <CardTitle tag="h5">회원관리</CardTitle>
+          <div style={{display:"flex"}}>
+            <SearchForm 
+              selectList={[
+                {value:"searchField1",name:"닉네임"}
+              ]}
+              setQueryParam={setQueryParam}
+              placeholder={"검색어 입력"}
+              paramType={2} // 1: 쿼리파라미터 미존재시, 2: 쿼리파라미터 존재시
+              getListEvent={getUserListByFetcher}
+              setCurrentPage={setCurrentPage}
+            />
+          </div>
           <Table className="no-wrap mt-3 align-middle" responsive borderless>
             <thead>
               <tr>
@@ -122,6 +147,13 @@ const MemberList = () => {
             </tbody>
           </Table>
         </CardBody>
+        <PaginationComponet  
+          itemsPerPage={10}
+          totalCount={getTotalCount}
+          pageBlockSize={10}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
       </Card>
     </div>
   );
