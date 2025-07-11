@@ -6,6 +6,7 @@ import * as boardMngrService from "service/admin/boardMngr/boardMngrService";
 import { useNavigate } from "react-router-dom";
 import SearchForm from "components/common/SearchForm";
 import { search } from "data/search";
+import PaginationComponet from "components/common/PaginationComponet";
 
 const logo = process.env.PUBLIC_URL+"/asset/images/title.png";
 const tempImg1 = process.env.PUBLIC_URL+"/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
@@ -30,15 +31,21 @@ const BoardList = () => {
   const [queryParam, setQueryParam] = useState("");
 
   const isAllChecked = checkedStates.every((checked) => checked);
+  const [getTotalCount, setTotalCount] =  useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const getBoardMngrListByFetcher = async  () => {
       const inputData ={
-        queryParam :queryParam
+        queryParam :queryParam,
+        currentPage : currentPage,
+        itemsPerPage : 8,
+        pageBlockSize : 10,
       };
 
       boardMngrService.fetcherBoardMngrList(inputData).then((outPutData) => {
         console.log(outPutData.data)
-        setBoardMngrList(outPutData.data);
+        setBoardMngrList(outPutData.data.content);
+        setTotalCount(outPutData.data.totalCount);
       })
   };
 
@@ -88,8 +95,8 @@ const BoardList = () => {
 
   useEffect(() => {
     getBoardMngrListByFetcher();
-  },[])
-  
+  },[currentPage])
+
   return (
     <div style={{display:"flex",width:"100%"}}>
       <Card style={{width:"100%"}}>
@@ -110,7 +117,7 @@ const BoardList = () => {
                         ]}
                         setQueryParam={setQueryParam}
                         placeholder={"검색어 입력"}
-                        paramType={1} // 1: 쿼리파라미터 미존재시, 2: 쿼리파라미터 존재시
+                        paramType={2} // 1: 쿼리파라미터 미존재시, 2: 쿼리파라미터 존재시
                         getListEvent={getBoardMngrListByFetcher}
             />
             <Button style={{width:"8%", marginRight:"1%", float:"right"}} 
@@ -152,6 +159,13 @@ const BoardList = () => {
             ))}  
           </Row>
         </CardBody>
+        <PaginationComponet  
+          itemsPerPage={8}
+          totalCount={getTotalCount}
+          pageBlockSize={10}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
       </Card>
     </div>
   );

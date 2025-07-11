@@ -2,7 +2,15 @@ import Fetcher from 'utils/Fetcher';
 
 export const fetcherLogsList = async (data) => {
 
-      const fetcher = new Fetcher().setUrl(`/logs/all?itemsPerPage=${data.itemsPerPage}&pageBlockSize=${data.pageBlockSize}&currentPage=${data.currentPage}`)
+      let start = "";
+      let end = "";
+      if (data?.formData?.searchStartDate) {
+        start = `&searchStartDate=${encodeURIComponent(data?.formData?.searchStartDate)}`;
+      }
+      if (data?.formData?.searchEndDate) {
+        end = `&searchEndDate=${encodeURIComponent(data?.formData?.searchEndDate)}`;
+      }
+      const fetcher = new Fetcher().setUrl(`/logs/all?itemsPerPage=${data.itemsPerPage}&pageBlockSize=${data.pageBlockSize}&currentPage=${data.currentPage}${data.queryParam}${start}${end}`)
                                          .setMethod("GET");
       try {
         const result = await fetcher.jsonFetch();
