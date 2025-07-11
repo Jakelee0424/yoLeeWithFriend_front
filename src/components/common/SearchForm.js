@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Button, Input } from 'reactstrap';
 
 
-const SearchForm = ({selectList, setQueryParam, placeholder, paramType, getListEvent }) => {
+const SearchForm = ({selectList, setQueryParam, placeholder, paramType, getListEvent, setCurrentPage }) => {
   //paramType  1: 쿼리파라미터 미존재시, 2: 쿼리파라미터 존재시
 
   const [searchText, setSearchText] = useState("");
-  const [selectValue, setSelectValue] = useState("all");
+  const [selectValue, setSelectValue] = useState(selectList[0].value);
 
   const setQueryParamString = event => {
     setSearchText(event.target.value)
@@ -19,6 +19,14 @@ const SearchForm = ({selectList, setQueryParam, placeholder, paramType, getListE
 
   const selectSearchField = event => {
     setSelectValue(event.target.value)
+  }
+
+  const clickButton = () =>{
+    if(setCurrentPage != null){
+      setCurrentPage(1);
+    }
+    
+    getListEvent();
   }
 
   return (
@@ -42,10 +50,16 @@ const SearchForm = ({selectList, setQueryParam, placeholder, paramType, getListE
         onChange={setQueryParamString}
         value={searchText}
         style={{width:"30%", marginRight:"1%"}}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            clickButton();
+          }
+        }}
       />
       <Button style={{width:"10%", marginRight:"5%", float:"right"}} 
               color="primary"
-              onClick={getListEvent}
+              onClick={clickButton}
       >
         검색
       </Button>
