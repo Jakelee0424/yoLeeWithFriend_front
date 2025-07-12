@@ -17,6 +17,8 @@ const BannerList = (args) => {
   const [fileImg, setfileImg] = useState(null);
   const [previewImg, setPreviewImg] = useState("");
   const fileInputRef = useRef(null);
+  const normalizePath = (path) => path.replace(/\\/g, "/");
+  const fallbackImage = "/images/default.png"; // 대체 이미지
 
   const toggle = () => {
     setModal(!modal);
@@ -192,6 +194,20 @@ const BannerList = (args) => {
     })
   };
 
+  const resolveImageUrl = (imgUrl) => {
+    if (!imgUrl) return fallbackImage;
+
+    const normalized = normalizePath(imgUrl);
+    const publicIndex = normalized.indexOf("public");
+
+    if (publicIndex !== -1) {
+      const relativePath = normalized.slice(publicIndex + "public".length);
+      return process.env.PUBLIC_URL + relativePath;
+    }
+
+    return process.env.PUBLIC_URL + normalized;
+  };
+
 useEffect(() => {
   if(selectedBannerIds.length === 1){
     const selected = tableData.find(t => t.bannerId === selectedBannerIds[0]);
@@ -203,7 +219,10 @@ useEffect(() => {
       fileGroupId: selected.fileGroupId
     });
     if(selected.imgUrl){
-      setPreviewImg(process.env.PUBLIC_URL + selected.imgUrl.split("public")[1].replace(/\\/g, "/"));
+
+      
+
+      setPreviewImg(resolveImageUrl(selected.imgUrl));
       setfileImg(selected.imgUrl);
     }
   }else{
@@ -216,6 +235,8 @@ useEffect(() => {
     setPreviewImg("");
   }
 },[selectedBannerIds])
+
+
 
 useEffect(() => {
   getBannerList();
