@@ -55,15 +55,18 @@ const BoardView = () => {
     const publicIndex = normalized.indexOf("public");
 
     if (publicIndex !== -1) {
+      console.log(normalized)
       const relativePath = normalized.slice(publicIndex + "public".length);
+      console.log(process.env.PUBLIC_URL + relativePath)
       return process.env.PUBLIC_URL + relativePath;
     }else {
       // ✅ "img"가 경로에 있을 때, 그 앞부분을 잘라내기
       const imgIndex = normalized.indexOf("/img");
 
       if (imgIndex !== -1) {
+        console.log(normalized)
         const relativeImgPath = normalized.slice(imgIndex); // "/img/..." 만 남김
-        return `/{relativeImgPath}`;
+        return `/${relativeImgPath}`;
       } else {
         // img가 없는 경우 fallback 처리 (예외 상황)
         return fallbackImage;
@@ -85,7 +88,7 @@ const BoardView = () => {
         setBoardName(outPutData.data.boardMngrResDto.boardName)
         setBrandCodeId(outPutData.data.boardMngrResDto.brandCodeId)
         const fullPath = outPutData.data.boardMngrResDto.imgUrl;
-        const relativePath = fullPath ? resolveImageUrl(fullPath)
+        const relativePath = fullPath ? fullPath
         : process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
         setProfileImg(process.env.PUBLIC_URL +relativePath)
         setNuinfoList(await getCodeListByParentIdApi(outPutData.data.boardMngrResDto.nuinfoId))
