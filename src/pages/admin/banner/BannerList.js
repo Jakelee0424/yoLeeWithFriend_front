@@ -209,7 +209,7 @@ const BannerList = (args) => {
 
     if (imgIndex !== -1) {
       const relativeImgPath = normalized.slice(imgIndex); // "/img/..." 만 남김
-      return `/${relativeImgPath}`;
+      return `${relativeImgPath}`;
     } else {
       // img가 없는 경우 fallback 처리 (예외 상황)
       return fallbackImage;
