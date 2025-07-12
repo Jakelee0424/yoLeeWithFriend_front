@@ -44,6 +44,34 @@ const BoardView = () => {
   //boardId
   const { id } = useParams();
 
+  const fallbackImage = process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
+
+  const normalizePath = (path) => path.replace(/\\/g, "/");
+
+  const resolveImageUrl = (imgUrl) => {
+    if (!imgUrl) return fallbackImage;
+
+    const normalized = normalizePath(imgUrl);
+    const publicIndex = normalized.indexOf("public");
+
+    if (publicIndex !== -1) {
+      const relativePath = normalized.slice(publicIndex + "public".length);
+      return process.env.PUBLIC_URL + relativePath;
+    }else {
+      // ✅ "img"가 경로에 있을 때, 그 앞부분을 잘라내기
+      const imgIndex = normalized.indexOf("/img");
+
+      if (imgIndex !== -1) {
+        const relativeImgPath = normalized.slice(imgIndex); // "/img/..." 만 남김
+        return `/{relativeImgPath}`;
+      } else {
+        // img가 없는 경우 fallback 처리 (예외 상황)
+        return fallbackImage;
+      }
+    }
+    
+  };
+
 
   const getBoardByFetcher = async  (boardId) => {
     if(boardId != null && boardId !== ""){  // boardId이 담겨있을때만 정보조회
@@ -57,7 +85,7 @@ const BoardView = () => {
         setBoardName(outPutData.data.boardMngrResDto.boardName)
         setBrandCodeId(outPutData.data.boardMngrResDto.brandCodeId)
         const fullPath = outPutData.data.boardMngrResDto.imgUrl;
-        const relativePath = fullPath ? process.env.PUBLIC_URL + fullPath.split("public")[1].replace(/\\/g, "/")
+        const relativePath = fullPath ? resolveImageUrl(fullPath)
         : process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
         setProfileImg(process.env.PUBLIC_URL +relativePath)
         setNuinfoList(await getCodeListByParentIdApi(outPutData.data.boardMngrResDto.nuinfoId))
