@@ -149,7 +149,7 @@ const BoardList = () => {
                 > 
                   <Blog
                     image={tdata.imgUrl
-                    ? process.env.PUBLIC_URL + tdata.imgUrl.split("public")[1].replace(/\\/g, "/")
+                    ? tdata.imgUrl
                     : tempImg1}
                     title={tdata.boardName}
                     text={`맛 : 3.5 가격 : 3.5 성분 : 3.5`}
