@@ -55,16 +55,13 @@ const BoardView = () => {
     const publicIndex = normalized.indexOf("public");
 
     if (publicIndex !== -1) {
-      console.log(normalized)
       const relativePath = normalized.slice(publicIndex + "public".length);
-      console.log(process.env.PUBLIC_URL + relativePath)
       return process.env.PUBLIC_URL + relativePath;
     }else {
       // ✅ "img"가 경로에 있을 때, 그 앞부분을 잘라내기
       const imgIndex = normalized.indexOf("/img");
 
       if (imgIndex !== -1) {
-        console.log(normalized)
         const relativeImgPath = normalized.slice(imgIndex); // "/img/..." 만 남김
         return `${relativeImgPath}`;
       } else {
