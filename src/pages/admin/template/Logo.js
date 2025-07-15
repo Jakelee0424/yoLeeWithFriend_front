@@ -2,9 +2,9 @@ import { ReactComponent as LogoDark } from "../../../otherLib/bootStrap/assets/i
 import { Link } from "react-router-dom";
 
 const logo = process.env.PUBLIC_URL+"/asset/images/title.png";
-const Logo = () => {
+const Logo = ({url}) => {
   return (
-    <Link to="/admin" style={{paddingBottom:"1%"}}>
+    <Link to={`${url}`} style={{paddingBottom:"1%"}}>
       <img src={logo} />
     </Link>
   );
