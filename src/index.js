@@ -20,6 +20,7 @@ root.render(
     <style>
       {`
       #root {
+        height: 100%;
         margin: 0%;
       }
       `}
