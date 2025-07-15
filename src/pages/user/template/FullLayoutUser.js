@@ -10,7 +10,7 @@ const FullLayoutUser = () => {
       <div className="pageWrapper d-lg-flex" style={{maxWidth:"83%", margin:"0 auto"}}>
         {/********Sidebar**********/}
         {/********Content Area**********/}
-        <div className="contentArea" > 
+        <div className="contentArea" style={{width:"100%"}}> 
           {/********Middle Content**********/}
           <Container className="p-4" fluid>
             <Outlet />
