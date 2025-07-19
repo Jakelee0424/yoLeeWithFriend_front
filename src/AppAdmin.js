@@ -15,7 +15,6 @@ import { MenuContext } from "contexts/MenuContext.js";
 const FullLayout = lazy(() => import("./pages/admin/template/FullLayout.js"));
 // 프로젝트 파일구조에서 특정 js 화면을 추출하기 위한 modules 변수
 const modules = require.context("./pages/admin", true, /\.js$/);
-console.log(modules.keys());
 
 function AppAdmin () {
   // 메뉴 context 설정을 위한 useState
@@ -37,7 +36,7 @@ function AppAdmin () {
   }, []);
 
   return (
-      <MenuContext.Provider value={menuTree}>
+      <MenuContext.Provider value={{menuTree, reloadMenu: () => getMenuList(1)}}>
         <div className="AppAdmin">  
             <Suspense fallback={<div>Loading...</div>}>
               <Routes> 
@@ -75,7 +74,6 @@ function buildRouteList(menuTree) {
         const path = url.replace("/admin/", "");
         // 실제 컴포넌트를
         const matchedKey = modules.keys().find((k) => k.endsWith(`/${componentFileNm}`));
-        console.log("matchedKey : ", matchedKey);
         if (matchedKey) {
           const Component = lazy(() => Promise.resolve(modules(matchedKey)));
           result.push(

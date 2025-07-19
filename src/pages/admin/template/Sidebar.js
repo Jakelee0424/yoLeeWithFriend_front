@@ -6,10 +6,10 @@ import layoutStyle from "../../../style/layout.module.css"
 import { useMenu } from "contexts/MenuContext";
 
 const Sidebar = () => {
-  const menuList = useMenu();
+  const { menuTree } = useMenu();
 
-  const renderMenuItem = (menuList) => {
-    return menuList.map(menu => (
+  const renderMenuItem = (menuTree) => {
+    return menuTree.map(menu => (
             <NavItem key={menu.menuNo} className="sidenav-bg">
               <Link
                 to={menu.url}
@@ -52,7 +52,7 @@ const Sidebar = () => {
       </div>
       <div className={layoutStyle.sidebarContainer} >
         <Nav vertical className="sidebarNav">
-          {renderMenuItem(menuList[0]?.children || [])}
+          {renderMenuItem(menuTree[0]?.children || [])}
         </Nav>
       </div>
     </div>

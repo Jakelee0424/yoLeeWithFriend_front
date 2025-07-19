@@ -2,6 +2,7 @@ import styles from "style/menu.module.css";
 import { Tree } from "react-arborist";
 import { useEffect, useState, useRef } from "react";
 import * as menuMngService from "service/admin/menu/menuMngService";
+import { useMenu } from 'contexts/MenuContext';
 
 let idCounter = 1000;
 
@@ -12,6 +13,8 @@ const MenuList = () => {
   const [deletedIdList, setDeletedIdList] = useState(new Set());
   const selectedNodeRef = useRef(null);
   const originalDataRef = useRef([]);
+
+  const { reloadMenu } = useMenu();
 
   const selectedData = selectedNodeRef.current?.data;
 
@@ -130,12 +133,12 @@ const MenuList = () => {
       deleteIdList: Array.from(deletedIdList),
     };
 
-    console.log("전송할 DTO", dto);
-
     menuMngService.fetcherSaveTreeMenuList(JSON.stringify(dto)).then((result) => {
       const isSaved = result.data;
       if (isSaved === "Y") alert("저장되었습니다.");
       getTreeMenuList();
+      // 사이드바 메뉴 재조회
+      reloadMenu();
     });
   };
 
