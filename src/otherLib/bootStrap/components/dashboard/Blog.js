@@ -8,22 +8,37 @@ import {
   Button,
 } from "reactstrap";
 
-const fallbackImage = "/images/default.png"; // 대체 이미지
+const fallbackImage = process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
+
 
 const normalizePath = (path) => path.replace(/\\/g, "/");
 
 const resolveImageUrl = (imgUrl) => {
+  
   if (!imgUrl) return fallbackImage;
 
   const normalized = normalizePath(imgUrl);
+  console.log(normalized)
   const publicIndex = normalized.indexOf("public");
-
+  console.log(publicIndex)
   if (publicIndex !== -1) {
     const relativePath = normalized.slice(publicIndex + "public".length);
     return process.env.PUBLIC_URL + relativePath;
+  } else {
+    const imgIndex = normalized.indexOf("/img");
+    if (imgIndex !== -1) {
+      const relativeImgPath = normalized.slice(imgIndex); // "/img/..." 만 남김
+      return `${relativeImgPath}`; // 앞에 '/' 붙이면 상대경로
+    } else if (
+      normalized.startsWith("blob:") ||
+      normalized.startsWith("data:") // base64 데이터도 처리
+    ) {
+      return normalized; // 그대로 리턴
+    } else {
+      // fallback 처리
+      return fallbackImage;
+    }
   }
-
-  return process.env.PUBLIC_URL + normalized;
 };
 
 const Blog = (props) => {
