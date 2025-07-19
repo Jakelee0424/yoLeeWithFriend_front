@@ -4,7 +4,7 @@ import loginStyle from "style/login.module.css"
 import basicStyle from "style/basic.module.css"
 import Logo from "../template/Logo";
 import * as adminLoginService from "service/admin/login/adminLoginService";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   
@@ -44,7 +44,9 @@ const Login = () => {
 
   return (
     <div className={loginStyle.loginContainer} >
-        <Logo></Logo>
+      <Link to={"/"} style={{paddingBottom:"1%"}}>
+        <Logo />
+      </Link>
         <Card  style={{height:"40%", width:"25%"}}>
           <CardBody style={{display:"flex", justifyContent:"center", flexDirection:"column"}}>
               <label className={basicStyle.basicLabel} >아이디</label>
