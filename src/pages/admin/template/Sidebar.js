@@ -3,41 +3,29 @@ import { Link, useLocation } from "react-router-dom";
 import user1 from "../../../otherLib/bootStrap/assets/images/users/user4.jpg";
 import probg from "../../../otherLib/bootStrap/assets/images/bg/download.jpg";
 import layoutStyle from "../../../style/layout.module.css"
-
-const navigation = [
-  {
-    title: "회원관리",
-    href: "/admin/memberMngr",
-    icon: "bi bi-speedometer2",
-  },
-  {
-    title: "관리자관리",
-    href: "/admin/adminMngr",
-    icon: "bi bi-bell",
-  },
-  {
-    title: "메뉴관리",
-    href: "/admin/menuMngr",
-    icon: "bi bi-patch-check",
-  },
-  {
-    title: "게시물관리",
-    href: "/admin/boardMngr",
-    icon: "bi bi-hdd-stack",
-  },
-  {
-    title: "배너관리",
-    href: "/admin/bannerMngr",
-    icon: "bi bi-card-text",
-  },
-  {
-    title: "로그관리",
-    href: "/admin/logMngr",
-    icon: "bi bi-columns",
-  },
-];
+import { useMenu } from "contexts/MenuContext";
 
 const Sidebar = () => {
+  const menuList = useMenu();
+
+  const renderMenuItem = (menuList) => {
+    return menuList.map(menu => (
+            <NavItem key={menu.menuNo} className="sidenav-bg">
+              <Link
+                to={menu.url}
+                className={
+                  location.pathname === menu.url
+                    ? "active nav-link py-3"
+                    : "nav-link text-secondary py-3"
+                }
+              >
+                <i className="bi bi-speedometer2"></i>
+                <span className="ms-3 d-inline-block">{menu.menuNm}</span>
+              </Link>
+            </NavItem>
+          ))
+  }
+
   const showMobilemenu = () => {
     document.getElementById("sidebarArea").classList.toggle("showSidebar");
   };
@@ -64,21 +52,7 @@ const Sidebar = () => {
       </div>
       <div className={layoutStyle.sidebarContainer} >
         <Nav vertical className="sidebarNav">
-          {navigation.map((navi, index) => (
-            <NavItem key={index} className="sidenav-bg">
-              <Link
-                to={navi.href}
-                className={
-                  location.pathname === navi.href
-                    ? "active nav-link py-3"
-                    : "nav-link text-secondary py-3"
-                }
-              >
-                <i className={navi.icon}></i>
-                <span className="ms-3 d-inline-block">{navi.title}</span>
-              </Link>
-            </NavItem>
-          ))}
+          {renderMenuItem(menuList[0]?.children || [])}
         </Nav>
       </div>
     </div>

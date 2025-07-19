@@ -39,6 +39,9 @@
     "reactstrap": "^9.2.3",
     "redux": "^5.0.1",
     "redux-thunk": "^3.1.0",
+    "resolve-url-loader": "^3.1.5",
+    "sass": "^1.89.2",
+    "sass-loader": "^16.0.5",
     "sockjs-client": "^1.6.1",
     "styled-components": "^6.1.9",
     "web-vitals": "^2.1.4"

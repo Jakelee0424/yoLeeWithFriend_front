@@ -22,4 +22,4 @@ export const fetcherSaveTreeMenuList = async (data) => {
   } catch (error) {
     console.error('treeNodeSave Error:', error);
   }
-}
+};
