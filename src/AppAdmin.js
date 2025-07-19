@@ -3,7 +3,7 @@ import {React, useEffect, useState, lazy, Suspense} from "react";
 import { Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import * as menuService from "service/admin/menu/menuService";
+import * as menuService from "service/common/menuService";
 /* 컴포넌트 import */
 import Main from "./pages/admin/Main.js";
 import Login from "./pages/admin/login/Login.js";
@@ -61,7 +61,6 @@ function AppAdmin () {
 export default AppAdmin;
 
 // ==================== 헬퍼 함수 ====================
-
 function buildRouteList(menuTree) {
   const result = [];
 

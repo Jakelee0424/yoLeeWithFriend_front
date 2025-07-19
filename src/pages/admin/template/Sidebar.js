@@ -8,6 +8,7 @@ import { useMenu } from "contexts/MenuContext";
 const Sidebar = () => {
   const { menuTree } = useMenu();
 
+  // 메뉴 렌더링 함수
   const renderMenuItem = (menuTree) => {
     return menuTree.map(menu => (
             <NavItem key={menu.menuNo} className="sidenav-bg">
