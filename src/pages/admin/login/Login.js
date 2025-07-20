@@ -42,6 +42,12 @@ const Login = () => {
     })
   };
 
+  const handleEnterEvent = event => {
+    if (event.key === "Enter") {
+      adminLogin();
+    }
+  }
+
   return (
     <div className={loginStyle.loginContainer} >
       <Link to={"/"} style={{paddingBottom:"1%"}}>
@@ -58,6 +64,7 @@ const Login = () => {
               <input className={basicStyle.basicInput}
                 value={getAdminPassWord}
                 onChange={saveAdminPassWord}
+                onKeyDown={handleEnterEvent}
                 type="password"
               ></input>
               <div style={{display:"flex", justifyContent:"center", alignItems:"center", marginTop:"10%"}} >
