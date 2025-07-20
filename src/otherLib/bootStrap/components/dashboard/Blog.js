@@ -18,9 +18,9 @@ const resolveImageUrl = (imgUrl) => {
   if (!imgUrl) return fallbackImage;
 
   const normalized = normalizePath(imgUrl);
-  console.log(normalized)
+  //console.log(normalized)
   const publicIndex = normalized.indexOf("public");
-  console.log(publicIndex)
+  //console.log(publicIndex)
   if (publicIndex !== -1) {
     const relativePath = normalized.slice(publicIndex + "public".length);
     return process.env.PUBLIC_URL + relativePath;
