@@ -1,7 +1,8 @@
 import styles from "style/menu.module.css";
 import { Tree } from "react-arborist";
 import { useEffect, useState, useRef } from "react";
-import * as menuMngService from "service/admin/menuMngr/menuMngService";
+import * as menuMngService from "service/admin/menu/menuMngService";
+import { useMenu } from 'contexts/MenuContext';
 
 let idCounter = 1000;
 
@@ -12,6 +13,8 @@ const MenuList = () => {
   const [deletedIdList, setDeletedIdList] = useState(new Set());
   const selectedNodeRef = useRef(null);
   const originalDataRef = useRef([]);
+
+  const { reloadMenu } = useMenu();
 
   const selectedData = selectedNodeRef.current?.data;
 
@@ -58,6 +61,7 @@ const MenuList = () => {
       url: "",
       ord: 0,
       useYn: "Y",
+      componentFileNm: "",
       upperMenuNo: parentNode ? parentNode.data.menuNo ?? parentNode.id : null,
       isNew: true,
       children: [],
@@ -110,36 +114,33 @@ const MenuList = () => {
     }
   };
 
-const saveMenu = () => {
-  const updateList = [];
+  const saveMenu = () => {
+    const updateList = [];
+    const insertList = buildInsertListSorted(treeData);
 
-  // 계층 순서대로 insertList 생성
-  const insertList = buildInsertListSorted(treeData);
-
-  // updateList 수집 (기존 노드 중 변경된 것만)
-  flattenTree(treeData, (node) => {
-    if (!node.isNew) {
-      const originalNode = findNodeById(originalDataRef.current, node.id);
-      if (originalNode && hasChanged(originalNode, node)) {
-        updateList.push(toDto(node));
+    flattenTree(treeData, (node) => {
+      if (!node.isNew) {
+        const originalNode = findNodeById(originalDataRef.current, node.id);
+        if (originalNode && hasChanged(originalNode, node)) {
+          updateList.push(toDto(node));
+        }
       }
-    }
-  });
+    });
 
-  const dto = {
-    insertList,
-    updateList,
-    deleteIdList: Array.from(deletedIdList),
+    const dto = {
+      insertList,
+      updateList,
+      deleteIdList: Array.from(deletedIdList),
+    };
+
+    menuMngService.fetcherSaveTreeMenuList(JSON.stringify(dto)).then((result) => {
+      const isSaved = result.data;
+      if (isSaved === "Y") alert("저장되었습니다.");
+      getTreeMenuList();
+      // 사이드바 메뉴 재조회
+      reloadMenu();
+    });
   };
-
-  console.log("전송할 DTO", dto);
-
-  menuMngService.fetcherSaveTreeMenuList(JSON.stringify(dto)).then((result) => {
-    const isSaved = result.data;
-    if (isSaved === "Y") alert("저장되었습니다.");
-    getTreeMenuList(); // 최신 DB 상태 반영
-  });
-};
 
   return (
     <div
@@ -203,6 +204,7 @@ const saveMenu = () => {
           <div className={styles.detailCard}>
             <DetailInput label="메뉴명" value={selectedData?.name} onChange={(v) => updateNodeValue("name", v)} />
             <DetailInput label="매핑 URL" value={selectedData?.url} onChange={(v) => updateNodeValue("url", v)} />
+            <DetailInput label="컴포넌트 파일명" value={selectedData?.componentFileNm} onChange={(v) => updateNodeValue("componentFileNm", v)} /> {/* (추가) */}
             <DetailInput label="정렬 순서" type="number" value={selectedData?.ord ?? ""} onChange={(v) => updateNodeValue("ord", Number(v))} />
             <div className={styles.detailRow}>
               <label>사용 여부</label>
@@ -244,6 +246,7 @@ function convertToTreeFormat(data) {
     url: menu.url,
     ord: menu.ord,
     useYn: menu.useYn,
+    componentFileNm: menu.componentFileNm || "", // (추가)
     menuNo: menu.menuNo,
     upperMenuNo: menu.upperMenuNo,
     children: menu.children ? convertToTreeFormat(menu.children) : [],
@@ -324,7 +327,8 @@ function hasChanged(original, current) {
     original.name !== current.name ||
     original.url !== current.url ||
     original.ord !== current.ord ||
-    original.useYn !== current.useYn
+    original.useYn !== current.useYn ||
+    original.componentFileNm !== current.componentFileNm // (추가)
   );
 }
 
@@ -337,6 +341,7 @@ function toDto(node) {
     url: node.url,
     ord: node.ord,
     useYn: node.useYn,
+    componentFileNm: node.componentFileNm || "", // (추가)
   };
 }
 
