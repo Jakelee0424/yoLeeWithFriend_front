@@ -24,6 +24,10 @@ const BannerList = (args) => {
     setModal(!modal);
   }
 
+  const handleRowClick = (id, checked) => {
+    setSelectedBannerIds(checked ? [id] : []);
+  }
+
   const toggleBtnFlg = () => {
     if(btnToggleFlg){
       setBtnToggleFlg(false);
@@ -228,16 +232,13 @@ useEffect(() => {
       fileGroupId: selected.fileGroupId
     });
     if(selected.imgUrl){
-
-      
-
       setPreviewImg(resolveImageUrl(selected.imgUrl));
       setfileImg(selected.imgUrl);
     }
   }else{
     setBannerInfo({
       bannerName: "",
-      createdAt: "",
+      createdAt: new Date().toISOString().split('T')[0],
       validDays: "",
       fileGroupId: ""
     });
@@ -249,6 +250,10 @@ useEffect(() => {
 
 useEffect(() => {
   getBannerList();
+  setBannerInfo(
+    {
+      createdAt: new Date().toISOString().split('T')[0],
+    });
 },[])
 
 const handleLevelChange = (level, bannerId, direction) => {
@@ -331,7 +336,7 @@ const handleLevelChange = (level, bannerId, direction) => {
                         layout
                         transition={{ duration: 0.3 }}
                         onClick={() => {
-                          handleCheckboxChange(tdata.bannerId, !isChecked);
+                          handleRowClick(tdata.bannerId, !isChecked);
                         }}
                         style={{ cursor: 'pointer' }}
                       >
