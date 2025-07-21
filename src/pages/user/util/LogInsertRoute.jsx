@@ -46,7 +46,8 @@ function LogInsertRoute() {
             ipAddress  : userIp,
             browser : getBrowserName(),
             device : device,
-            url : location.pathname
+            url : location.pathname,
+            description:location.search,
         };
 
         logsService.fetcherLogsSave(inputData).then((outPutData) => {

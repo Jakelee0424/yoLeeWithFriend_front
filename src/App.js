@@ -10,6 +10,9 @@ import IPBlockProtectedRoute from "pages/user/util/IPBlockProtectedRoute";
 import FullLayoutUser from "pages/user/template/FullLayoutUser";
 import { MenuContext } from "contexts/MenuContext.js";
 import LogInsertRoute from "pages/user/util/LogInsertRoute";
+import Login from "pages/user/login/Login";
+import OAuth2RedirectHandler from "pages/user/login/OAuth2RedirectHandler";
+import KakaoOAuth2RedirectHandler from "pages/user/login/KakaoOAuth2RedirectHandler";
 
 // 프로젝트 파일구조에서 특정 js 화면을 추출하기 위한 modules 변수
 const modules = require.context("./pages/user", true, /\.js$/);
@@ -48,7 +51,10 @@ function App () {
                   </Route>
                   <Route index element={<Main />} /> {/* 기본 경로 */}  
                 </Route>
+                <Route path="/login" element={<Login />} /> {/* 기본 경로 */}  
               </Route>
+              <Route path="/login/callback/naver" element={<OAuth2RedirectHandler/>} />
+              <Route path="/login/callback/kakao" element={<KakaoOAuth2RedirectHandler/>} />
             </Routes>
           </Suspense>
         </div>
