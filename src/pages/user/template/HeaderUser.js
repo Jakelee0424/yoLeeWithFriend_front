@@ -29,7 +29,7 @@ const Header = () => {
   let location = useLocation();
 
   const navigation = [
-    { title: "로그인", href: "/admin/memberMngr" },
+    { title: "로그인", href: "/login" },
   ];
   // 메뉴 랜더링 함수
   const renderMenuItem = (menuTree) => {
@@ -52,6 +52,17 @@ const Header = () => {
               </Link>
             </NavItem>
           ))
+  }
+
+  const handleClick = () =>{
+    const popup = window.open(
+      '/login', // 경로 (리액트 라우터가 처리해야 함)
+      'popupWindow',
+      'width=600,height=600,resizable=yes,scrollbars=yes'
+    );
+
+    // 팝업에 포커스
+    if (popup) popup.focus();
   }
 
   return (
@@ -86,7 +97,6 @@ const Header = () => {
           {navigation.map((navi, index) => (
           <NavItem key={index} className="sidenav-bg">
             <Link
-              to={navi.href}
               className={
                 location.pathname === navi.href
                   ? "active nav-link py-3"
@@ -96,6 +106,17 @@ const Header = () => {
               <span
                 className={`ms-3 d-inline-block ${styles.text}`}
                 style={{ color: "black", fontSize: "1.5rem" }} // 24px -> 1.5rem
+                 onClick={e => {
+                    if (index === navigation.length - 1) {
+                      // 마지막일 경우 클릭 막기
+                      e.preventDefault();
+                      e.stopPropagation(); // 이벤트 버블링도 막음
+                      handleClick();
+                    } else {
+                      // 원하는 동작
+                      navigate(`${navi.href}`); // 예시: React Router로 이동
+                    }
+                  }}
               >
                 {navi.title}
               </span>
