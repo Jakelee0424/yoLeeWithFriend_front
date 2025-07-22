@@ -17,9 +17,15 @@ const BannerList = (args) => {
   const [fileImg, setfileImg] = useState(null);
   const [previewImg, setPreviewImg] = useState("");
   const fileInputRef = useRef(null);
+  const normalizePath = (path) => path.replace(/\\/g, "/");
+  const fallbackImage = "/images/default.png"; // 대체 이미지
 
   const toggle = () => {
     setModal(!modal);
+  }
+
+  const handleRowClick = (id, checked) => {
+    setSelectedBannerIds(checked ? [id] : []);
   }
 
   const toggleBtnFlg = () => {
@@ -192,6 +198,29 @@ const BannerList = (args) => {
     })
   };
 
+  const resolveImageUrl = (imgUrl) => {
+    if (!imgUrl) return fallbackImage;
+
+    const normalized = normalizePath(imgUrl);
+    const publicIndex = normalized.indexOf("public");
+
+    if (publicIndex !== -1) {
+      const relativePath = normalized.slice(publicIndex + "public".length);
+      return process.env.PUBLIC_URL + relativePath;
+    }else {
+    // ✅ "img"가 경로에 있을 때, 그 앞부분을 잘라내기
+    const imgIndex = normalized.indexOf("/img");
+
+    if (imgIndex !== -1) {
+      const relativeImgPath = normalized.slice(imgIndex); // "/img/..." 만 남김
+      return `${relativeImgPath}`;
+    } else {
+      // img가 없는 경우 fallback 처리 (예외 상황)
+      return fallbackImage;
+    }
+  }
+  };
+
 useEffect(() => {
   if(selectedBannerIds.length === 1){
     const selected = tableData.find(t => t.bannerId === selectedBannerIds[0]);
@@ -203,13 +232,13 @@ useEffect(() => {
       fileGroupId: selected.fileGroupId
     });
     if(selected.imgUrl){
-      setPreviewImg(process.env.PUBLIC_URL + selected.imgUrl.split("public")[1].replace(/\\/g, "/"));
+      setPreviewImg(resolveImageUrl(selected.imgUrl));
       setfileImg(selected.imgUrl);
     }
   }else{
     setBannerInfo({
       bannerName: "",
-      createdAt: "",
+      createdAt: new Date().toISOString().split('T')[0],
       validDays: "",
       fileGroupId: ""
     });
@@ -217,8 +246,14 @@ useEffect(() => {
   }
 },[selectedBannerIds])
 
+
+
 useEffect(() => {
   getBannerList();
+  setBannerInfo(
+    {
+      createdAt: new Date().toISOString().split('T')[0],
+    });
 },[])
 
 const handleLevelChange = (level, bannerId, direction) => {
@@ -301,7 +336,7 @@ const handleLevelChange = (level, bannerId, direction) => {
                         layout
                         transition={{ duration: 0.3 }}
                         onClick={() => {
-                          handleCheckboxChange(tdata.bannerId, !isChecked);
+                          handleRowClick(tdata.bannerId, !isChecked);
                         }}
                         style={{ cursor: 'pointer' }}
                       >

@@ -4,6 +4,9 @@ import Blog from "../../../otherLib/bootStrap/components/dashboard/Blog";
 import { useEffect, useState } from "react";
 import * as boardMngrService from "service/admin/boardMngr/boardMngrService";
 import { useNavigate } from "react-router-dom";
+import SearchForm from "components/common/SearchForm";
+import { search } from "data/search";
+import PaginationComponet from "components/common/PaginationComponet";
 
 const logo = process.env.PUBLIC_URL+"/asset/images/title.png";
 const tempImg1 = process.env.PUBLIC_URL+"/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
@@ -24,16 +27,25 @@ const BoardList = () => {
   // 선택된 ID 리스트
   const [selectedIds, setSelectedIds] = useState([]);
 
+  // 쿼리파라미터
+  const [queryParam, setQueryParam] = useState("");
+
   const isAllChecked = checkedStates.every((checked) => checked);
+  const [getTotalCount, setTotalCount] =  useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const getBoardMngrListByFetcher = async  () => {
       const inputData ={
-      
+        queryParam :queryParam,
+        currentPage : currentPage,
+        itemsPerPage : 8,
+        pageBlockSize : 10,
       };
 
       boardMngrService.fetcherBoardMngrList(inputData).then((outPutData) => {
         console.log(outPutData.data)
-        setBoardMngrList(outPutData.data);
+        setBoardMngrList(outPutData.data.content);
+        setTotalCount(outPutData.data.totalCount);
       })
   };
 
@@ -83,8 +95,8 @@ const BoardList = () => {
 
   useEffect(() => {
     getBoardMngrListByFetcher();
-  },[])
-  
+  },[currentPage])
+
   return (
     <div style={{display:"flex",width:"100%"}}>
       <Card style={{width:"100%"}}>
@@ -97,27 +109,17 @@ const BoardList = () => {
               onChange={handleAllCheck}
               style={{marginRight:"3%"}}
             />
-            <Input
-              type="select"
-              name="select"
-              id="exampleSelect" 
-              style={{width:"10%", marginRight:"1%"}}
-            > 
-              <option value="nomal">일반</option>
-              <option value="ban">정지</option>  
-            </Input>
-            <Input
-              id="adminPwd"
-              name="adminPwd"
-              placeholder={"회사명"}
-              type="text"
-              style={{width:"30%", marginRight:"1%"}}
+            <SearchForm 
+                        selectList={[
+                          {value:"all",name:"전체"},
+                          {value:"searchField1",name:"회사명"},
+                          {value:"searchField2",name:"제목"}
+                        ]}
+                        setQueryParam={setQueryParam}
+                        placeholder={"검색어 입력"}
+                        paramType={2} // 1: 쿼리파라미터 미존재시, 2: 쿼리파라미터 존재시
+                        getListEvent={getBoardMngrListByFetcher}
             />
-            <Button style={{width:"10%", marginRight:"5%", float:"right"}} 
-                    color="primary"
-            >
-              검색
-            </Button>
             <Button style={{width:"8%", marginRight:"1%", float:"right"}} 
                                 color="primary"
                     onClick={() => clickBoard()}            
@@ -147,7 +149,7 @@ const BoardList = () => {
                 > 
                   <Blog
                     image={tdata.imgUrl
-                    ? process.env.PUBLIC_URL + tdata.imgUrl.split("public")[1].replace(/\\/g, "/")
+                    ? tdata.imgUrl
                     : tempImg1}
                     title={tdata.boardName}
                     text={`맛 : 3.5 가격 : 3.5 성분 : 3.5`}
@@ -157,6 +159,13 @@ const BoardList = () => {
             ))}  
           </Row>
         </CardBody>
+        <PaginationComponet  
+          itemsPerPage={8}
+          totalCount={getTotalCount}
+          pageBlockSize={10}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
       </Card>
     </div>
   );

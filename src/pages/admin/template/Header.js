@@ -46,7 +46,7 @@ const Header = () => {
     <Navbar style={{backgroundColor:"#495057"}} dark expand="md" className="fix-header">
       <div className="d-flex align-items-center">
         <div className="d-lg-block d-none me-5 pe-3">
-          <Logo />
+          <Logo url={"/admin"}/>
         </div>
         <NavbarBrand href="/">
           <LogoWhite className=" d-lg-none" />

@@ -23,6 +23,9 @@ const BoardView = () => {
   // 회사코드 Id
   const [getBrandCodeId, setBrandCodeId] = useState("");
 
+   // 회사코드 Id
+  const [getFileGroupId, setFileGroupId] = useState("");
+
   // 회사명 리스트
   const [getBrandList, setBrandList] = useState([]);
 
@@ -44,6 +47,34 @@ const BoardView = () => {
   //boardId
   const { id } = useParams();
 
+  const fallbackImage = process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
+
+  const normalizePath = (path) => path.replace(/\\/g, "/");
+
+  const resolveImageUrl = (imgUrl) => {
+    if (!imgUrl) return fallbackImage;
+
+    const normalized = normalizePath(imgUrl);
+    const publicIndex = normalized.indexOf("public");
+
+    if (publicIndex !== -1) {
+      const relativePath = normalized.slice(publicIndex + "public".length);
+      return process.env.PUBLIC_URL + relativePath;
+    }else {
+      // ✅ "img"가 경로에 있을 때, 그 앞부분을 잘라내기
+      const imgIndex = normalized.indexOf("/img");
+
+      if (imgIndex !== -1) {
+        const relativeImgPath = normalized.slice(imgIndex); // "/img/..." 만 남김
+        return `${relativeImgPath}`;
+      } else {
+        // img가 없는 경우 fallback 처리 (예외 상황)
+        return fallbackImage;
+      }
+    }
+    
+  };
+
 
   const getBoardByFetcher = async  (boardId) => {
     if(boardId != null && boardId !== ""){  // boardId이 담겨있을때만 정보조회
@@ -51,15 +82,17 @@ const BoardView = () => {
         boardId:boardId,
       };
       boardMngrService.fetcherBoard(inputData).then(async (outPutData) => {
-        //console.log(outPutData);
+        console.log(outPutData);
         setBoard(outPutData.data.boardMngrResDto)
         setBoardSn(outPutData.data.boardMngrResDto.boardId)
         setBoardName(outPutData.data.boardMngrResDto.boardName)
         setBrandCodeId(outPutData.data.boardMngrResDto.brandCodeId)
+        setFileGroupId(outPutData.data.boardMngrResDto.fileGroupId)
         const fullPath = outPutData.data.boardMngrResDto.imgUrl;
-        const relativePath = fullPath ? process.env.PUBLIC_URL + fullPath.split("public")[1].replace(/\\/g, "/")
+        const relativePath = fullPath ? fullPath
         : process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
         setProfileImg(process.env.PUBLIC_URL +relativePath)
+        setfileImg(process.env.PUBLIC_URL +relativePath)
         setNuinfoList(await getCodeListByParentIdApi(outPutData.data.boardMngrResDto.nuinfoId))
         const updatedFormData = { ...formData };
         for(let i=0; i<outPutData.data.nuinfoResDtoList.length; i++){
@@ -130,10 +163,11 @@ const BoardView = () => {
           boardId: (id === undefined || id === null || id === 'undefined') ? 0 : id,
           boardName: getBoardName,
           brandCodeId : getBrandCodeId,
+          fileGroupId : getFileGroupId,
       },
       nuinfoReqDtoList : nuinfoReqDtoList
     };
-
+    console.log(getfileImg)
     const formFileData = new FormData();
     formFileData.append('multipartFile', getfileImg); // formData에 파일 추가
     formFileData.append('data', JSON.stringify(inputData));
