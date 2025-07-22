@@ -84,6 +84,7 @@ const BannerList = (args) => {
 
       setfileImg(null);
       setPreviewImg("");
+      setBtnToggleFlg(true);
 
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -123,6 +124,7 @@ const BannerList = (args) => {
       setModalMsg("배너가 수정되었습니다.")
       toggle();
 
+      setBtnToggleFlg(true);
       setfileImg(null);
       setPreviewImg("");
 
@@ -138,17 +140,18 @@ const BannerList = (args) => {
     })
       setSelectedBannerIds([]);
       setModalMsg("배너 " + selectedBannerIds.length + " 건이 삭제 되었습니다.")
+      setBtnToggleFlg(true);
       toggle();
   }
 
-  const bannerRestore = (selectedBannerIds) => {
-    bannerService.fetcherRestoreBanner(selectedBannerIds).then((outPutData) => {
-      setTableData(outPutData.data)
-    })
-      setSelectedBannerIds([]);
-      setModalMsg("배너 " + selectedBannerIds.length + " 건이 복구 되었습니다.")
-      toggle();
-  }
+  // const bannerRestore = (selectedBannerIds) => {
+  //   bannerService.fetcherRestoreBanner(selectedBannerIds).then((outPutData) => {
+  //     setTableData(outPutData.data)
+  //   })
+  //     setSelectedBannerIds([]);
+  //     setModalMsg("배너 " + selectedBannerIds.length + " 건이 복구 되었습니다.")
+  //     toggle();
+  // }
 
   const handleBannerNameChange = (e) => {
     setBannerInfo(prev => ({
@@ -285,7 +288,6 @@ const handleLevelChange = (level, bannerId, direction) => {
     return [...sorted];
   });
 };
-
 
   return (
     <div style={{display:"flex",width:"100%"}} >
@@ -456,7 +458,6 @@ const handleLevelChange = (level, bannerId, direction) => {
                     > 변경 
                   </Button>
                 </Col>
-                {btnToggleFlg && (
                   <Col md={1}> 
                     <Button 
                       color="danger" 
@@ -471,8 +472,7 @@ const handleLevelChange = (level, bannerId, direction) => {
                       삭제
                     </Button>
                   </Col>
-                )}
-                {!btnToggleFlg && (
+                {/* {!btnToggleFlg && (
                   <Col md={1}> 
                     <Button 
                       color="danger" 
@@ -486,8 +486,8 @@ const handleLevelChange = (level, bannerId, direction) => {
                     >
                       복구
                     </Button>
-                  </Col>
-                )}
+                  </Col> 
+                )}*/}
               </Row>
               <FormGroup>
                 <Label for="bannerFile">
