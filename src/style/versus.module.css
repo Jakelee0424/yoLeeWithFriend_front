@@ -45,7 +45,7 @@
 .pickKind{
   display: flex;
   align-items: center;
-  margin: 0;
+  margin: 0 0 1rem 0;
 }
 
 .titleInModal{
@@ -62,4 +62,8 @@
 
 .buttonContainerInModal Button{
   width: 6rem;
+}
+
+.boardList{
+  font-size: 0.5rem;
 }
