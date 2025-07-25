@@ -164,10 +164,11 @@ const BoardView = () => {
           boardName: getBoardName,
           brandCodeId : getBrandCodeId,
           fileGroupId : getFileGroupId,
+          boardCategoryCodeId : location.search.replace("?type=","")
       },
       nuinfoReqDtoList : nuinfoReqDtoList
     };
-    console.log(getfileImg)
+    //console.log(location.search.replace("?type=",""))
     const formFileData = new FormData();
     formFileData.append('multipartFile', getfileImg); // formData에 파일 추가
     formFileData.append('data', JSON.stringify(inputData));
@@ -204,7 +205,8 @@ const BoardView = () => {
   };
 
   const goBack = () => {
-    navigate(`/admin/boardMngr`);
+    
+    navigate(`/admin/boardMngr${location.search.replace("?type=boardCategory0","")}`);
   };
 
   const clickBoardImg = (boardId) => {

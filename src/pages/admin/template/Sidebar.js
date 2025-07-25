@@ -1,19 +1,36 @@
 import { Button, Nav, NavItem } from "reactstrap";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import user1 from "../../../otherLib/bootStrap/assets/images/users/user4.jpg";
 import probg from "../../../otherLib/bootStrap/assets/images/bg/download.jpg";
 import layoutStyle from "../../../style/layout.module.css"
 import { useMenu } from "contexts/MenuContext";
+import { useDispatch } from "react-redux";
 
 const Sidebar = () => {
   const { menuTree } = useMenu();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  
 
   // 메뉴 렌더링 함수
   const renderMenuItem = (menuTree) => {
-    return menuTree.map(menu => (
+
+
+  return menuTree.map((menu) => {
+          const handleClick = (e) => {
+            // 조건 분기: 특정 메뉴일 때만 특별 동작 수행
+            if (menu.menuNo === 5 || menu.menuNo === 14 || menu.menuNo === 15) {
+              e.preventDefault(); // Link 이동 막기
+              dispatch({ type: "searchClear" });
+              navigate(`${menu.url}`);
+            }
+          };
+
+          return (
             <NavItem key={menu.menuNo} className="sidenav-bg">
               <Link
                 to={menu.url}
+                onClick={handleClick}
                 className={
                   location.pathname === menu.url
                     ? "active nav-link py-3"
@@ -24,8 +41,9 @@ const Sidebar = () => {
                 <span className="ms-3 d-inline-block">{menu.menuNm}</span>
               </Link>
             </NavItem>
-          ))
-  }
+          );
+        });
+    };
 
   const showMobilemenu = () => {
     document.getElementById("sidebarArea").classList.toggle("showSidebar");

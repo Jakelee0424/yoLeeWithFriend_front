@@ -13,7 +13,7 @@ const logo = process.env.PUBLIC_URL+"/asset/images/title.png";
 const tempImg1 = process.env.PUBLIC_URL+"/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
 const tempImg2 = process.env.PUBLIC_URL+"/asset/images/엑스텐드 프로 웨이 아이솔레이트 64서빙.jpg";
 
-const BoardList = () => {
+const BoardList2 = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -43,7 +43,7 @@ const BoardList = () => {
         currentPage : currentPageRedux? currentPageRedux : currentPage,
         itemsPerPage : 8,
         pageBlockSize : 10,
-        type:"boardCategory01"
+        type:"boardCategory02"
       };
 
       boardMngrService.fetcherBoardMngrList(inputData).then((outPutData) => {
@@ -55,7 +55,7 @@ const BoardList = () => {
   };
 
   const clickBoard = (boardId) => {
-    navigate(`/admin/boardView/${boardId}?type=boardCategory01`);
+    navigate(`/admin/boardView/${boardId}?type=boardCategory02`);
   };
 
   const deleteBoard = async  () => {
@@ -107,7 +107,7 @@ const BoardList = () => {
     <div style={{display:"flex",width:"100%"}}>
       <Card style={{width:"100%"}}>
         <CardBody>
-          <CardTitle tag="h5">프로틴</CardTitle>
+          <CardTitle tag="h5">BCAA</CardTitle>
           <CardSubtitle className="mb-2 text-muted" tag="h6" style={{display: "flex"}}>
             <Input
               type="checkbox"
@@ -178,4 +178,4 @@ const BoardList = () => {
   );
 };
 
-export default BoardList;
+export default BoardList2;

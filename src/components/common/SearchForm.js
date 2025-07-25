@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Input } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 
 
 const SearchForm = ({selectList, setQueryParam, placeholder, paramType, getListEvent, setCurrentPage }) => {
@@ -10,9 +11,11 @@ const SearchForm = ({selectList, setQueryParam, placeholder, paramType, getListE
   const [selectValue, setSelectValue] = useState(selectList[0].value);
   const dispatch = useDispatch();
   const searchState = useSelector(state => state.search);
+  const location = useLocation();
 
   const setQueryParamString = event => {
     setSearchText(event.target.value)
+    location.search ="";
     let queryParam ="";
     if(paramType == 1){
       queryParam = `?searchField=${selectValue}&searchText=${event.target.value}`;
@@ -39,10 +42,22 @@ const SearchForm = ({selectList, setQueryParam, placeholder, paramType, getListE
   }
 
   const clickButton = () =>{
+
+
     if(setCurrentPage != null){
+      console.log("test")
       setCurrentPage(1);
     }
 
+    dispatch({
+      type: "search",
+      payload: {
+        data: {
+          ...searchState.data,    // 현재 상태를 직접 병합
+          currentPage: 1
+        }
+      }
+    });
     getListEvent();
   }
 

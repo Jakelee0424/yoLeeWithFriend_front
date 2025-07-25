@@ -1,6 +1,6 @@
 const initialState = {
     data:{
-
+      currentPage : 0
     }
 };
   
