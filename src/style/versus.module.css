@@ -1,0 +1,69 @@
+.buttonContainer{
+  display: flex;
+  justify-content: center;
+}
+
+.buttonGroup {
+  width: 70%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.pickButton {
+  border: none;
+  height: 20rem;
+  width: 15rem;
+  border-radius: 10px;
+  transition: 0.5s;
+}
+
+.pickButton:hover{
+  background-color: #909090;
+}
+
+.priceContainer{
+  height: 15rem;
+  margin-top: 2rem;
+
+  display: flex;
+}
+
+.nutriContainer{
+  height: 15rem;
+  margin-top: 2rem;
+
+  display: flex;
+}
+
+.evalContainer{
+  height: 15rem;
+  margin-top: 2rem;
+
+  display: flex;
+}
+
+.pickKind{
+  display: flex;
+  align-items: center;
+  margin: 0 0 1rem 0;
+}
+
+.titleInModal{
+  flex-basis: 20%;
+  display: flex;
+  justify-content: center;
+}
+
+.buttonContainerInModal{
+  flex-basis: 80%;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.buttonContainerInModal Button{
+  width: 6rem;
+}
+
+.boardList{
+  font-size: 0.5rem;
+}

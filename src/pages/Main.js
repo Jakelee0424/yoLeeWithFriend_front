@@ -23,7 +23,7 @@ function Main() {
   };
 
   const clickProtien1 = () => {
-    navigate(`/board/versus`);
+    navigate(`/user/board/versus`);
   };
 
   const clickProtien2 = () => {
