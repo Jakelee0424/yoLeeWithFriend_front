@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Input } from 'reactstrap';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 const SearchForm = ({selectList, setQueryParam, placeholder, paramType, getListEvent, setCurrentPage }) => {
@@ -7,14 +8,30 @@ const SearchForm = ({selectList, setQueryParam, placeholder, paramType, getListE
 
   const [searchText, setSearchText] = useState("");
   const [selectValue, setSelectValue] = useState(selectList[0].value);
+  const dispatch = useDispatch();
+  const searchState = useSelector(state => state.search);
 
   const setQueryParamString = event => {
     setSearchText(event.target.value)
+    let queryParam ="";
     if(paramType == 1){
-        setQueryParam(`?searchField=${selectValue}&searchText=${event.target.value}`)
+      queryParam = `?searchField=${selectValue}&searchText=${event.target.value}`;
+      setQueryParam(queryParam)
     }else{
-      setQueryParam(`&searchField=${selectValue}&searchText=${event.target.value}`)
+      queryParam = `&searchField=${selectValue}&searchText=${event.target.value}`;
+      setQueryParam(queryParam);
     }
+    
+    dispatch({
+      type: "search",
+      payload: {
+        data: {
+          ...searchState.data,    // 현재 상태를 직접 병합
+          queryParam: queryParam
+        }
+      }
+    });
+
   }
 
   const selectSearchField = event => {
@@ -25,7 +42,7 @@ const SearchForm = ({selectList, setQueryParam, placeholder, paramType, getListE
     if(setCurrentPage != null){
       setCurrentPage(1);
     }
-    
+
     getListEvent();
   }
 
@@ -52,7 +69,7 @@ const SearchForm = ({selectList, setQueryParam, placeholder, paramType, getListE
         style={{width:"30%", marginRight:"1%"}}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
-            e.preventDefault();
+            //e.preventDefault();
             clickButton();
           }
         }}

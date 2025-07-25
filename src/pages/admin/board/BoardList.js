@@ -1,12 +1,13 @@
 import { Button, Col, Input, Row } from "reactstrap";
 import {  Card, CardBody, CardTitle, CardSubtitle, Table} from "reactstrap";
 import Blog from "../../../otherLib/bootStrap/components/dashboard/Blog";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import * as boardMngrService from "service/admin/boardMngr/boardMngrService";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import SearchForm from "components/common/SearchForm";
 import { search } from "data/search";
 import PaginationComponet from "components/common/PaginationComponet";
+import { useDispatch, useSelector } from "react-redux";
 
 const logo = process.env.PUBLIC_URL+"/asset/images/title.png";
 const tempImg1 = process.env.PUBLIC_URL+"/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
@@ -15,6 +16,7 @@ const tempImg2 = process.env.PUBLIC_URL+"/asset/images/엑스텐드 프로 웨�
 const BoardList = () => {
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   // 게시물 목록
   const [getBoardMngrList, setBoardMngrList] = useState([]);
@@ -34,16 +36,27 @@ const BoardList = () => {
   const [getTotalCount, setTotalCount] =  useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const searchData = useSelector((state) => state.search.data);
+  const dispatch = useDispatch();
+
   const getBoardMngrListByFetcher = async  () => {
+      console.log(searchData.currentPage)
+      if(searchData.currentPage){
+        setCurrentPage(searchData.currentPage)
+      }
+      console.log(searchData.queryParam)
       const inputData ={
-        queryParam :queryParam,
-        currentPage : currentPage,
+        queryParam : searchData.queryParam ?  searchData.queryParam : queryParam,
+        currentPage : searchData.currentPage ?  searchData.currentPage : currentPage,
         itemsPerPage : 8,
         pageBlockSize : 10,
       };
 
+      
+
       boardMngrService.fetcherBoardMngrList(inputData).then((outPutData) => {
-        console.log(outPutData.data)
+        //console.log(searchData)
+        //console.log(outPutData.data)
         setBoardMngrList(outPutData.data.content);
         setTotalCount(outPutData.data.totalCount);
       })
@@ -96,6 +109,11 @@ const BoardList = () => {
   useEffect(() => {
     getBoardMngrListByFetcher();
   },[currentPage])
+
+  useEffect(() => {
+    dispatch({ type: "searchClear" });
+    
+  }, [location.pathname]);
 
   return (
     <div style={{display:"flex",width:"100%"}}>

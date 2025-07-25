@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 
 const ITEMS_PER_PAGE = 10;
@@ -9,9 +10,21 @@ const PaginationComponet = ({itemsPerPage, totalCount, pageBlockSize, currentPag
   
 
   const totalPages = Math.ceil(totalCount / itemsPerPage);
-
+  const dispatch = useDispatch();
+  const searchState = useSelector(state => state.search);
   const handleClick = (page) => {
     setCurrentPage(page);
+    
+    dispatch({
+      type: "search",
+      payload: {
+        data: {
+          ...searchState.data,    // 현재 상태를 직접 병합
+          currentPage: page
+        }
+      }
+    });
+
   };
 
 

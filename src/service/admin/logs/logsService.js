@@ -86,5 +86,25 @@ export const fetcherGetIpBlock = async (data) => {
 
 };
 
+export const fetcherUserLogsList = async (data) => {
 
+      let start = "";
+      let end = "";
+      if (data?.formData?.searchStartDate) {
+        start = `&searchStartDate=${encodeURIComponent(data?.formData?.searchStartDate)}`;
+      }
+      if (data?.formData?.searchEndDate) {
+        end = `&searchEndDate=${encodeURIComponent(data?.formData?.searchEndDate)}`;
+      }
+      const fetcher = new Fetcher().setUrl(`/logs/user/all?itemsPerPage=${data.itemsPerPage}&pageBlockSize=${data.pageBlockSize}&currentPage=${data.currentPage}${data.queryParam}${start}${end}`)
+                                         .setMethod("GET");
+      try {
+        const result = await fetcher.jsonFetch();
+        return result;
+        //console.log("result : ", result.data);
+      } catch (error) {
+        console.error('login error:', error);
+      }
+
+};
 

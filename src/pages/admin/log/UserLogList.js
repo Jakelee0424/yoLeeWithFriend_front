@@ -3,12 +3,14 @@ import { Button, Col, Input, Label, Row } from "reactstrap";
 import {  Card, CardBody, CardTitle, CardSubtitle, Table } from "reactstrap";
 import * as logsService from "service/admin/logs/logsService";
 import bS from "style/basic.module.css"
+import LogMenuView from "./LogMenuView";
+import LogMenuList from "./LogMenuList";
 import dayjs from 'dayjs';
 import PaginationComponet from 'components/common/PaginationComponet';
 import {search} from 'data/search';
 import SearchForm from "components/common/SearchForm";
 
-const LogList = () => {
+const UserLogList = () => {
 
   // 로그 목록
   const [getLogList, setLogList] = useState([]);
@@ -44,8 +46,8 @@ const LogList = () => {
         formData: formData
       };
 
-      logsService.fetcherLogsList(inputData).then((outPutData) => {
-        //console.log(outPutData.data)
+      logsService.fetcherUserLogsList(inputData).then((outPutData) => {
+        console.log(outPutData.data)
         setLogList(outPutData.data.content);
         setTotalCount(outPutData.data.totalCount);
       })
@@ -151,7 +153,11 @@ const LogList = () => {
           setCurrentPage={setCurrentPage}
         />
       </div>
-      <Card style={{width:"100%", marginTop:"3%"}}>
+      <div style={{display:"flex"}}>
+        <LogMenuList />
+        <LogMenuView />
+      </div>
+      <Card style={{width:"100%"}}>
         <CardBody>
           <CardTitle tag="h5">로그관리</CardTitle>
           <Table className="no-wrap mt-3 align-middle" responsive borderless>
@@ -162,6 +168,8 @@ const LogList = () => {
                 <th>url</th>
                 <th>로그 구분</th>
                 <th>ip</th>
+                <th>device</th>
+                <th>browser</th>
               </tr>
             </thead>
             <tbody>
@@ -182,6 +190,12 @@ const LogList = () => {
                     </td>
                     <td>
                       {tdata.ipAddress}
+                    </td>
+                    <td>
+                      {tdata.device}
+                    </td>
+                    <td>
+                      {tdata.browser}
                     </td>
                   </tr>
                 ))}   
@@ -235,4 +249,4 @@ const LogList = () => {
   );
 };
 
-export default LogList;
+export default UserLogList;
