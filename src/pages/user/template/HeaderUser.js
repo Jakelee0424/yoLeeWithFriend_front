@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Navbar,
@@ -9,28 +9,58 @@ import {
 import Logo from "pages/admin/template/Logo";
 import styles from '../../../style/font.module.css';
 import { useMenu } from "contexts/MenuContext";
+import { useDispatch, useSelector } from "react-redux";
+import Fetcher from "utils/Fetcher";
 
 const Header = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = React.useState(false);
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const { menuTree } = useMenu();
-
   const toggle = () => setDropdownOpen((prevState) => !prevState);
   const Handletoggle = () => setIsOpen(!isOpen);
   const showMobilemenu = () => {
     document.getElementById("sidebarArea").classList.toggle("showSidebar");
   };
-  const token = sessionStorage.getItem("accessToken");
-  const handleLogout = () => {
-    sessionStorage.removeItem("accessToken");
-    navigate("/admin/login");
-  };
   let location = useLocation();
 
-  const navigation = [
-    { title: "로그인", href: "/login" },
-  ];
+  const dispatch = useDispatch();
+  let reduxUserInfo = useSelector((state) => state.login);
+  const token = JSON.parse(localStorage.getItem("token"));
+
+  // 로그인 유저 정보 함수
+  const fetchUserInfo = async () => {
+    if (token != null) {
+      //console.log(token.accessToken);
+
+      const fetcher = new Fetcher().setUrl("/user/info")
+                                         .setMethod("GET")
+                                         .setAccessToken(token.accessToken);
+      try {
+        const result = await fetcher.jsonFetch();
+        dispatch({type:"PLUS_ONE",payload: result.data})
+        console.log("sss")
+      } catch (error) {
+        console.error('login error:', error);
+      }
+    }
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/")
+  };
+
+  let navigation = []; 
+  if(token){
+    navigation = [
+      { title: "로그아웃", href: "/login" },
+    ];
+  }else{
+    navigation = [
+        { title: "로그인", href: "/login" },
+    ];
+  }
   // 메뉴 랜더링 함수
   const renderMenuItem = (menuTree) => {
     return menuTree.map(menu => (
@@ -65,6 +95,26 @@ const Header = () => {
     if (popup) popup.focus();
   }
 
+  useEffect(() => {
+    fetchUserInfo();
+  },[])
+
+  useEffect(() => {
+          const handleMessage = (event) => {
+              if (event.data === "naver_login_success") {
+                  window.location.reload();
+              }else if(event.data === "kakao_login_success"){
+                  window.location.reload();
+              }
+          };
+  
+      window.addEventListener("message", handleMessage);
+
+      return () => {
+          window.removeEventListener("message", handleMessage);
+      };
+  }, []);
+
   return (
     <Navbar
       style={{
@@ -91,7 +141,7 @@ const Header = () => {
       >
         <Nav
           className="sidebarNav"
-          style={{ marginLeft: `${Math.max(82 - (menuTree[0]?.children.length) * 15, 0)}%` }}
+          style={{ marginLeft: `${Math.max(80 - (menuTree[0]?.children.length) * 15, 0)}%` }}
         >
           {renderMenuItem(menuTree[0]?.children || [])}
           {navigation.map((navi, index) => (
@@ -111,7 +161,11 @@ const Header = () => {
                       // 마지막일 경우 클릭 막기
                       e.preventDefault();
                       e.stopPropagation(); // 이벤트 버블링도 막음
-                      handleClick();
+                      if(token){
+                        handleLogout();
+                      }else{
+                        handleClick();  
+                      }  
                     } else {
                       // 원하는 동작
                       navigate(`${navi.href}`); // 예시: React Router로 이동

@@ -1,9 +1,10 @@
 
 import React from "react";
 import Fetcher from '../../../utils/Fetcher';
+import { useLocation } from "react-router-dom";
 
 export const NaverLogin = (code,state) => {
-    
+    let location = useLocation();
     return async function(code,state){
         const data = {
             code: code,
@@ -24,7 +25,8 @@ export const NaverLogin = (code,state) => {
             const expirationTime = new Date().getTime() + 3600 * 1000;
             localStorage.setItem("token",JSON.stringify(accessToken));
             localStorage.setItem('expirationTime', expirationTime);
-            window.opener.close();
+            window.opener.postMessage("naver_login_success", "*");
+            //window.opener.close();
             window.close();
 
         } catch (error) {
