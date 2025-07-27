@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import moduleStyle from "../../../style/common.module.css";
 import Logo from "pages/admin/template/Logo";
 import { Link } from "react-router-dom";
@@ -23,6 +23,24 @@ const Login = () => {
         window.open(KAKAO_AUTH_URL,'_blank','width=700, height=600, top=50, left=50, scrollbars=yes');     
     };
 
+    useEffect(() => {
+        const handleMessage = (event) => {
+            if (event.data === "naver_login_success") {
+                //console.log("로그인 성공!");
+                window.opener.postMessage("naver_login_success", "*");
+                window.close();
+            }else if(event.data === "kakao_login_success"){
+                window.opener.postMessage("kakao_login_success", "*");
+                window.close();
+            }
+        };
+
+        window.addEventListener("message", handleMessage);
+
+        return () => {
+            window.removeEventListener("message", handleMessage);
+        };
+    }, []);
         
     return  <div>
                 <div className="body" style={{display:"flex", height:"97vh",}}>        
