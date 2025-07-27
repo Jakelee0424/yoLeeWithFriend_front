@@ -24,7 +24,8 @@ export const KakaoLogin = (code,state) => {
             const expirationTime = new Date().getTime() + 3600 * 1000;
             localStorage.setItem("token",JSON.stringify(accessToken));
             localStorage.setItem('expirationTime', expirationTime);
-            window.opener.close();
+            window.opener.postMessage("kakao_login_success", "*");
+            //window.opener.close();
             window.close();
 
         } catch (error) {
