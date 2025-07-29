@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Navbar,
@@ -17,7 +17,6 @@ const Header = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const { menuTree } = useMenu();
-  const [getUserName, setUserName] = useState("");
   const toggle = () => setDropdownOpen((prevState) => !prevState);
   const Handletoggle = () => setIsOpen(!isOpen);
   const showMobilemenu = () => {
@@ -40,7 +39,7 @@ const Header = () => {
       try {
         const result = await fetcher.jsonFetch();
         dispatch({type:"PLUS_ONE",payload: result.data})
-        setUserName(result.data.nickName)
+        console.log("sss")
       } catch (error) {
         console.error('login error:', error);
       }
@@ -187,7 +186,7 @@ const Header = () => {
           width: "15%",
           height: "5rem", // 80px
         }}
-      >{token ? getUserName : ""}</div>
+      ></div>
     </Navbar>
   );
 };
