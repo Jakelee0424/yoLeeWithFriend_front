@@ -6,8 +6,8 @@ export const fetcherBoardMngrList = async (data) => {
                                          .setMethod("GET");
       try {
         const result = await fetcher.jsonFetch();
+        // console.log("result : ", result.data);
         return result;
-        //console.log("result : ", result.data);
       } catch (error) {
         console.error('login error:', error);
       }
