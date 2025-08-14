@@ -15,12 +15,17 @@ function VersusModal({modal, toggle, selectedBoard, setSelectedBoard, selectedIn
   const [selected, setSelected] = useState(""); // 버튼용 변수
 
   const getBoardMngrListByFetcher = async () => {
+    setQueryParam("");
+
     const inputData = {
       queryParam: queryParam,
       currentPage: currentPage,
+      type : "all",
       itemsPerPage: 8,
       pageBlockSize: 10
     };
+
+    console.log(inputData)
 
     boardMngrService.fetcherBoardMngrList(inputData).then((outPutData) => {
       setBoardMngrList(outPutData.data.content);
@@ -33,19 +38,30 @@ function VersusModal({modal, toggle, selectedBoard, setSelectedBoard, selectedIn
     const inputData = {
       queryParam: queryParam,
       currentPage: currentPage,
+      type : category,
       itemsPerPage: 8,
       pageBlockSize: 10
     };
-
-    if (category !== "all") {
-      inputData.type = category;
-    }
 
     boardMngrService.fetcherBoardMngrList(inputData).then((outPutData) => {
       setBoardMngrList(outPutData.data.content);
     });
 
   };
+
+  const searchBoardList = () => {
+    const inputData = {
+      queryParam: queryParam,
+      currentPage: currentPage,
+      type : selected,
+      itemsPerPage: 8,
+      pageBlockSize: 10
+    };
+
+    boardMngrService.fetcherBoardMngrList(inputData).then((outPutData) => {
+      setBoardMngrList(outPutData.data.content);
+    });
+  }
 
   // 모달 안에서 보충제 클릭 시 해당 칸에 삽입
   const onBoardClickInVersus = (tdata) => {
@@ -68,6 +84,7 @@ function VersusModal({modal, toggle, selectedBoard, setSelectedBoard, selectedIn
 
   useEffect(() => {
     getBoardMngrListByFetcher();
+    setSelected("all");
   }, []);
 
   return (
@@ -141,7 +158,7 @@ function VersusModal({modal, toggle, selectedBoard, setSelectedBoard, selectedIn
               value={queryParam}
               onChange={(e) => setQueryParam(e.target.value)}
             />
-            <Button color="secondary" outline onClick={getBoardMngrListByFetcher}>
+            <Button color="secondary" outline onClick={() => searchBoardList()}>
               검색
             </Button>
           </div>

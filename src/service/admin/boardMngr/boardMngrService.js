@@ -2,7 +2,7 @@ import Fetcher from 'utils/Fetcher';
 
 export const fetcherBoardMngrList = async (data) => {
 
-      const fetcher = new Fetcher().setUrl(`/boardMngr/all?itemsPerPage=${data.itemsPerPage}&pageBlockSize=${data.pageBlockSize}&type=${data.type}&currentPage=${data.currentPage}${data.queryParam}`)
+      const fetcher = new Fetcher().setUrl(`/boardMngr/all?itemsPerPage=${data.itemsPerPage}&pageBlockSize=${data.pageBlockSize}&type=${data.type}&currentPage=${data.currentPage}&searchText=${data.queryParam}`)
                                          .setMethod("GET");
       try {
         const result = await fetcher.jsonFetch();
