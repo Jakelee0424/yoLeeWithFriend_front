@@ -4,6 +4,7 @@ import Blog from "../../../../otherLib/bootStrap/components/dashboard/Blog";
 import versusStyle from "style/versus.module.css";
 import fontstyles from "style/font.module.css";
 import * as boardMngrService from "service/admin/boardMngr/boardMngrService";
+import * as boardService from "service/user/boardMngr/boardService";
 import { getCodeNameByIdApi, getCodeListByParentIdApi } from 'utils/CodeUtil';
 
 function VersusModal({modal, toggle, selectedBoard, setSelectedBoard, selectedIndex, setNuinfoList, getNuinfoList}) {
@@ -12,40 +13,47 @@ function VersusModal({modal, toggle, selectedBoard, setSelectedBoard, selectedIn
   const [queryParam, setQueryParam] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [getBoardMngrList, setBoardMngrList] = useState([]);
-  const [selected, setSelected] = useState(""); // 버튼용 변수
+  const [brandId, setBrandId] = useState("");
+  const [selected, setSelected] = useState(""); 
 
   const getBoardMngrListByFetcher = async () => {
     setQueryParam("");
+    setBrandId("boardBand00");
 
     const inputData = {
       queryParam: queryParam,
       currentPage: currentPage,
       type : "all",
-      itemsPerPage: 8,
-      pageBlockSize: 10
+      itemsPerPage: 20,
+      pageBlockSize: 10,
+      brandId: brandId
     };
-
-    console.log(inputData)
 
     boardMngrService.fetcherBoardMngrList(inputData).then((outPutData) => {
       setBoardMngrList(outPutData.data.content);
+    });
+  };
+
+  const getBrandListByFetcher = async () => {
+    boardService.fetcherBrandList().then((outPutData) => {
+      setBrandList([{ id: "boardBand00", name: "전체" }, ...(outPutData.data || [])]);
     });
   };
   
   const onClickCategory = (category) => {
     setSelected(category);
     
-    const inputData = {
-      queryParam: queryParam,
-      currentPage: currentPage,
-      type : category,
-      itemsPerPage: 8,
-      pageBlockSize: 10
-    };
+    // const inputData = {
+    //   queryParam: queryParam,
+    //   currentPage: currentPage,
+    //   type : category,
+    //   itemsPerPage: 8,
+    //   pageBlockSize: 10
+    // };
 
-    boardMngrService.fetcherBoardMngrList(inputData).then((outPutData) => {
-      setBoardMngrList(outPutData.data.content);
-    });
+    // boardMngrService.fetcherBoardMngrList(inputData).then((outPutData) => {
+    //   setBoardMngrList(outPutData.data.content);
+    // });
 
   };
 
@@ -55,11 +63,12 @@ function VersusModal({modal, toggle, selectedBoard, setSelectedBoard, selectedIn
       currentPage: currentPage,
       type : selected,
       itemsPerPage: 8,
-      pageBlockSize: 10
+      pageBlockSize: 10,
+      brandId: brandId
     };
 
-    boardMngrService.fetcherBoardMngrList(inputData).then((outPutData) => {
-      setBoardMngrList(outPutData.data.content);
+    boardService.fetcherBoardFind(inputData).then((outPutData) => {
+      setBoardMngrList(outPutData.data);
     });
   }
 
@@ -84,6 +93,7 @@ function VersusModal({modal, toggle, selectedBoard, setSelectedBoard, selectedIn
 
   useEffect(() => {
     getBoardMngrListByFetcher();
+    getBrandListByFetcher();
     setSelected("all");
   }, []);
 
@@ -143,7 +153,11 @@ function VersusModal({modal, toggle, selectedBoard, setSelectedBoard, selectedIn
             브랜드
           </p>
           <div className={versusStyle.buttonContainerInModal}>
-            <Input type="select" />
+            <Input type="select" value={brandId} onChange={(e) => setBrandId(e.target.value)}>
+              {brandList.map((brandList, index) => (
+                <option key={index} value={brandList.id}>{brandList.name}</option>
+              ))}
+            </Input>
           </div>
         </div>
 
@@ -170,27 +184,33 @@ function VersusModal({modal, toggle, selectedBoard, setSelectedBoard, selectedIn
         <Card style={{ width: "100%" }}>
           <CardBody>
             <CardSubtitle className="mb-2 text-muted" tag="h6" style={{ display: "flex" }}>
-              <Input type="checkbox" style={{ marginRight: "3%" }} />
             </CardSubtitle>
-            <Row>
-              {getBoardMngrList.map((tdata, index) => (
-                <Col
-                  sm="6"
-                  lg="6"
-                  xl="3"
-                  key={index}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => onBoardClickInVersus(tdata)}
-                >
-                  <Input type="checkbox" name="boardCheckBox" />
-                  <div style={{ flex: 1 }}></div>
-                  <Blog
-                    className={versusStyle.boardList}
-                    title={tdata.boardName}
-                  />
-                </Col>
-              ))}
-            </Row>
+            <div
+              style={{
+                height: "calc(8 * 3rem)", // 높이는 8개 정도만 보이게
+                overflowX: "hidden",
+                minHeight: "0",
+              }}
+            >
+              <Row>
+                {getBoardMngrList.map((tdata, index) => (
+                  <Col
+                    sm="6"
+                    lg="6"
+                    xl="3"
+                    key={index}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => onBoardClickInVersus(tdata)}
+                  >
+                    <div style={{ flex: 1 }}></div>
+                    <Blog
+                      className={versusStyle.boardList}
+                      title={tdata.boardName}
+                    />
+                  </Col>
+                ))}
+              </Row>
+            </div>
           </CardBody>
         </Card>
       </ModalBody>
