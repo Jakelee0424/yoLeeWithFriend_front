@@ -15,6 +15,11 @@
   width: 15rem;
   border-radius: 10px;
   transition: 0.5s;
+  cursor: pointer;
+  background-color: #dadada;      
+  display: flex;        
+  align-items: center;
+  justify-content: center;
 }
 
 .pickButton:hover{
