@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import VersusModal from "./VersusModal.js";
 import versusStyle from "style/versus.module.css";
 import fontstyles from "style/font.module.css";
@@ -27,22 +27,20 @@ function BoardVersus() {
     });
   };
 
-  useEffect(() => {
-    
-  }, []);
-
   return (
     <div className="App">
       <div className={versusStyle.buttonContainer}>
         <div className={versusStyle.buttonGroup}>
           {[0, 1, 2].map((index) => (
-            <button
+            <div
               key={index}
               className={versusStyle.pickButton}
+              role="button"
+              tabIndex={0}
               onClick={() => handleSlotClick(index)}
             >
               {selectedBoard[index] ? (
-                <p className={fontstyles.text}>
+                <div className={fontstyles.text}>
                   <div>
                     <button
                       onClick={(e) => {
@@ -54,14 +52,13 @@ function BoardVersus() {
                     </button>
                   </div>
                   <div>{selectedBoard[index].boardName}</div>
-                </p>
+                </div>
               ) : (
                 <>
-                  <p>+</p>
                   <p className={fontstyles.text}>보충제를 선택하세요</p>
                 </>
               )}
-            </button>
+            </div>
           ))}
         </div>
       </div>
