@@ -85,6 +85,7 @@ function VersusModal({ modal, toggle, selectedBoard, setSelectedBoard, selectedI
 
     boardMngrService.fetcherBoard(tdata).then(async (outPutData) => {
       console.log("선택된 보충제:", tdata);
+      console.log("선택된 보충제:", tdata.boardId);
       // setNuinfoList(await getCodeListByParentIdApi(outPutData.data.boardMngrResDto.nuinfoId))
     });
 
