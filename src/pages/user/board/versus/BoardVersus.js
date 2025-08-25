@@ -2,12 +2,15 @@ import { useState } from "react";
 import VersusModal from "./VersusModal.js";
 import versusStyle from "style/versus.module.css";
 import fontstyles from "style/font.module.css";
+import questionIcon from "../../../../otherLib/bootStrap/assets/images/icon/question.png"
 
 function BoardVersus() {
   const [selectedBoard, setSelectedBoard] = useState([null, null, null]);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [getNuinfoList, setNuinfoList] = useState([]);
+  const [nuinfoList, setNuinfoList] = useState([[], [], []]);
+  const [showTooltip, setShowTooltip] = useState();
+  const question = process.env.PUBLIC_URL+"/assets/images/icon/question.png";
 
   // 칸 클릭 시 모달 열고 index 저장
   const handleSlotClick = (index) => {
@@ -70,7 +73,58 @@ function BoardVersus() {
       <hr />
 
       <div className={versusStyle.nutriContainer}>
-        <p className={fontstyles.text}>영양 정보</p>
+        <div className={versusStyle.nutriTitleContainer}>
+          <p className={fontstyles.text}>영양 정보 (한 스쿱 당)</p>
+          <div style={{ position: "relative", display: "inline-block" }}>
+            <img
+              src={questionIcon}
+              className={versusStyle.questionIcon}
+              style={{ cursor: "pointer" }}
+              alt="정보"
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
+            />
+            {showTooltip && (
+              <div className={versusStyle.scoopDetail}>
+                한 스쿱(1회 제공량)은 30G 기준입니다.
+              </div>
+            )}
+          </div>
+        </div>
+        <div className={versusStyle.nutriGrid}>
+          {[0, 1, 2].map((index) => (
+            <div key={index} className={versusStyle.nutriColumn}>
+              {selectedBoard[index] ? (
+                <ul>
+                  {nuinfoList[index].map((item, i) => {
+                    const values = nuinfoList.map((list) => {
+                      const val = list[i]?.value;
+                      return val && !isNaN(Number(val)) ? Number(val) : null;
+                    });
+
+                    const maxValue = Math.max(...values.filter((v) => v !== null));
+                    const currentValue = item.value && !isNaN(Number(item.value)) ? Number(item.value) : null;
+                    const isMax = currentValue !== null && currentValue === maxValue;
+
+                    return (
+                      <li
+                        key={i}
+                        className={isMax ? versusStyle.winner : ''}
+                      >
+                        <span>{item.name}</span>
+                        <span>
+                          {item.value || '-'}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className={fontstyles.text}>보충제를 선택해주세요</p>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       <hr />
@@ -87,7 +141,7 @@ function BoardVersus() {
         setSelectedBoard={setSelectedBoard}
         selectedIndex={selectedIndex}
         setNuinfoList={setNuinfoList}
-        getNuinfoList={getNuinfoList}
+        nuinfoList={nuinfoList}
       />
     </div>
   );

@@ -83,10 +83,12 @@ function VersusModal({ modal, toggle, selectedBoard, setSelectedBoard, selectedI
 
     setSelected(tdata.boardCategoryCodeId);
 
-    boardMngrService.fetcherBoard(tdata).then(async (outPutData) => {
-      console.log("선택된 보충제:", tdata);
-      console.log("선택된 보충제:", tdata.boardId);
-      // setNuinfoList(await getCodeListByParentIdApi(outPutData.data.boardMngrResDto.nuinfoId))
+    boardService.fetcherGetNuteInfo(tdata).then(async (outPutData) => {
+      setNuinfoList((prev) => {
+        const updated = [...prev];
+        updated[selectedIndex] = outPutData.data; 
+        return updated;
+      });
     });
 
     toggle();

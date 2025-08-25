@@ -40,3 +40,17 @@ export const fetcherBoardFind = async (data) => {
 
 };
 
+export const fetcherGetNuteInfo = async (data) => {
+
+
+  const fetcher = new Fetcher().setUrl(`/board/getNutriInfo?boardId=${data.boardId}`)
+                                     .setMethod("GET");
+  try {
+    const result = await fetcher.jsonFetch();
+    return result;
+  } catch (error) {
+    console.error('login error:', error);
+  }
+
+};
+
