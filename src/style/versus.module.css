@@ -1,6 +1,7 @@
-.buttonContainer{
+.buttonContainer {
   display: flex;
   justify-content: center;
+  margin-bottom: 2rem; /* 버튼과 아래 영역 간격 추가 */
 }
 
 .buttonGroup {
@@ -16,59 +17,123 @@
   border-radius: 10px;
   transition: 0.5s;
   cursor: pointer;
-  background-color: #dadada;      
-  display: flex;        
+  background-color: #dadada;
+  display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.pickButton:hover{
+.pickButton:hover {
   background-color: #909090;
 }
 
-.priceContainer{
-  height: 15rem;
+.priceContainer,
+.nutriContainer,
+.evalContainer {
   margin-top: 2rem;
-
+  padding: 1rem;
+  background-color: #f9f9f9; /* 배경색 추가로 구분감 */
+  border-radius: 10px;
   display: flex;
+  flex-direction: column;
 }
 
-.nutriContainer{
-  height: 15rem;
-  margin-top: 2rem;
-
-  display: flex;
-}
-
-.evalContainer{
-  height: 15rem;
-  margin-top: 2rem;
-
-  display: flex;
-}
-
-.pickKind{
+.pickKind {
   display: flex;
   align-items: center;
   margin: 0 0 1rem 0;
 }
 
-.titleInModal{
+.titleInModal {
   flex-basis: 20%;
   display: flex;
   justify-content: center;
 }
 
-.buttonContainerInModal{
+.buttonContainerInModal {
   flex-basis: 80%;
   display: flex;
   justify-content: space-evenly;
 }
 
-.buttonContainerInModal Button{
+.buttonContainerInModal Button {
   width: 6rem;
 }
 
-.boardList{
+.boardList {
   font-size: 0.5rem;
 }
+
+/* ✅ 영양 정보 그리드 스타일 */
+.nutriGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* 반응형 */
+  gap: 16px;
+  margin-top: 1rem;
+}
+
+.nutriColumn {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.nutriColumn ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nutriColumn li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #eee;
+}
+
+.nutriColumn li:last-child {
+  border-bottom: none;
+}
+
+.nutriColumn span {
+  font-weight: bold;
+}
+
+.winner {
+  background-color: rgba(83, 233, 78, 0.15);
+  color: #007a14; 
+  font-weight: 600; 
+  padding: 0.25rem 0.5rem; 
+  border-radius: 4px; 
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
+}
+
+.nutriTitleContainer{
+  display: flex;
+}
+
+.questionIcon{
+  width: 1rem;
+  height: 1rem;
+  margin-left: 1rem;
+}
+
+.scoopDetail {
+  position: absolute; /* 부모 기준 위치 */
+  bottom: 100%;       /* 부모 요소 바로 위 */
+  left: 50%;          /* 가로 중앙 */
+  transform: translateX(-50%); /* 정확히 중앙 정렬 */
+  background: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 10;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem; /* 아이콘과 간격 */
+}
+
