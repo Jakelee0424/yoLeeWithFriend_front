@@ -39,8 +39,14 @@ const Header = () => {
                                          .setAccessToken(token.accessToken);
       try {
         const result = await fetcher.jsonFetch();
-        dispatch({type:"PLUS_ONE",payload: result.data})
-        setUserNickName(result.data.nickName)
+        if(result.data){
+          dispatch({type:"PLUS_ONE",payload: result.data})
+          setUserNickName(result.data.nickName)
+        }else{
+          alert("메인으로 돌아갑니다. 다시 로그인을 시도해주세요")
+          handleLogout();
+        }
+
       } catch (error) {
         console.error('login error:', error);
       }
@@ -76,7 +82,7 @@ const Header = () => {
               >
                 <span
                   className={`ms-3 d-inline-block ${styles.text}`}
-                  style={{ color: "black", fontSize: "1.5rem" }} // 24px -> 1.5rem
+                  style={{ color: "black", fontSize: "clamp(16px, 2vw, 24px)" }} // 24px -> 1.5rem
                 >
                   {menu.menuNm}
                 </span>
@@ -142,7 +148,7 @@ const Header = () => {
       >
         <Nav
           className="sidebarNav"
-          style={{ marginLeft: `${Math.max(80 - (menuTree[0]?.children.length) * 15, 0)}%` }}
+          // style={{ marginLeft: `${Math.max(70 - (menuTree[0]?.children.length) * 15, 0)}%` }}
         >
           {renderMenuItem(menuTree[0]?.children || [])}
           {navigation.map((navi, index) => (
@@ -156,7 +162,7 @@ const Header = () => {
             >
               <span
                 className={`ms-3 d-inline-block ${styles.text}`}
-                style={{ color: "black", fontSize: "1.5rem" }} // 24px -> 1.5rem
+                style={{ color: "black", fontSize: "clamp(12px, 2vw, 24px)"  }} // 24px -> 1.5rem
                  onClick={e => {
                     if (index === navigation.length - 1) {
                       // 마지막일 경우 클릭 막기
