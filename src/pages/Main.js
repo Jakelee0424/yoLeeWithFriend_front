@@ -13,10 +13,10 @@ function Main() {
   const [boardMainList, setBoardMainList] = useState([]);
   const [boardMainList2, setBoardMainList2] = useState([]);
   const [brandCodeMap, setBrandCodeMap] = useState({});
-
-  useEffect(() => {
-    document.body.style.margin = "0";
-  },[]);
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
 
   const goToTest = () => {
     navigate("/test");
@@ -27,7 +27,7 @@ function Main() {
   };
 
   const clickProtien2 = () => {
-    navigate(`/board/detail`);
+    navigate(`/user/board/list`);
   };
 
   const getBannerList = async  () => {
@@ -37,17 +37,17 @@ function Main() {
   };
 
   const loadBrandCodes = async () => {
-  try {
-    const codes = await getCodeListByParentIdApi("boardBrand"); // 상위 코드 ID
-    const codeMap = {};
-    codes.forEach(code => {
-      codeMap[code.id] = code.name;
-    });
-    setBrandCodeMap(codeMap);
-  } catch (e) {
-    console.error("브랜드 코드 로딩 실패", e);
-  }
-};
+    try {
+      const codes = await getCodeListByParentIdApi("boardBrand"); // 상위 코드 ID
+      const codeMap = {};
+      codes.forEach(code => {
+        codeMap[code.id] = code.name;
+      });
+      setBrandCodeMap(codeMap);
+    } catch (e) {
+      console.error("브랜드 코드 로딩 실패", e);
+    }
+  };
 
   
 
@@ -92,20 +92,41 @@ function Main() {
     loadBrandCodes();
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    // 이벤트 등록
+    window.addEventListener("resize", handleResize);
+
+    // 컴포넌트 언마운트 시 이벤트 해제
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    document.body.style.margin = "0";
+  },[]);
+
 
   const protienImg = process.env.PUBLIC_URL +"/asset/images/protein_19499571.png";
   const protien2Img = process.env.PUBLIC_URL +"/asset/images/interactive_56784531.png";
   return (
     <div className="App" style={{width:"100%",height:"100%"}}>
       <div style={{
-        display:"flex"
+        display: windowSize.width > 800 ? "flex" : "none",
       }}>
         <div style={{
           backgroundColor:"black"
           ,width:"60%"
           ,height:"20rem"
           ,marginRight:"3%"
-          ,display:"flex"
+          ,display: "flex"
           ,borderRadius:"10px"
           ,position:"relative"
         }}>
@@ -153,68 +174,100 @@ function Main() {
           </div>   
         </div>
       </div>
-      <div style={{
-        width:"100%",
-        height:"13rem",
-        marginTop:"3%",
-        backgroundColor:"#D9D9D9"
-        ,borderRadius:"10px"
-      }}>
+      {/* 배너 */}
+      <div
+        style={{
+          width: "100%",
+          minHeight: "12rem",
+          borderRadius: "10px",
+          backgroundColor: "#D9D9D9",
+          marginBottom: "2%",
+          marginTop: "2%",
+        }}
+      >
         <RollingBanner items={tableData} />
       </div>
-      <div style={{
-        width:"100%",
-        height:"40rem",
-        marginTop:"3%"
-      }}>
-        <div style={{width:"100%", height:"20rem"}}>
-          <div style={{width:"100%", height:"3rem"}}> 
-              <div className={styles.text}>다수의 선택! 평점 최고 프로틴</div>
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          gap: "2rem",
+        }}
+      >
+        {/* 평점 최고 프로틴 */}
+        <div>
+          <div className={styles.text} style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>
+            다수의 선택! 평점 최고 프로틴
           </div>
-          <div style={{width:"100%", height:"17rem"}}>
-              <div style={{width:"100%", height:"17rem", paddingLeft:"4%", paddingRight:"4%", display:"flex"}}>
-                {boardMainList.map((tdata, index) => (
-                  <div key={index} style={{width:"18%", height:"17rem", marginRight:"2%"}}>
-                    <div style={{width:"100%", height:"12rem"}}>
-                      <img
-                        src={`${resolveImageUrl(tdata.imgUrl)}`}
-                        style={{objectFit:"contain", width:"100%", height:"12rem"}}
-                      />
-                    </div>
-                    <div className={styles.text} style={{height:"3rem", textAlign:"center"}}>
-                        {tdata.boardName}
-                    </div>
-                    <div style={{height:"2rem", textAlign:"center"}}>
-                        {brandCodeMap[tdata.brandCodeId]}
-                    </div>
-                  </div>
-                ))}  
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "1%",
+              justifyContent: "flex-start",
+            }}
+          >
+            {boardMainList.map((tdata, index) => (
+              <div
+                key={index}
+                style={{
+                  flex: "1 1 18%",
+                  minWidth: "12rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  marginBottom: "1rem",
+                }}
+              >
+                <img
+                  src={resolveImageUrl(tdata.imgUrl)}
+                  alt={tdata.boardName}
+                  style={{ objectFit: "contain", width: "100%", height: "12rem" }}
+                />
+                <div className={styles.text} style={{ textAlign: "center" }}>
+                  {tdata.boardName}
+                </div>
+                <div style={{ textAlign: "center" }}>{brandCodeMap[tdata.brandCodeId]}</div>
               </div>
+            ))}
           </div>
         </div>
-        <div style={{width:"100%", height:"20rem"}}>
-          <div style={{width:"100%", height:"3rem"}}> 
-              <div className={styles.text}>따끈따끈 신상 보충제</div>
+
+        {/* 신상 보충제 */}
+        <div>
+          <div className={styles.text} style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>
+            따끈따끈 신상 보충제
           </div>
-          <div style={{width:"100%", height:"17rem"}}>
-              <div style={{width:"100%", height:"17rem", paddingLeft:"4%", paddingRight:"4%", display:"flex"}}>
-                {boardMainList2.map((tdata, index) => (
-                  <div key={index} style={{width:"18%", height:"17rem", marginRight:"2%"}}>
-                    <div style={{width:"100%", height:"12rem"}}>
-                      <img
-                        src={`${resolveImageUrl(tdata.imgUrl)}`}
-                        style={{objectFit:"contain", width:"100%", height:"12rem"}}
-                      />
-                    </div>
-                    <div className={styles.text} style={{height:"3rem", textAlign:"center"}}>
-                        {tdata.boardName}
-                    </div>
-                    <div style={{height:"2rem", textAlign:"center"}}>
-                       {brandCodeMap[tdata.brandCodeId]}
-                    </div>
-                  </div>
-                ))}  
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "1%",
+              justifyContent: "flex-start",
+            }}
+          >
+            {boardMainList2.map((tdata, index) => (
+              <div
+                key={index}
+                style={{
+                  flex: "1 1 18%",
+                  minWidth: "12rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  marginBottom: "1rem",
+                }}
+              >
+                <img
+                  src={resolveImageUrl(tdata.imgUrl)}
+                  alt={tdata.boardName}
+                  style={{ objectFit: "contain", width: "100%", height: "12rem" }}
+                />
+                <div className={styles.text} style={{ textAlign: "center" }}>
+                  {tdata.boardName}
+                </div>
+                <div style={{ textAlign: "center" }}>{brandCodeMap[tdata.brandCodeId]}</div>
               </div>
+            ))}
           </div>
         </div>
       </div>
