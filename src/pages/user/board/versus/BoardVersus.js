@@ -32,6 +32,14 @@ function BoardVersus() {
 
   return (
     <div className="App">
+      <button className={versusStyle.resetButton}
+          onClick={() => {
+            setSelectedBoard([null, null, null]);
+            setNuinfoList([[], [], []]);
+          }}
+        >
+          초기화
+      </button>
       <div className={versusStyle.buttonContainer}>
         <div className={versusStyle.buttonGroup}>
           {[0, 1, 2].map((index) => (
@@ -66,8 +74,30 @@ function BoardVersus() {
         </div>
       </div>
 
-      <div className={versusStyle.priceContainer}>
-        <p className={fontstyles.text}>가격</p>
+      <div className={versusStyle.nutriContainer}>
+        <div className={versusStyle.nutriTitleContainer}>
+          <p className={fontstyles.text}>가격</p>
+        </div>
+        <div className={versusStyle.nutriGrid}>
+          {[0, 1, 2].map((index) => (
+            <div key={index} className={versusStyle.nutriColumn}>
+              {selectedBoard[index] ? (
+                <ul>
+                  <li>
+                    <span>가격</span>
+                    <span>
+                      {selectedBoard[index].price !== undefined && selectedBoard[index].price !== null && selectedBoard[index].price !== ""
+                        ? selectedBoard[index].price
+                        : "-"}
+                    </span>
+                  </li>
+                </ul>
+              ) : (
+                <p className={fontstyles.text}></p>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       <hr />
@@ -120,7 +150,7 @@ function BoardVersus() {
                   })}
                 </ul>
               ) : (
-                <p className={fontstyles.text}>보충제를 선택해주세요</p>
+                <p className={fontstyles.text}></p>
               )}
             </div>
           ))}
@@ -131,6 +161,19 @@ function BoardVersus() {
 
       <div className={versusStyle.evalContainer}>
         <p className={fontstyles.text}>평가 정보</p>
+        {!localStorage.getItem("token") ? (
+          <div className={versusStyle.evalBlurContainer}>
+            <div className={versusStyle.evalBlur}>
+              회원만 볼수 있는 서비스 입니다.
+            </div>
+            <div style={{ filter: "blur(3px)", pointerEvents: "none" }}>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <p style={{ color: "#888" }}>평점 내용 여기에</p>
+          </div>
+        )}
       </div>
 
       {/* 모달 */}
