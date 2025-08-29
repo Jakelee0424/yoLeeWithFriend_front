@@ -12,6 +12,30 @@ function BoardVersus() {
   const [showTooltip, setShowTooltip] = useState();
   const question = process.env.PUBLIC_URL+"/assets/images/icon/question.png";
 
+  const fallbackImage = process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
+
+  const normalizePath = (path) => path.replace(/\\/g, "/");
+
+  const resolveImageUrl = (imgUrl) => {
+    if (!imgUrl) return fallbackImage;
+    const normalized = normalizePath(imgUrl);
+    const publicIndex = normalized.indexOf("public");
+    if (publicIndex !== -1) {
+      const relativePath = normalized.slice(publicIndex + "public".length);
+      return process.env.PUBLIC_URL + relativePath;
+    } else {
+      const imgIndex = normalized.indexOf("/img");
+      if (imgIndex !== -1) {
+        const relativeImgPath = normalized.slice(imgIndex);
+        return `${relativeImgPath}`;
+      } else if (normalized.startsWith("blob:") || normalized.startsWith("data:")) {
+        return normalized;
+      } else {
+        return fallbackImage;
+      }
+    }
+  };
+
   // 칸 클릭 시 모달 열고 index 저장
   const handleSlotClick = (index) => {
     setSelectedIndex(index);
@@ -52,17 +76,15 @@ function BoardVersus() {
             >
               {selectedBoard[index] ? (
                 <div className={fontstyles.text}>
-                  <div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteBtnClick(index);
-                      }}
-                    >
+                  <div className={versusStyle.selectedBoardContainer}>
+                    <button className={versusStyle.selectedBoardDelete} onClick={(e) => {e.stopPropagation(); onDeleteBtnClick(index);}}>
                       x
                     </button>
+                    <div className={versusStyle.selectedBoardDetail}>
+                      <img className={versusStyle.selectedImg} src={resolveImageUrl(selectedBoard[index]?.imgUrl)} alt="보충제 이미지" />
+                      <div>{selectedBoard[index].boardName}</div>
+                    </div>
                   </div>
-                  <div>{selectedBoard[index].boardName}</div>
                 </div>
               ) : (
                 <>

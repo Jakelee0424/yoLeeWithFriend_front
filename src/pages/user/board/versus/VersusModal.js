@@ -81,6 +81,8 @@ function VersusModal({ modal, toggle, selectedBoard, setSelectedBoard, selectedI
       });
     }
 
+    console.log(tdata)
+
     setSelected(tdata.boardCategoryCodeId);
 
     boardService.fetcherGetNuteInfo(tdata).then(async (outPutData) => {
