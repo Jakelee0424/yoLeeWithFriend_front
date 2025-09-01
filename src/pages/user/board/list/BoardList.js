@@ -17,6 +17,7 @@ function BoardList() {
 
   const protienImg = process.env.PUBLIC_URL +"/asset/images/Group 44.png";
   const protien2Img = process.env.PUBLIC_URL +"/asset/images/recommend_5126118 1.png";
+  const bottomButton = process.env.PUBLIC_URL +"/asset/images/Vector.png";
 
   const loadCategoryCodes = async () => {
     try {
@@ -44,7 +45,8 @@ function BoardList() {
           type = "boardCategory03";
           break;  
       }
-      boardService.fetcherBoardRandomList({type:type}).then((outPutData) => {
+      boardService.fetcherBoardRandomList({type:type
+                                          ,boardList: boardList}).then((outPutData) => {
         console.log(outPutData)
         setBoardList(outPutData.data);
       })  
@@ -110,6 +112,35 @@ function BoardList() {
 
   const clickView = (boardId) => {
     navigate(`/user/board/view?boardId=${boardId}`);
+  };
+
+  const clickMore = () => {
+    try {
+      let type = "boardCategory01";
+      switch (selectCategory) {
+        case 0:
+          type = "boardCategory01";
+          break;
+
+        case 1:
+          type = "boardCategory02";
+          break;
+
+        case 2:
+          type = "boardCategory03";
+          break;  
+      }
+      boardService.fetcherBoardRandomList({type:type
+                                          ,boardList: boardList}).then((outPutData) => {
+        console.log(outPutData)
+        if(outPutData.data.length == 0){
+          alert("더이상 불러올 목록이 없습니다.")
+        }
+        setBoardList(boardList => [...boardList, ...outPutData.data]);
+      })  
+    } catch (e) {
+      console.error("카테고리 코드 로딩 실패", e);
+    }
   };
 
   useEffect(() => {
@@ -232,20 +263,20 @@ function BoardList() {
           backgroundColor:"#FF8800",
           borderRadius:"8px",
           alignItems:"center",
-          marginRight:"2%"
+          marginRight:"2%",
+          display:"flex"
         }}>
-          <div style={{display:"flex"}}>
-            <div style={{width:"50%",height:"6rem"}}>
-              
-            </div> 
-            <div style={{width:"50%",height:"6rem"}}>
-              <img style={{position:"absolute", width:"8%", height:"13%", marginLeft:"7%", marginTop:"2%"}} src={protienImg} />
+          <div style={{ height:"12rem", width:"50%"}}>
+            <div style={{width:"100%", height:"12rem", display:"flex", flexDirection:"column", justifyContent:"center"}}>
+              <div className={styles.text} style={{color:"black", paddingLeft:"11%", fontSize:"18px"}}>보충제가고민되나요?</div>
+              <div className={styles.text} style={{color:"black", paddingLeft:"11%", fontSize:"18px"}}>나에게 맞는 보충제를 골라보세요</div>
             </div>
           </div>
-          <div style={{display:"flex"}}>
-            <div style={{width:"50%",height:"5rem"}}>
+          <div style={{height:"12rem", width:"50%"}}>
+            <div style={{width:"100%",height:"5rem"}}>
+              <img style={{position:"absolute", width:"8%", height:"13%", marginLeft:"7%", marginTop:"2%"}} src={protienImg} />
             </div>
-            <div style={{width:"50%",height:"5rem", display:"flex"}}>
+            <div style={{width:"100%",height:"5rem", display:"flex"}}>
               
               <div style={{backgroundColor:"white", width:"60%", height:"2rem", borderRadius:"10px", marginTop:"13%", marginLeft:"21%"}}>
                 <div style={{display: "flex",
@@ -269,8 +300,34 @@ function BoardList() {
           backgroundColor:"#29E3FF",
           borderRadius:"8px",
           alignItems:"center",
+          display:"flex"
         }}>
-          
+          <div style={{ height:"12rem", width:"48%"}}>
+            <div style={{width:"100%", height:"12rem", display:"flex", flexDirection:"column", justifyContent:"center"}}>
+              <div className={styles.text} style={{color:"black", paddingLeft:"11%", fontSize:"18px"}}>내가 필요한 보충제는?</div>
+              <div className={styles.text} style={{color:"black", paddingLeft:"11%", fontSize:"18px"}}>보충제를 추천해드립니다!</div>
+            </div>
+          </div>
+          <div style={{height:"12rem", width:"50%"}}>
+            <div style={{width:"100%",height:"5rem"}}>
+              <img style={{position:"absolute", width:"8%", height:"13%", marginLeft:"7%", marginTop:"2%"}} src={protienImg} />
+            </div>
+            <div style={{width:"100%",height:"5rem", display:"flex"}}>
+              
+              <div style={{backgroundColor:"white", width:"60%", height:"2rem", borderRadius:"10px", marginTop:"13%", marginLeft:"21%"}}>
+                <div style={{display: "flex",
+                            justifyContent: "center",  
+                            alignItems: "center", 
+                            cursor:"pointer",
+                            height:"100%"
+                          }}
+                  // onClick={(e) => {clickProtien1()}}
+                >
+                  <div className={styles.text}>보충제 추천 받기</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       {boardList.map((tdata, index) => (
@@ -381,11 +438,17 @@ function BoardList() {
         width:"100%",
         height:"12rem",
         marginTop:"1%",
-        backgroundColor:"black",
         borderRadius:"8px",
         display:"flex",
+        flexDirection:"column",
         alignItems:"center",
-      }}>
+        justifyContent:"center",
+        cursor:"pointer"
+      }}
+        onClick={(e) => {clickMore()}}
+      >
+        <div className={styles.text} style={{marginBottom:"1%"}}>더보기</div>
+        <img src={bottomButton} />
       </div>
     </div>
   );
