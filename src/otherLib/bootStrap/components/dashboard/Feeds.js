@@ -11,40 +11,40 @@ import {
 
 const FeedData = [
   {
-    title: "Cras justo odio",
+    title: "보충제1",
     icon: "bi bi-bell",
     color: "primary",
-    date: "6 minute ago",
+    date: "6",
   },
   {
-    title: "New user registered.",
+    title: "보충제2",
     icon: "bi bi-person",
     color: "info",
-    date: "6 minute ago",
+    date: "5",
   },
   {
-    title: "Server #1 overloaded.",
+    title: "보충제3",
     icon: "bi bi-hdd",
     color: "danger",
-    date: "6 minute ago",
+    date: "4",
   },
   {
-    title: "New order received.",
+    title: "보충제4",
     icon: "bi bi-bag-check",
     color: "success",
-    date: "6 minute ago",
+    date: "3",
   },
   {
-    title: "Cras justo odio",
+    title: "보충제5",
     icon: "bi bi-bell",
     color: "dark",
-    date: "6 minute ago",
+    date: "2",
   },
   {
-    title: "Server #1 overloaded.",
+    title: "보충제6",
     icon: "bi bi-hdd",
     color: "warning",
-    date: "6 minute ago",
+    date: "1",
   },
 ];
 
@@ -52,9 +52,9 @@ const Feeds = () => {
   return (
     <Card>
       <CardBody>
-        <CardTitle tag="h5">Feeds</CardTitle>
+        <CardTitle tag="h5">인기 리뷰 보충제</CardTitle>
         <CardSubtitle className="mb-2 text-muted" tag="h6">
-          Widget you can use
+          리뷰 수
         </CardSubtitle>
         <ListGroup flush className="mt-4">
           {FeedData.map((feed, index) => (
@@ -65,13 +65,6 @@ const Feeds = () => {
               tag="a"
               className="d-flex align-items-center p-3 border-0"
             >
-              <Button
-                className="rounded-circle me-3"
-                size="sm"
-                color={feed.color}
-              >
-                <i className={feed.icon}></i>
-              </Button>
               {feed.title}
               <small className="ms-auto text-muted text-small">
                 {feed.date}

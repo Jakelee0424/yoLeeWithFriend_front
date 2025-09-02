@@ -24,6 +24,10 @@ const Header = () => {
     document.getElementById("sidebarArea").classList.toggle("showSidebar");
   };
   let location = useLocation();
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
 
   const dispatch = useDispatch();
   let reduxUserInfo = useSelector((state) => state.login);
@@ -55,6 +59,7 @@ const Header = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    dispatch({ type: "RESET_USER" });
     navigate("/")
   };
 
@@ -122,6 +127,27 @@ const Header = () => {
       };
   }, []);
 
+  useEffect(() => {
+      const handleResize = () => {
+        setWindowSize({
+          width: window.innerWidth,
+          height: window.innerHeight
+        });
+      };
+  
+      // 이벤트 등록
+      window.addEventListener("resize", handleResize);
+  
+      // 컴포넌트 언마운트 시 이벤트 해제
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }, []);
+  
+    useEffect(() => {
+      document.body.style.margin = "0";
+    },[]);
+
   return (
     <Navbar
       style={{
@@ -133,67 +159,72 @@ const Header = () => {
       dark
       expand="md"
       className="fix-header"
-    >
-      <div className="d-flex align-items-center">
-        <NavbarBrand href="/">
-          <Logo />
-        </NavbarBrand>
-      </div>
-      <div
-        className="hstack gap-2"
-        style={{
-          width: "85%",
-          height: "5rem", // 80px
-        }}
-      >
-        <Nav
-          className="sidebarNav"
-          // style={{ marginLeft: `${Math.max(70 - (menuTree[0]?.children.length) * 15, 0)}%` }}
+    > 
+      <div style={{width:"100%", display: windowSize.width > 500 ? "flex" : undefined}}>
+        <div className="d-flex align-items-center" style={{width:"100%"}}>
+          <NavbarBrand href="/">
+            <Logo />
+          </NavbarBrand>
+        </div>
+        <div
+          className="hstack gap-2"
+          style={{
+            width: "100%",
+          }}
         >
-          {renderMenuItem(menuTree[0]?.children || [])}
-          {navigation.map((navi, index) => (
-          <NavItem key={index} className="sidenav-bg">
-            <Link
-              className={
-                location.pathname === navi.href
-                  ? "active nav-link py-3"
-                  : "nav-link text-secondary py-3"
-              }
-            >
-              <span
-                className={`ms-3 d-inline-block ${styles.text}`}
-                style={{ color: "black", fontSize: "clamp(12px, 2vw, 24px)"  }} // 24px -> 1.5rem
-                 onClick={e => {
-                    if (index === navigation.length - 1) {
-                      // 마지막일 경우 클릭 막기
-                      e.preventDefault();
-                      e.stopPropagation(); // 이벤트 버블링도 막음
-                      if(token){
-                        handleLogout();
-                      }else{
-                        handleClick();  
-                      }  
-                    } else {
-                      // 원하는 동작
-                      navigate(`${navi.href}`); // 예시: React Router로 이동
-                    }
-                  }}
+          <Nav
+            className="sidebarNav"
+            // style={{ marginLeft: `${Math.max(70 - (menuTree[0]?.children.length) * 15, 0)}%` }}
+          >
+            {renderMenuItem(menuTree[0]?.children || [])}
+            {navigation.map((navi, index) => (
+            <NavItem key={index} className="sidenav-bg">
+              <Link
+                className={
+                  location.pathname === navi.href
+                    ? "active nav-link py-3"
+                    : "nav-link text-secondary py-3"
+                }
               >
-                {navi.title}
-              </span>
-            </Link>
-          </NavItem>
-             ))}
-        </Nav>
+                <span
+                  className={`ms-3 d-inline-block ${styles.text}`}
+                  style={{ color: "black", fontSize: "clamp(16px, 2vw, 24px)"  }} // 24px -> 1.5rem
+                  onClick={e => {
+                      if (index === navigation.length - 1) {
+                        // 마지막일 경우 클릭 막기
+                        e.preventDefault();
+                        e.stopPropagation(); // 이벤트 버블링도 막음
+                        if(token){
+                          handleLogout();
+                        }else{
+                          handleClick();  
+                        }  
+                      } else {
+                        // 원하는 동작
+                        navigate(`${navi.href}`); // 예시: React Router로 이동
+                      }
+                    }}
+                >
+                  {navi.title}
+                </span>
+              </Link>
+            </NavItem>
+              ))}
+          </Nav>
+        </div>
+        <div
+          className={`hstack gap-2 ${styles.text}`}
+          style={{
+            border: "white",
+            width: "100%",
+            paddingLeft: "8%",
+            cursor:"pointer"
+          }}
+          onClick={e => {
+            navigate(`/mypage`); 
+          }}
+        >{token ? getUserNickName : "" }</div>
       </div>
-      <div
-        className="hstack gap-2"
-        style={{
-          border: "white",
-          width: "15%",
-          height: "5rem", // 80px
-        }}
-      >{token ? getUserNickName : "" }</div>
     </Navbar>
   );
 };
