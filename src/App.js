@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import * as menuService from "service/common/menuService";
 /* 컴포넌트 import */
 import Main from "./pages/Main";
-import Test from "pages/user/test/Test";
+import Mypage from "pages/user/mypage/Mypage";
 import IPBlockProtectedRoute from "pages/user/util/IPBlockProtectedRoute";
 import FullLayoutUser from "pages/user/template/FullLayoutUser";
 import { MenuContext } from "contexts/MenuContext.js";
@@ -46,7 +46,7 @@ function App () {
                 <Route path="/" element={ <FullLayoutUser /> }> {/* 기본 경로 */}
                   {/* 보호 라우트 그룹 */}
                   <Route element={<IPBlockProtectedRoute />}>
-                    <Route path="/test" element={<Test />} /> {/* /test */}
+                    <Route path="/mypage" element={<Mypage />} /> {/* /마이페이지 */}
                     {routes}
                   </Route>
                   <Route index element={<Main />} /> {/* 기본 경로 */}  

@@ -3,7 +3,7 @@ import { ReactComponent as LogoDark } from "../../../otherLib/bootStrap/assets/i
 const logo = process.env.PUBLIC_URL+"/asset/images/title.png";
 const Logo = () => {
   return (
-      <img src={logo} />
+      <img style={{width:"100%"}} src={logo} />
   );
 };
 

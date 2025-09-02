@@ -38,6 +38,7 @@
     "react-scripts": "5.0.1",
     "reactstrap": "^9.2.3",
     "redux": "^5.0.1",
+    "redux-persist": "^6.0.0",
     "redux-thunk": "^3.1.0",
     "resolve-url-loader": "^3.1.5",
     "sass": "^1.89.2",

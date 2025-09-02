@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { Routes, Route, BrowserRouter 
 } from "react-router-dom";
 import { Provider } from 'react-redux';
-import store from "./redux/config/configStore"; 
+import { store, persistor } from "./redux/config/configStore";
 import App from './App';
 import AppAdmin from './AppAdmin';
 import reportWebVitals from './reportWebVitals';
