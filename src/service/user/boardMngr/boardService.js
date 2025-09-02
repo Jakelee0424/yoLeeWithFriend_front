@@ -17,8 +17,8 @@ export const fetcherBoardMainList = async (data) => {
 
 export const fetcherBoardRandomList = async (data) => {
 
-      const fetcher = new Fetcher().setUrl(`/board/randomAll?type=${data.type}&clickCnt=${0}`)
-                                         .setMethod("GET");
+      const fetcher = new Fetcher().setUrl(`/board/randomAll`)
+                                         .setMethod("POST").setData(JSON.stringify(data));
       try {
         const result = await fetcher.jsonFetch();
         return result;
