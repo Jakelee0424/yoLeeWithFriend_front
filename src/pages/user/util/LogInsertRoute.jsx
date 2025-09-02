@@ -3,10 +3,12 @@ import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import * as logsService from "service/admin/logs/logsService";
+import { useSelector } from "react-redux";
 
 function LogInsertRoute() {
     const navigate = useNavigate();
     const location = useLocation();
+    let reduxUserInfo = useSelector((state) => state.login);
   useEffect(() => {
     const checkIpBlock = async () => {
       try {
@@ -48,7 +50,9 @@ function LogInsertRoute() {
             device : device,
             url : location.pathname,
             description:location.search,
+            userId : reduxUserInfo.id
         };
+        console.log(reduxUserInfo)
 
         logsService.fetcherLogsSave(inputData).then((outPutData) => {
            console.log(outPutData)

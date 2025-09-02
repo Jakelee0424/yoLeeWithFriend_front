@@ -12,7 +12,7 @@ import bg4 from "../../otherLib/bootStrap/assets/images/bg/bg4.jpg";
 const BlogData = [
   {
     image: bg1,
-    title: "This is simple blog",
+    title: "조회수 1위 보충제",
     subtitle: "2 comments, 1 Like",
     description:
       "This is a wider card with supporting text below as a natural lead-in to additional content.",
