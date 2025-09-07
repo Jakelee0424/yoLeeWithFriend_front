@@ -6,13 +6,37 @@ import fontstyles from "style/font.module.css";
 import * as boardMngrService from "service/admin/boardMngr/boardMngrService";
 import * as boardService from "service/user/boardMngr/boardService";
 
-function VersusModal({ modal, toggle, selectedBoard, setSelectedBoard, selectedIndex, setNuinfoList, getNuinfoList }) {
+function VersusModal({ modal, toggle, selectedBoard, setSelectedBoard, selectedIndex, setNuinfoList, getNuinfoList, modalState, setModalState }) {
   const [brandList, setBrandList] = useState([]);
   const [queryParam, setQueryParam] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [getBoardList, setBoardList] = useState([]);
   const [brandId, setBrandId] = useState("boardBand00");
   const [selected, setSelected] = useState("all");
+
+  const fallbackImage = process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
+
+  const normalizePath = (path) => path.replace(/\\/g, "/");
+
+  const resolveImageUrl = (imgUrl) => {
+    if (!imgUrl) return fallbackImage;
+    const normalized = normalizePath(imgUrl);
+    const publicIndex = normalized.indexOf("public");
+    if (publicIndex !== -1) {
+      const relativePath = normalized.slice(publicIndex + "public".length);
+      return process.env.PUBLIC_URL + relativePath;
+    } else {
+      const imgIndex = normalized.indexOf("/img");
+      if (imgIndex !== -1) {
+        const relativeImgPath = normalized.slice(imgIndex);
+        return `${relativeImgPath}`;
+      } else if (normalized.startsWith("blob:") || normalized.startsWith("data:")) {
+        return normalized;
+      } else {
+        return fallbackImage;
+      }
+    }
+  };
 
   // 보충제 목록 가져오기
   const getBoardListByFetcher = async () => {
@@ -80,6 +104,8 @@ function VersusModal({ modal, toggle, selectedBoard, setSelectedBoard, selectedI
         return updated;
       });
     }
+
+    console.log(tdata)
 
     setSelected(tdata.boardCategoryCodeId);
 
@@ -222,7 +248,11 @@ function VersusModal({ modal, toggle, selectedBoard, setSelectedBoard, selectedI
                     style={{ cursor: "pointer" }}
                     onClick={() => onBoardClickInVersus(tdata)}
                   >
-                    <Blog className={versusStyle.boardList} title={tdata.boardName} />
+                    <div className={versusStyle.boardList}>
+                      <img className={versusStyle.selectedImg} src={resolveImageUrl(tdata.imgUrl)} alt="보충제 이미지" />
+                      <div className={versusStyle.boardListTitle}>{tdata.boardName}</div>
+                    </div>
+                    {/* <Blog className={versusStyle.boardList} title={tdata.boardName} /> */}
                   </Col>
                 ))}
               </Row>

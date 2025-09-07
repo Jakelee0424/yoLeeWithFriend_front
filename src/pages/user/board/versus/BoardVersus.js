@@ -1,16 +1,72 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import VersusModal from "./VersusModal.js";
 import versusStyle from "style/versus.module.css";
 import fontstyles from "style/font.module.css";
 import questionIcon from "../../../../otherLib/bootStrap/assets/images/icon/question.png"
+import { useNavigate } from "react-router-dom";
+
+const STORAGE_KEY = "boardVersusState";
 
 function BoardVersus() {
-  const [selectedBoard, setSelectedBoard] = useState([null, null, null]);
+  // Load initial state from sessionStorage if available
+  const getInitialState = () => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          selectedBoard: parsed.selectedBoard ?? [null, null, null],
+          nuinfoList: parsed.nuinfoList ?? [[], [], []],
+        };
+      }
+    } catch (e) {}
+    return {
+      selectedBoard: [null, null, null],
+      nuinfoList: [[], [], []],
+    };
+  };
+
+  const [selectedBoard, setSelectedBoard] = useState(getInitialState().selectedBoard);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [nuinfoList, setNuinfoList] = useState([[], [], []]);
+  const [nuinfoList, setNuinfoList] = useState(getInitialState().nuinfoList);
   const [showTooltip, setShowTooltip] = useState();
-  const question = process.env.PUBLIC_URL+"/assets/images/icon/question.png";
+  const navigate = useNavigate();
+
+  // Save state to sessionStorage whenever selectedBoard or nuinfoList changes
+  useEffect(() => {
+    sessionStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        selectedBoard,
+        nuinfoList,
+      })
+    );
+  }, [selectedBoard, nuinfoList]);
+
+  const fallbackImage = process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
+
+  const normalizePath = (path) => path.replace(/\\/g, "/");
+
+  const resolveImageUrl = (imgUrl) => {
+    if (!imgUrl) return fallbackImage;
+    const normalized = normalizePath(imgUrl);
+    const publicIndex = normalized.indexOf("public");
+    if (publicIndex !== -1) {
+      const relativePath = normalized.slice(publicIndex + "public".length);
+      return process.env.PUBLIC_URL + relativePath;
+    } else {
+      const imgIndex = normalized.indexOf("/img");
+      if (imgIndex !== -1) {
+        const relativeImgPath = normalized.slice(imgIndex);
+        return `${relativeImgPath}`;
+      } else if (normalized.startsWith("blob:") || normalized.startsWith("data:")) {
+        return normalized;
+      } else {
+        return fallbackImage;
+      }
+    }
+  };
 
   // 칸 클릭 시 모달 열고 index 저장
   const handleSlotClick = (index) => {
@@ -28,14 +84,24 @@ function BoardVersus() {
       updated[index] = null;
       return updated;
     });
+    setNuinfoList((prev) => {
+      const updated = [...prev];
+      updated[index] = [];
+      return updated;
+    });
+  };
+
+  const handleBoardDetailClick = (boardId) => {
+    navigate(`/user/board/view?boardId=${boardId}`);
   };
 
   return (
     <div className="App">
-      <button className={versusStyle.resetButton}
+      <button className={`${versusStyle.resetButton} ${fontstyles.text}`}
           onClick={() => {
             setSelectedBoard([null, null, null]);
             setNuinfoList([[], [], []]);
+            sessionStorage.removeItem(STORAGE_KEY);
           }}
         >
           초기화
@@ -52,17 +118,16 @@ function BoardVersus() {
             >
               {selectedBoard[index] ? (
                 <div className={fontstyles.text}>
-                  <div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteBtnClick(index);
-                      }}
-                    >
+                  <div className={versusStyle.selectedBoardContainer}>
+                    <button className={versusStyle.selectedBoardDelete} onClick={(e) => {e.stopPropagation(); onDeleteBtnClick(index);}}>
                       x
                     </button>
+                    <div className={versusStyle.selectedBoardDetail}>
+                      <img className={versusStyle.selectedImgInVersus} src={resolveImageUrl(selectedBoard[index]?.imgUrl)} alt="보충제 이미지" />
+                      <div className={fontstyles.text}>{selectedBoard[index].boardName}</div>
+                    </div>
+                    <button className={versusStyle.boardDetailButton} onClick={(e) => {e.stopPropagation(); handleBoardDetailClick(selectedBoard[index].boardId)}}>자세히 보기</button>
                   </div>
-                  <div>{selectedBoard[index].boardName}</div>
                 </div>
               ) : (
                 <>
