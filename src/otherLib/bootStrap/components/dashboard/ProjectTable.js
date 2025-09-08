@@ -58,9 +58,9 @@ const ProjectTables = () => {
     <div>
       <Card>
         <CardBody>
-          <CardTitle tag="h5">Project Listing</CardTitle>
+          <CardTitle tag="h5">리뷰어 순위</CardTitle>
           <CardSubtitle className="mb-2 text-muted" tag="h6">
-            Overview of the projects
+            리뷰순
           </CardSubtitle>
 
           <Table className="no-wrap mt-3 align-middle" responsive borderless>

@@ -30,15 +30,18 @@ const SalesChart = () => {
     colors: ["#0d6efd", "#009efb", "#6771dc"],
     xaxis: {
       categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
       ],
     },
     responsive: [
@@ -69,9 +72,9 @@ const SalesChart = () => {
   return (
     <Card>
       <CardBody>
-        <CardTitle tag="h5">Sales Summary</CardTitle>
+        <CardTitle tag="h5">유저 접속 통계</CardTitle>
         <CardSubtitle className="text-muted" tag="h6">
-          Yearly Sales Report
+          월단위
         </CardSubtitle>
         <Chart options={options} series={series} type="bar" height="379" />
       </CardBody>

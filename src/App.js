@@ -48,6 +48,7 @@ function App () {
                   {/* 보호 라우트 그룹 */}
                     <Route element={<IPBlockProtectedRoute />}>
                     <Route path="/user/board/detail" element={<BoardDetail />} /> {/* /게시판 상세 */}
+                    <Route element={<IPBlockProtectedRoute />}>
                     <Route path="/mypage" element={<Mypage />} /> {/* /마이페이지 */}
                     {routes}
                   </Route>

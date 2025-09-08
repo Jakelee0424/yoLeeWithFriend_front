@@ -3,8 +3,6 @@ import { Button, Col, Input, Label, Row } from "reactstrap";
 import {  Card, CardBody, CardTitle, CardSubtitle, Table } from "reactstrap";
 import * as logsService from "service/admin/logs/logsService";
 import bS from "style/basic.module.css"
-import LogMenuView from "./LogMenuView";
-import LogMenuList from "./LogMenuList";
 import dayjs from 'dayjs';
 import PaginationComponet from 'components/common/PaginationComponet';
 import {search} from 'data/search';
@@ -153,11 +151,7 @@ const LogList = () => {
           setCurrentPage={setCurrentPage}
         />
       </div>
-      <div style={{display:"flex"}}>
-        <LogMenuList />
-        <LogMenuView />
-      </div>
-      <Card style={{width:"100%"}}>
+      <Card style={{width:"100%", marginTop:"3%"}}>
         <CardBody>
           <CardTitle tag="h5">로그관리</CardTitle>
           <Table className="no-wrap mt-3 align-middle" responsive borderless>
@@ -178,7 +172,7 @@ const LogList = () => {
                     onContextMenu={(e) => handleRightClick(e, tdata.ipAddress)}
                   >
                      <td>
-                      {dayjs(tdata.createdDate).format('YYYY-MM-DD')}
+                      {dayjs(tdata.createdDate).format('YYYY-MM-DD HH:mm:ss')}
                     </td>
                     <td>
                       {tdata.url}

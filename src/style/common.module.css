@@ -1,0 +1,78 @@
+
+.displayFlex{
+    display: flex;
+}
+.menuVarOuter{
+    background-color: black;
+    width: 100%;
+    height: 10%;
+    display: flex;
+    position: fixed;
+    z-index: 50;
+}
+.menuVarInnerLeft{
+    background-color: black;
+    width: 80%;
+    padding: 2% 0%;
+    text-align: left;
+}
+.menuVarInnerRight{
+    background-color: black;
+    width: 16%;
+    padding: 1% 2%;
+    text-align: right;
+}
+.menuVarLinkTitle{
+    color: green;
+    margin: 1%;
+    font-size: medium;
+    text-decoration: none;
+}
+.menuVarLink{
+    color: white;
+    margin: 1%;
+    text-decoration: none;
+}
+.menuVarLinkBlack{
+    color: black;
+    margin: 1%;
+    text-decoration: none;
+}
+.bodySide{
+    width: 15%;
+    height: 200vh;
+    border: solid black 1px;
+}
+.bodySideHeight100{
+    width: 15%;
+    height: 100%;
+    border: solid black 1px;
+}
+.bodySideHeight100NotBorder{
+    width: 15%;
+    height: 100%;
+}
+.bodyCenter{
+    width: 70%;
+    border: solid black 1px;
+}
+.bodyCenterNotBorder{
+    width: 70%;
+}
+.verticalHorizontalCenter{
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+.flexJustifyRight{
+    justify-content: right;
+    display: flex;
+}
+.inputBottomBorderStyle{
+    border-left: hidden;
+    border-top: hidden;
+    border-right: hidden;
+}
+
+
+

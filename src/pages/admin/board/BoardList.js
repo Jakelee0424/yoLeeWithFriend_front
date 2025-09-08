@@ -7,13 +7,14 @@ import { useNavigate } from "react-router-dom";
 import SearchForm from "components/common/SearchForm";
 import { search } from "data/search";
 import PaginationComponet from "components/common/PaginationComponet";
+import { useDispatch, useSelector } from "react-redux";
 
 const logo = process.env.PUBLIC_URL+"/asset/images/title.png";
 const tempImg1 = process.env.PUBLIC_URL+"/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
 const tempImg2 = process.env.PUBLIC_URL+"/asset/images/엑스텐드 프로 웨이 아이솔레이트 64서빙.jpg";
 
 const BoardList = () => {
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   // 게시물 목록
@@ -34,23 +35,27 @@ const BoardList = () => {
   const [getTotalCount, setTotalCount] =  useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const queryParamRedux = useSelector((state) => state.search.data.queryParam);
+  const currentPageRedux = useSelector((state) => state.search.data.currentPage);
   const getBoardMngrListByFetcher = async  () => {
       const inputData ={
-        queryParam :queryParam,
-        currentPage : currentPage,
+        queryParam :queryParamRedux ? queryParamRedux : queryParam,
+        currentPage : currentPageRedux? currentPageRedux : currentPage,
         itemsPerPage : 8,
         pageBlockSize : 10,
+        type:"boardCategory01"
       };
 
       boardMngrService.fetcherBoardMngrList(inputData).then((outPutData) => {
         console.log(outPutData.data)
         setBoardMngrList(outPutData.data.content);
         setTotalCount(outPutData.data.totalCount);
+        setCurrentPage(currentPageRedux? currentPageRedux : currentPage)
       })
   };
 
   const clickBoard = (boardId) => {
-    navigate(`/admin/boardView/${boardId}`);
+    navigate(`/admin/boardView/${boardId}?type=boardCategory01`);
   };
 
   const deleteBoard = async  () => {
@@ -97,11 +102,12 @@ const BoardList = () => {
     getBoardMngrListByFetcher();
   },[currentPage])
 
+
   return (
     <div style={{display:"flex",width:"100%"}}>
       <Card style={{width:"100%"}}>
         <CardBody>
-          <CardTitle tag="h5">게시물 관리</CardTitle>
+          <CardTitle tag="h5">프로틴</CardTitle>
           <CardSubtitle className="mb-2 text-muted" tag="h6" style={{display: "flex"}}>
             <Input
               type="checkbox"
@@ -119,6 +125,7 @@ const BoardList = () => {
                         placeholder={"검색어 입력"}
                         paramType={2} // 1: 쿼리파라미터 미존재시, 2: 쿼리파라미터 존재시
                         getListEvent={getBoardMngrListByFetcher}
+                        setCurrentPage={setCurrentPage}
             />
             <Button style={{width:"8%", marginRight:"1%", float:"right"}} 
                                 color="primary"

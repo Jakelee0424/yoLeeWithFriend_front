@@ -23,6 +23,9 @@ const BoardView = () => {
   // 회사코드 Id
   const [getBrandCodeId, setBrandCodeId] = useState("");
 
+   // 회사코드 Id
+  const [getFileGroupId, setFileGroupId] = useState("");
+
   // 회사명 리스트
   const [getBrandList, setBrandList] = useState([]);
 
@@ -79,15 +82,17 @@ const BoardView = () => {
         boardId:boardId,
       };
       boardMngrService.fetcherBoard(inputData).then(async (outPutData) => {
-        //console.log(outPutData);
+        console.log(outPutData);
         setBoard(outPutData.data.boardMngrResDto)
         setBoardSn(outPutData.data.boardMngrResDto.boardId)
         setBoardName(outPutData.data.boardMngrResDto.boardName)
         setBrandCodeId(outPutData.data.boardMngrResDto.brandCodeId)
+        setFileGroupId(outPutData.data.boardMngrResDto.fileGroupId)
         const fullPath = outPutData.data.boardMngrResDto.imgUrl;
         const relativePath = fullPath ? fullPath
         : process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
         setProfileImg(process.env.PUBLIC_URL +relativePath)
+        setfileImg(process.env.PUBLIC_URL +relativePath)
         setNuinfoList(await getCodeListByParentIdApi(outPutData.data.boardMngrResDto.nuinfoId))
         const updatedFormData = { ...formData };
         for(let i=0; i<outPutData.data.nuinfoResDtoList.length; i++){
@@ -158,10 +163,12 @@ const BoardView = () => {
           boardId: (id === undefined || id === null || id === 'undefined') ? 0 : id,
           boardName: getBoardName,
           brandCodeId : getBrandCodeId,
+          fileGroupId : getFileGroupId,
+          boardCategoryCodeId : location.search.replace("?type=","")
       },
       nuinfoReqDtoList : nuinfoReqDtoList
     };
-
+    //console.log(location.search.replace("?type=",""))
     const formFileData = new FormData();
     formFileData.append('multipartFile', getfileImg); // formData에 파일 추가
     formFileData.append('data', JSON.stringify(inputData));
@@ -198,7 +205,8 @@ const BoardView = () => {
   };
 
   const goBack = () => {
-    navigate(`/admin/boardMngr`);
+    
+    navigate(`/admin/boardMngr${location.search.replace("?type=boardCategory0","")}`);
   };
 
   const clickBoardImg = (boardId) => {

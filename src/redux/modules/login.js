@@ -11,7 +11,9 @@ const login = (state = initialState, action) => {
     case "PLUS_ONE":
       return {id: action.payload.id, nickName: action.payload.nickName, profilePath: action.payload.profilePath};
     case "changeNickName":
-      return {nickName: action.payload.nickName, profilePath: action.payload.profilePath};  
+      return {nickName: action.payload.nickName, profilePath: action.payload.profilePath};
+    case "RESET_USER": // 초기화 액션
+      return initialState;    
     default:
       return state;
   }
