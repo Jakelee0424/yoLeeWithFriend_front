@@ -5,10 +5,15 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import * as menuService from "service/common/menuService";
 /* 컴포넌트 import */
 import Main from "./pages/Main";
-import Test from "pages/user/test/Test";
+import Mypage from "pages/user/mypage/Mypage";
 import IPBlockProtectedRoute from "pages/user/util/IPBlockProtectedRoute";
 import FullLayoutUser from "pages/user/template/FullLayoutUser";
 import { MenuContext } from "contexts/MenuContext.js";
+import LogInsertRoute from "pages/user/util/LogInsertRoute";
+import Login from "pages/user/login/Login";
+import OAuth2RedirectHandler from "pages/user/login/OAuth2RedirectHandler";
+import KakaoOAuth2RedirectHandler from "pages/user/login/KakaoOAuth2RedirectHandler";
+import BoardDetail from "pages/user/board/detail/BoardDetail";
 
 // 프로젝트 파일구조에서 특정 js 화면을 추출하기 위한 modules 변수
 const modules = require.context("./pages/user", true, /\.js$/);
@@ -37,15 +42,21 @@ function App () {
         <div className="app" style={{width:"100%", height:"100%"}}>
           <Suspense fallback={<div>Loading...</div>}>
             <Routes>   
+              <Route element={<LogInsertRoute />}>
               {/* 일반 유저용 메인 페이지 */}
-              <Route path="/" element={ <FullLayoutUser /> }> {/* 기본 경로 */}
-                {/* 보호 라우트 그룹 */}
-                <Route element={<IPBlockProtectedRoute />}>
-                  <Route path="/test" element={<Test />} /> {/* /test */}
-                  {routes}
+                <Route path="/" element={ <FullLayoutUser /> }> {/* 기본 경로 */}
+                  {/* 보호 라우트 그룹 */}
+                    <Route element={<IPBlockProtectedRoute />}>
+                    <Route path="/user/board/detail" element={<BoardDetail />} /> {/* /게시판 상세 */}
+                    <Route path="/mypage" element={<Mypage />} /> {/* /마이페이지 */}
+                    {routes}
+                  </Route>
+                  <Route index element={<Main />} /> {/* 기본 경로 */}  
                 </Route>
-                <Route index element={<Main />} /> {/* 기본 경로 */}  
+                <Route path="/login" element={<Login />} /> {/* 기본 경로 */}  
               </Route>
+              <Route path="/login/callback/naver" element={<OAuth2RedirectHandler/>} />
+              <Route path="/login/callback/kakao" element={<KakaoOAuth2RedirectHandler/>} />
             </Routes>
           </Suspense>
         </div>
