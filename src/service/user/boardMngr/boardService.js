@@ -14,7 +14,6 @@ export const fetcherBoardMainList = async (data) => {
 
 };
 
-
 export const fetcherBoardRandomList = async (data) => {
 
       const fetcher = new Fetcher().setUrl(`/board/randomAll`)
@@ -71,3 +70,38 @@ export const fetcherGetNuteInfo = async (data) => {
 
 };
 
+export const fetcherSaveBoardComment = async (data) => {
+  const fetcher = new Fetcher().setUrl("/board/saveBoardComment")
+                                  .setMethod("POST")
+                                  .setData(data);
+  try {
+    const result = await fetcher.jsonFetch();
+    return result;
+  } catch (error) {
+    console.error("error 발생! :", error);
+  }
+};
+
+export const fetcherGetBoardCommentById = async (data) => {
+  const fetcher = new Fetcher().setUrl("/board/getBoardCommentById")
+                                .setMethod("GET")
+                                .setData(data);
+  try {
+    const result = await fetcher.jsonFetch();
+    return result;
+  } catch (error) {
+    console.error("error 발생! :", error);
+  }
+};
+
+export const fetcherGetBoardRateById = async (data) => {
+  const fetcher = new Fetcher().setUrl("/board/getBoardRateById")
+                                .setMethod("GET")
+                                .setData(data);
+  try {
+    const result = await fetcher.jsonFetch();
+    return result;
+  } catch (error) {
+    console.error("error 발생! :", error);
+  }
+};
