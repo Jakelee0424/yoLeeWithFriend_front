@@ -111,7 +111,7 @@ function BoardList() {
   };
 
   const clickView = (boardId) => {
-    navigate(`/user/board/view?boardId=${boardId}`);
+    navigate(`/user/board/detail?boardId=${boardId}`);
   };
 
   const clickMore = () => {
