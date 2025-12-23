@@ -3,10 +3,12 @@ import { useSelector } from "react-redux";
 import styles from "style/boardDetail.module.css";
 import * as boardService from "service/user/boardMngr/boardService";
 import * as boardMngrService from "service/admin/boardMngr/boardMngrService";
+import { useLocation } from 'react-router-dom';
 
 const BoardDetail = ({ item, onChange }) => {
+  const query = new URLSearchParams(useLocation().search);  
+  const boardId = query.get('boardId'); // 'myParam'에 해당하는 쿼리 파라미터 값 가져오기
   const user = useSelector((state) => state.login);
-  const boardId = 6;
   item = {
     imageUrl: "/no-image.png",
     nutritionInfo: [
@@ -34,6 +36,12 @@ const BoardDetail = ({ item, onChange }) => {
   });
 
   const saveComment = async () => {
+
+    if(!user.id){
+       alert("한줄평 등록은 로그인 후 가능합니다.")
+       return false;
+    } 
+
     if (comment.trim() === "") {
       alert("한줄평 내용을 입력해주세요.");
       return false;
@@ -104,15 +112,81 @@ const BoardDetail = ({ item, onChange }) => {
   const getBoardByFetcher = async  (boardId) => {
     const data = { boardId: boardId };
     boardMngrService.fetcherBoard(data).then((result) => {
-      if (result && result.boardMngrResDto) {
+      console.log(result)
+      if (result.data && result.data.boardMngrResDto) {
+        let priceText = 0;
+        if(result.data.nuinfoResDtoList.length > 8){
+          priceText = result.data.nuinfoResDtoList[8].value;
+        }
         setBoardInfo({
-          boardId: result.boardMngrResDto.boardId,
-          boardName: result.boardMngrResDto.boardName,
-          imgUrl: result.boardMngrResDto.imgUrl || "/no-image.png",
-          nutritionInfo: result.nuinfoResDtoList || [],
+          boardId: result.data.boardMngrResDto.boardId,
+          boardName: result.data.boardMngrResDto.boardName,
+          imgUrl: result.data.boardMngrResDto.imgUrl || "/no-image.png",
+          nutritionInfo: result.data.nuinfoResDtoList || [],
+          priceText : priceText
         });
       }
     });
+  };
+
+  const getNutriInfoName = (code) =>{
+    let codeName = "";
+    switch (code) {
+      case 'nutritionInformation0101':
+        codeName = "단백질";
+        break;
+      case 'nutritionInformation0102':
+        codeName = "당류";
+        break;
+      case 'nutritionInformation0103':
+        codeName = "지방";
+        break;  
+      case 'nutritionInformation0104':
+        codeName = "칼로리";
+        break;
+      case 'nutritionInformation0105':
+        codeName = "콜레스테롤";
+        break;  
+      case 'nutritionInformation0106':
+        codeName = "나트륨";
+        break;
+      case 'nutritionInformation0107':
+        codeName = "칼륨";
+        break;
+      case 'nutritionInformation0108':
+        codeName = "탄수화물";
+        break;
+      case 'nutritionInformation0109':
+        codeName = "가격";
+        break;      
+      default:
+        codeName = "";
+    }
+    return codeName;
+  }
+
+  const fallbackImage = process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
+
+  const normalizePath = (path) => path.replace(/\\/g, "/");
+
+  const resolveImageUrl = (imgUrl) => {
+    if (!imgUrl) return fallbackImage;
+    const normalized = normalizePath(imgUrl);
+    const publicIndex = normalized.indexOf("public");
+    if (publicIndex !== -1) {
+      const relativePath = normalized.slice(publicIndex + "public".length);
+      return process.env.PUBLIC_URL + relativePath;
+    } else {
+      const imgIndex = normalized.indexOf("/img");
+      if (imgIndex !== -1) {
+        const relativeImgPath = normalized.slice(imgIndex);
+        return `${relativeImgPath}`;
+      } else if (normalized.startsWith("blob:") || normalized.startsWith("data:")) {
+        return normalized;
+      } else {
+        return fallbackImage;
+      }
+    }
   };
 
   useEffect(() => {
@@ -130,7 +204,7 @@ const BoardDetail = ({ item, onChange }) => {
           <div className={styles.imageBox}>
             <div className={styles.imageWrapper}>
               <img
-                src={boardInfo?.imageUrl || "/no-image.png"}
+                src={`${resolveImageUrl(boardInfo?.imgUrl)}`}
                 alt="보충제 이미지"
                 className={styles.image}
               />
@@ -168,11 +242,13 @@ const BoardDetail = ({ item, onChange }) => {
             <div className={styles.grayBox}>
               <h4 className={styles.sectionTitle}>영양정보</h4>
               <div className={styles.infoInnerBox}>
-                {(item?.nutritionInfo || []).map((nutrient, idx) => (
-                  <div key={idx} className={styles.nutritionRow}>
-                    <span>{nutrient.name}</span>
-                    <span>{nutrient.value}</span>
-                  </div>
+                {(boardInfo?.nutritionInfo || []).map((nutrient, idx) => (
+                  idx !== 8 && (
+                    <div key={idx} className={styles.nutritionRow}>
+                      <span>{getNutriInfoName(nutrient.codeId)}</span>
+                      <span>{nutrient.value}</span>
+                    </div>
+                  )
                 ))}
               </div>
             </div>
@@ -184,7 +260,7 @@ const BoardDetail = ({ item, onChange }) => {
               <div className={styles.infoInnerBox}>
                 <div className={styles.nutritionRow}>
                   <span>가격</span>
-                  <span>{item?.priceText || "정보 없음"}</span>
+                  <span>{boardInfo?.priceText || "정보없음"}</span>
                 </div>
               </div>
             </div>
