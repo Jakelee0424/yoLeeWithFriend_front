@@ -84,6 +84,10 @@ function Main() {
         }
       })   
   }    
+
+  const handleBoardDetailClick = (boardId) => {
+    navigate(`/user/board/detail?boardId=${boardId}`);
+  };
   
   useEffect(() => {
     getBannerList()
@@ -222,7 +226,8 @@ function Main() {
                 <img
                   src={resolveImageUrl(tdata.imgUrl)}
                   alt={tdata.boardName}
-                  style={{ objectFit: "contain", width: "100%", height: "12rem" }}
+                  style={{ objectFit: "contain", width: "100%", height: "12rem", cursor:"pointer" }}
+                  onClick={(e) => {e.stopPropagation(); handleBoardDetailClick(tdata.boardId)}}
                 />
                 <div className={styles.text} style={{ textAlign: "center" }}>
                   {tdata.boardName}
@@ -260,7 +265,8 @@ function Main() {
                 <img
                   src={resolveImageUrl(tdata.imgUrl)}
                   alt={tdata.boardName}
-                  style={{ objectFit: "contain", width: "100%", height: "12rem" }}
+                  style={{ objectFit: "contain", width: "100%", height: "12rem", cursor:"pointer" }}
+                  onClick={(e) => {e.stopPropagation(); handleBoardDetailClick(tdata.boardId)}}
                 />
                 <div className={styles.text} style={{ textAlign: "center" }}>
                   {tdata.boardName}
@@ -274,9 +280,8 @@ function Main() {
       {/* 뉴스레터 div */}
       <div style={{
         width:"100%",
-        height:"20rem",
+        height:"4rem",
         marginTop:"3%",
-        backgroundColor:"black"
       }}>
         
       </div>

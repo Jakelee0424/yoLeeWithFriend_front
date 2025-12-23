@@ -92,7 +92,7 @@ function BoardVersus() {
   };
 
   const handleBoardDetailClick = (boardId) => {
-    navigate(`/user/board/view?boardId=${boardId}`);
+    navigate(`/user/board/detail?boardId=${boardId}`);
   };
 
   return (
