@@ -16,7 +16,7 @@ export const NaverLogin = (code,state) => {
                                      .setData(JSON.stringify(data))
                                      .build();
                                      
-        // console.log("fetcher :", fetcher);
+        console.log("fetcher :", fetcher);
         const result = await fetcher.jsonFetch();
 
         try {

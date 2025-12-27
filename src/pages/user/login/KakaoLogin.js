@@ -9,13 +9,13 @@ export const KakaoLogin = (code,state) => {
             code: code,
             state: state
         };
-        // console.log("kakao")
+        console.log("kakao")
         const fetcher = new Fetcher().setUrl("/login/callback/kakao")
                                      .setMethod("post")
                                      .setData(JSON.stringify(data))
                                      .build();
                                      
-        // console.log("fetcher :", fetcher);
+        console.log("fetcher :", fetcher);
         const result = await fetcher.jsonFetch();
 
         try {
