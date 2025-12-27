@@ -105,9 +105,22 @@ function VersusModal({ modal, toggle, selectedBoard, setSelectedBoard, selectedI
       });
     }
 
-    console.log(tdata)
-
+    // 한줄평 조회 함수
+      const tempData = { boardId: tdata.boardId };
+      boardService
+        .fetcherGetBoardCommentById(JSON.stringify(tempData))
+        .then(
+              async (outPutData) => {
+                setSelectedBoard((prev) => {
+                  const updated = [...prev];
+                  updated[selectedIndex].comment = outPutData.data;
+                  return updated;
+                });
+              }
+            
+        );
     setSelected(tdata.boardCategoryCodeId);
+    getBoardRate(tdata.boardId, selectedIndex)
 
     boardService.fetcherGetNuteInfo(tdata).then(async (outPutData) => {
       setNuinfoList((prev) => {
@@ -115,9 +128,35 @@ function VersusModal({ modal, toggle, selectedBoard, setSelectedBoard, selectedI
         updated[selectedIndex] = outPutData.data; 
         return updated;
       });
+
+      // 가격 세팅
+      if(outPutData.data.length > 7){
+        setSelectedBoard((prev) => {
+          const updated = [...prev];
+          updated[selectedIndex].price = outPutData.data[8].value;
+          return updated;
+        });
+      }
     });
 
     toggle();
+  };
+
+  // 게시글 평점 함수
+  const getBoardRate = async (boardId, selectedIndex) => {
+    const data = { boardId: boardId };
+    const boardRate = await boardService
+      .fetcherGetBoardRateById(JSON.stringify(data))
+      .then((result) => result.data
+    );
+    // ✅ 상태에 저장
+      setSelectedBoard((prev) => {
+        const updated = [...prev];
+        updated[selectedIndex].avgIngredientRate = boardRate.avgIngredientRate;
+        updated[selectedIndex].avgPriceRate = boardRate.avgPriceRate;
+        updated[selectedIndex].avgTasteRate = boardRate.avgTasteRate;
+        return updated;
+      });
   };
 
   useEffect(() => {
