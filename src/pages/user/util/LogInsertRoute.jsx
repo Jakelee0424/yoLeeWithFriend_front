@@ -52,10 +52,10 @@ function LogInsertRoute() {
             description:location.search,
             userId : reduxUserInfo.id
         };
-        console.log(reduxUserInfo)
+        // console.log(reduxUserInfo)
 
         logsService.fetcherLogsSave(inputData).then((outPutData) => {
-           console.log(outPutData)
+          //  console.log(outPutData)
         })
 
         
