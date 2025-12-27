@@ -4,6 +4,7 @@ import versusStyle from "style/versus.module.css";
 import fontstyles from "style/font.module.css";
 import questionIcon from "../../../../otherLib/bootStrap/assets/images/icon/question.png"
 import { useNavigate } from "react-router-dom";
+import styles from "style/boardDetail.module.css";
 
 const STORAGE_KEY = "boardVersusState";
 
@@ -42,6 +43,7 @@ function BoardVersus() {
         nuinfoList,
       })
     );
+    console.log(selectedBoard)
   }, [selectedBoard, nuinfoList]);
 
   const fallbackImage = process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
@@ -93,6 +95,12 @@ function BoardVersus() {
 
   const handleBoardDetailClick = (boardId) => {
     navigate(`/user/board/detail?boardId=${boardId}`);
+  };
+
+  const renderStars = (score) => {
+    if (!score) return "평가 없음";
+    const rounded = Math.round(score); // 소수점 반올림
+    return "★".repeat(rounded) + "☆".repeat(5 - rounded);
   };
 
   return (
@@ -192,6 +200,8 @@ function BoardVersus() {
               {selectedBoard[index] ? (
                 <ul>
                   {nuinfoList[index].map((item, i) => {
+
+                    if (i > 7) return null;
                     const values = nuinfoList.map((list) => {
                       const val = list[i]?.value;
                       return val && !isNaN(Number(val)) ? Number(val) : null;
@@ -235,8 +245,52 @@ function BoardVersus() {
             </div>
           </div>
         ) : (
-          <div>
-            <p style={{ color: "#888" }}>평점 내용 여기에</p>
+          <div className={versusStyle.nutriGrid}>
+            {[0, 1, 2].map((index) => {
+              if (!selectedBoard[index]) return null;
+
+              // 각 카테고리별 최대값 찾기
+              const ingredientRates = [0, 1, 2]
+                .map(i => selectedBoard[i]?.avgIngredientRate)
+                .filter(v => v != null);
+              const priceRates = [0, 1, 2]
+                .map(i => selectedBoard[i]?.avgPriceRate)
+                .filter(v => v != null);
+              const tasteRates = [0, 1, 2]
+                .map(i => selectedBoard[i]?.avgTasteRate)
+                .filter(v => v != null);
+
+              const maxIngredient = Math.max(...ingredientRates);
+              const maxPrice = Math.max(...priceRates);
+              const maxTaste = Math.max(...tasteRates);
+
+              // 현재 항목이 최대값인지 확인
+              const isIngredientWinner = selectedBoard[index].avgIngredientRate === maxIngredient;
+              const isPriceWinner = selectedBoard[index].avgPriceRate === maxPrice;
+              const isTasteWinner = selectedBoard[index].avgTasteRate === maxTaste;
+
+              return(
+              <div key={index}  className={versusStyle.nutriColumn} >
+                {selectedBoard[index] ? (
+                  
+                  <>    
+                    <li className={isIngredientWinner ? versusStyle.winner : ''} style={{ color: "#888" }}>맛: {renderStars(selectedBoard[index].avgIngredientRate)}</li>
+                    <li className={isPriceWinner ? versusStyle.winner : ''} style={{ color: "#888" }}>가격: {renderStars(selectedBoard[index].avgPriceRate)}</li>
+                    <li className={isTasteWinner ? versusStyle.winner : ''} style={{ color: "#888" }}>성분: {renderStars(selectedBoard[index].avgTasteRate)}</li>
+                    <div>
+                       {selectedBoard[index].comment?.map((commentData, index2) => (
+                          <div key={index2} className={versusStyle.nutriColumn} style={{marginTop:"2%"}}>
+                            ㄴ {commentData.content}
+                          </div>
+                        ))} 
+                    </div>
+                  </>
+                ) : (
+                  <></>
+                )}
+              </div>
+              )
+            })}           
           </div>
         )}
       </div>

@@ -23,8 +23,8 @@ function IPBlockProtectedRoute() {
                 alert(userIp + " 정책상 차단된 아이피입니다.")
                 navigate("/");
             }else{
-                console.log(userIp)
-                console.log(outPutData.data.message)
+                // console.log(userIp)
+                // console.log(outPutData.data.message)
             }
         })
 
@@ -51,8 +51,8 @@ function IPBlockProtectedRoute() {
                 alert(userIp + " 정책상 차단된 아이피입니다.")
                 navigate("/");
             }else{
-                console.log(userIp)
-                console.log(outPutData.data.message)
+                // console.log(userIp)
+                // console.log(outPutData.data.message)
             }
         })
 
