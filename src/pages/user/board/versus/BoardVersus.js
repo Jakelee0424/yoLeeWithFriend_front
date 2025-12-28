@@ -247,7 +247,7 @@ function BoardVersus() {
         ) : (
           <div className={versusStyle.nutriGrid}>
             {[0, 1, 2].map((index) => {
-              if (!selectedBoard[index]) return null;
+              if (!selectedBoard[index]) return <div className={versusStyle.nutriColumn} ></div>;
 
               // 각 카테고리별 최대값 찾기
               const ingredientRates = [0, 1, 2]
