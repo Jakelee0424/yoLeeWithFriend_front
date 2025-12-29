@@ -94,6 +94,11 @@
   font-weight: bold;
 }
 
+.ratingValue2 {
+  color: black;
+  font-weight: bold;
+}
+
 .sectionBlock {
   display: flex;
   flex-direction: column;
@@ -248,6 +253,16 @@
   font-size: 14px;
   resize: vertical;
   border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.textarea2 {
+  min-height: 90px;
+  min-width: 320px;
+  padding: 12px;
+  font-size: 14px;
+  resize: vertical;
+  border: 1px solid white;
   border-radius: 6px;
 }
 
