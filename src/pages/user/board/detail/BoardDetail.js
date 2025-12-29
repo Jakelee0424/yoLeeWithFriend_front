@@ -306,7 +306,7 @@ const BoardDetail = ({ item, onChange }) => {
 
             <textarea
               className={styles.textarea}
-              placeholder="이 보충제에 대한 한줄평을 작성해보세요!"
+              placeholder="작성 한줄평이 부적절하거나, 서비스 운영 정책에 어긋나는 글의 경우 관리자에 의해 삭제될 수 있습니다.’"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
             />
