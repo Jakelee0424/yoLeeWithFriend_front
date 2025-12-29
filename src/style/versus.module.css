@@ -28,13 +28,13 @@
 
 .pickButtonTwo {
   border: none;
-  width: 22rem;
-  height: 25rem;
+  width: 33%;
+  height: 100%;
   font-size: 1rem;
   border-radius: 10px;
   transition: 0.5s;
   cursor: pointer;
-  background-color: #dadada;
+  background-color: #D9D9D957;
   display: flex;
   align-items: center;
   justify-content: center;
