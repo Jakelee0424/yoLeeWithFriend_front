@@ -82,7 +82,6 @@ const BoardView = () => {
         boardId:boardId,
       };
       boardMngrService.fetcherBoard(inputData).then(async (outPutData) => {
-        console.log(outPutData);
         setBoard(outPutData.data.boardMngrResDto)
         setBoardSn(outPutData.data.boardMngrResDto.boardId)
         setBoardName(outPutData.data.boardMngrResDto.boardName)
