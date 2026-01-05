@@ -1,18 +1,79 @@
-import { useEffect,React,useState } from "react";
+import { useEffect,React,useState, useRef } from "react";
 import { Input } from "reactstrap";
 import styles from '../../../style/font.module.css';
 import versusStyle from "style/versus.module.css";
 import boardDetailstyles from "style/boardDetail.module.css";
+import { useSelector } from "react-redux";
+import * as userService from "service/user/user/userService";
 
 function Mypage() {
-
   const profileImg = process.env.PUBLIC_URL+"/asset/images/profileImg.png";
   const profileImg2 = process.env.PUBLIC_URL+"/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
+  const editImg = process.env.PUBLIC_URL+"/asset/images/Edit.png";
+  let reduxUserInfo = useSelector((state) => state.login);
+
+  const [getProfileImg, setProfileImg] = useState(reduxUserInfo.profilePath ? reduxUserInfo.profilePath : profileImg);
+  const [getfileImg, setfileImg] = useState("");
+  const fileInput = useRef(null);
+  const [getUserNickName, setUserNickName] = useState(reduxUserInfo.nickName);
+
+  
+
   const renderStars = (score) => {
     if (!score) return "평가 없음";
     const rounded = Math.round(score); // 소수점 반올림
     return "★".repeat(rounded) + "☆".repeat(5 - rounded);
   };
+
+  const changeProfileImage = async (e) =>{
+    const reader = new FileReader();
+    reader.onload = () => {
+        if(reader.readyState === 2){
+            setProfileImg(reader.result)
+        }
+    }
+    reader.readAsDataURL(e.target.files[0]);
+    setfileImg(e.target.files[0]);
+
+    const formFileData = new FormData();
+    formFileData.append('multipartFile', e.target.files[0]); // formData에 파일 추가
+    formFileData.append('data', JSON.stringify({id: reduxUserInfo.id}));
+    userService.fetcherUserChangeProfileImg(formFileData).then((outPutData) => {
+    })  
+
+ }
+
+
+
+  const normalizePath = (path) => path.replace(/\\/g, "/");
+
+
+ const resolveImageUrl = (imgUrl) => {
+    if (!imgUrl) return profileImg;
+    const normalized = normalizePath(imgUrl);
+    const publicIndex = normalized.indexOf("public");
+    if (publicIndex !== -1) {
+      const relativePath = normalized.slice(publicIndex + "public".length);
+      return process.env.PUBLIC_URL + relativePath;
+    } else {
+      const imgIndex = normalized.indexOf("/img");
+      if (imgIndex !== -1) {
+        const relativeImgPath = normalized.slice(imgIndex);
+        return `${relativeImgPath}`;
+      } else if (normalized.startsWith("blob:") || normalized.startsWith("data:")) {
+        return normalized;
+      } else {
+        return profileImg;
+      }
+    }
+  };
+
+  useEffect(() => {
+
+  }, []);
+ 
+
+
   return (
     <div className="App" style={{width:"100%", height:"100vh"}}>
       <div style={{height:"50%", width:"100%"}}>
@@ -26,20 +87,27 @@ function Mypage() {
               width:"100%",
               display: "flex",
               justifyContent: "center",
-              alignItems: "center"    
-              }}>
-              <img src={profileImg} style={{width:"25%"}}/>
+              alignItems: "center" ,
+              cursor:"pointer"   
+              }}
+              onClick={()=>{fileInput.current.click()}}
+            >
+              <img src={resolveImageUrl(getProfileImg)} style={{width:"130px", height:"130px", borderRadius :"50%", overflow:"hidden"}}/>
+              <input accept="image/*" type="file" hidden value={""}  ref={fileInput}  onChange={changeProfileImage}/>
             </div>
             <div style={{height:"50%", width:"100%"}}>
               <div style={{height:"33%", width:"100%", display:"flex"}}>
                 <div style={{height:"90%", width:"25%", display:"flex", alignItems: "center", marginLeft:"15%"}} >
                   <h5>닉네임</h5>
                 </div>
-                <div style={{height:"90%", width:"50%", marginLeft:"3%", marginRight:"8%"}} >
+                <div style={{height:"90%", width:"50%", marginLeft:"3%", marginRight:"8%", display:"flex"}} >
                   <Input
                     type="text"
-                    value={"피트니스새싹12"}
+                    value={getUserNickName}
                   />
+                  <div style={{display:"flex", alignItems:"center", justifyContent:"center", marginLeft:"3%"}}>
+                    <img src={editImg} />
+                  </div>
                 </div>
               </div>
               <div style={{height:"33%", width:"100%", display:"flex"}}>
