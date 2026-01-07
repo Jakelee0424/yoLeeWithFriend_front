@@ -44,32 +44,32 @@ const Login = () => {
         
     return  <div>
                 <div className="body" style={{display:"flex", height:"97vh",}}>        
-                    <div className={moduleStyle.bodySideHeight100} >
+                    <div className={moduleStyle.bodySideHeight100} style={{border:"solid black 0px"}}>
                     </div>
-                    <div className={`${moduleStyle.bodyCenter} ${moduleStyle.verticalHorizontalCenter}`}  >
-                        <div style={{border:"solid black 1px",height: "60vh", width: "60vh"}} >
-                            <div style={{border:"solid black 1px",height:"20vh", justifyContent:"center",display:"flex" }}>
+                    <div className={`${moduleStyle.bodyCenter} ${moduleStyle.verticalHorizontalCenter}`}  style={{border:"solid black 0px"}}>
+                        <div style={{border:"solid black 0px",height: "60vh", width: "60vh"}} >
+                            <div style={{border:"solid black 0px",height:"20vh", justifyContent:"center",display:"flex" }}>
                                 <Link to={"/"} style={{paddingBottom:"1%"}}>
                                     <Logo />
                                 </Link>
                             </div>
-                            <div style={{border:"solid black 1px",height:"40vh"}}>
-                                <div style={{border:"solid black 1px",height:"10vh",margin:"2vh",justifyContent:"center",display:"flex"}}>
-                                    <div onClick={naverLoginClick}>
+                            <div style={{border:"solid black 0px",height:"40vh"}}>
+                                <div style={{border:"solid black 0px",height:"10vh",margin:"2vh",justifyContent:"center",display:"flex"}}>
+                                    <div onClick={naverLoginClick} style={{cursor:"pointer"}}>
                                         <img  src={naver} style={{width:"40vh" }} ></img>
                                     </div>
                                 </div>
-                                <div style={{border:"solid black 1px",height:"10vh",margin:"2vh",justifyContent:"center",display:"flex"}}>
-                                    <div onClick={kakaoLoginClick}>
+                                <div style={{border:"solid black 0px",height:"10vh",margin:"2vh",justifyContent:"center",display:"flex"}}>
+                                    <div onClick={kakaoLoginClick} style={{cursor:"pointer"}}>
                                         <img  src={kakao} style={{width:"40vh" }} ></img>
                                     </div>
                                 </div>
-                                <div style={{border:"solid black 1px",height:"10vh"}}>
+                                <div style={{border:"solid black 0px",height:"10vh"}} >
                                 </div>  
                             </div>
                         </div>
                     </div>
-                    <div className={moduleStyle.bodySideHeight100}  >
+                    <div className={moduleStyle.bodySideHeight100}  style={{border:"solid black 0px"}}>
                     </div>      
                 </div>
             </div>;

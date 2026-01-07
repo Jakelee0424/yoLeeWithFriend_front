@@ -3,10 +3,11 @@ import { Input } from "reactstrap";
 import styles from '../../../style/font.module.css';
 import versusStyle from "style/versus.module.css";
 import boardDetailstyles from "style/boardDetail.module.css";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch  } from "react-redux";
 import * as userService from "service/user/user/userService";
 
 function Mypage() {
+  const dispatch = useDispatch();
   const profileImg = process.env.PUBLIC_URL+"/asset/images/profileImg.png";
   const profileImg2 = process.env.PUBLIC_URL+"/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
   const editImg = process.env.PUBLIC_URL+"/asset/images/Edit.png";
@@ -15,7 +16,7 @@ function Mypage() {
   const [getProfileImg, setProfileImg] = useState(reduxUserInfo.profilePath ? reduxUserInfo.profilePath : profileImg);
   const [getfileImg, setfileImg] = useState("");
   const fileInput = useRef(null);
-  const [getUserNickName, setUserNickName] = useState(reduxUserInfo.nickName);
+  const [formData, setFormData] = useState({}); // 초기값 빈 객체
 
   
 
@@ -38,14 +39,55 @@ function Mypage() {
     const formFileData = new FormData();
     formFileData.append('multipartFile', e.target.files[0]); // formData에 파일 추가
     formFileData.append('data', JSON.stringify({id: reduxUserInfo.id}));
+
+    userService.fetcherUserChangeProfileImg(formFileData).then((outPutData) => {
+      
+    })  
+ }
+
+ const changeNickName = async (e) =>{
+  
+  if (window.confirm("닉네임을 수정하시겠습니까?")) { 
+      const inputData ={
+        id: reduxUserInfo.id,
+        nickName: formData.nickName.value
+      };
+      
+      userService.fetcherUserChangeNickName(inputData).then((outPutData) => {
+        if(outPutData.result === "SUCCESS"){
+          alert("완료되었습니다.");
+        }
+      })  
+      
+      dispatch({
+        type: "changeNickName",  // 액션 타입은 실제 사용하는 것으로 변경
+        payload: {
+          ...reduxUserInfo,
+          nickName: formData.nickName.value
+        }
+      });
+
+      //window.location.reload();
+  }
+ 
+ }
+
+ const reSetProfileImage = async (e) =>{
+
+    setProfileImg(null)
+    setfileImg(null);
+
+    const formFileData = new FormData();
+    formFileData.append('multipartFile',null); // formData에 파일 추가
+    formFileData.append('data', JSON.stringify({id: reduxUserInfo.id}));
     userService.fetcherUserChangeProfileImg(formFileData).then((outPutData) => {
     })  
-
+    //window.location.reload();
  }
 
 
 
-  const normalizePath = (path) => path.replace(/\\/g, "/");
+ const normalizePath = (path) => path.replace(/\\/g, "/");
 
 
  const resolveImageUrl = (imgUrl) => {
@@ -68,8 +110,21 @@ function Mypage() {
     }
   };
 
-  useEffect(() => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: {
+        ...prevData[name],   // 혹시 모를 다른 필드 유지
+        value: value          // value 필드만 업데이트
+      }
+    }));
+  };
 
+  useEffect(() => {
+    setFormData({
+      nickName: { value: reduxUserInfo.nickName }  // 구조 수정
+    });
   }, []);
  
 
@@ -86,14 +141,32 @@ function Mypage() {
             <div style={{height:"50%",
               width:"100%",
               display: "flex",
-              justifyContent: "center",
+              justifyContent: "space-between",
               alignItems: "center" ,
               cursor:"pointer"   
-              }}
+            }}
               onClick={()=>{fileInput.current.click()}}
             >
-              <img src={resolveImageUrl(getProfileImg)} style={{width:"130px", height:"130px", borderRadius :"50%", overflow:"hidden"}}/>
+              <img src={resolveImageUrl(getProfileImg)} style={{width:"130px", height:"130px", borderRadius :"50%", overflow:"hidden", marginLeft:"10%"}}/>
               <input accept="image/*" type="file" hidden value={""}  ref={fileInput}  onChange={changeProfileImage}/>
+              <div style={{
+                      width:"15%",
+                      height:"20%",
+                      borderRadius:"8px",
+                      border: "2px solid rgba(0, 0, 0, 0.2)",
+                      display:"flex",
+                      justifyContent:"center",
+                      alignItems:"center",
+                      backgroundColor:"#FFFFFF",
+                      marginRight:"2%",
+                      marginBottom:"15%"
+                    }}
+                    className={styles.text}
+                    onClick={(e) => {
+                      e.stopPropagation();  // 이벤트 전파 중단
+                      reSetProfileImage();
+                    }}
+                    >사진 초기화</div>
             </div>
             <div style={{height:"50%", width:"100%"}}>
               <div style={{height:"33%", width:"100%", display:"flex"}}>
@@ -103,10 +176,15 @@ function Mypage() {
                 <div style={{height:"90%", width:"50%", marginLeft:"3%", marginRight:"8%", display:"flex"}} >
                   <Input
                     type="text"
-                    value={getUserNickName}
+                    name="nickName"
+                    value={formData.nickName?.value ?? ""}
+                    onChange={handleChange}
                   />
                   <div style={{display:"flex", alignItems:"center", justifyContent:"center", marginLeft:"3%"}}>
-                    <img src={editImg} />
+                    <img src={editImg} style={{cursor:"pointer"}} onClick={(e) => {
+                      e.stopPropagation();  // 이벤트 전파 중단
+                      changeNickName();
+                    }} />
                   </div>
                 </div>
               </div>

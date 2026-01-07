@@ -13,10 +13,13 @@ import { useDispatch, useSelector } from "react-redux";
 import Fetcher from "utils/Fetcher";
 
 const Header = () => {
+  const profileImg = process.env.PUBLIC_URL+"/asset/images/profileImg.png";
+  let reduxUserInfo = useSelector((state) => state.login);
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = React.useState(false);
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [getUserNickName, setUserNickName] = useState("");
+  const [getProfileImg, setProfileImg] = useState(reduxUserInfo.profilePath ? reduxUserInfo.profilePath : profileImg);
   const { menuTree } = useMenu();
   const toggle = () => setDropdownOpen((prevState) => !prevState);
   const Handletoggle = () => setIsOpen(!isOpen);
@@ -30,8 +33,35 @@ const Header = () => {
   });
 
   const dispatch = useDispatch();
-  let reduxUserInfo = useSelector((state) => state.login);
   const token = JSON.parse(localStorage.getItem("token"));
+
+  const normalizePath = (path) => {
+    if (!path || typeof path !== 'string') return "";  // 타입 체크까지 추가
+    return path.replace(/\\/g, "/");
+  };
+
+ 
+
+
+  const resolveImageUrl = (imgUrl) => {
+    if (!imgUrl) return profileImg;
+    const normalized = normalizePath(imgUrl);
+    const publicIndex = normalized.indexOf("public");
+    if (publicIndex !== -1) {
+      const relativePath = normalized.slice(publicIndex + "public".length);
+      return process.env.PUBLIC_URL + relativePath;
+    } else {
+      const imgIndex = normalized.indexOf("/img");
+      if (imgIndex !== -1) {
+        const relativeImgPath = normalized.slice(imgIndex);
+        return `${relativeImgPath}`;
+      } else if (normalized.startsWith("blob:") || normalized.startsWith("data:")) {
+        return normalized;
+      } else {
+        return profileImg;
+      }
+    }
+  };
 
   // 로그인 유저 정보 함수
   const fetchUserInfo = async () => {
@@ -44,8 +74,10 @@ const Header = () => {
       try {
         const result = await fetcher.jsonFetch();
         if(result.data){
+          console.log(result.data)
           dispatch({type:"PLUS_ONE",payload: result.data})
           setUserNickName(result.data.nickName)
+          setProfileImg(result.data.profilePath)
         }else{
           alert("메인으로 돌아갑니다. 다시 로그인을 시도해주세요")
           handleLogout();
@@ -110,6 +142,10 @@ const Header = () => {
   useEffect(() => {
     fetchUserInfo();
   },[])
+
+  useEffect(() => {
+    setUserNickName(reduxUserInfo.nickName)
+  },[reduxUserInfo])
 
   useEffect(() => {
           const handleMessage = (event) => {
@@ -223,7 +259,11 @@ const Header = () => {
           onClick={e => {
             navigate(`/mypage`); 
           }}
-        >{token ? getUserNickName : "" }</div>
+        >
+          {token ? <img src={resolveImageUrl(getProfileImg)} style={{width:"30px", height:"30px", borderRadius :"50%", overflow:"hidden", marginLeft:"10%"}}/>
+          :<></>}
+          {token ? getUserNickName : "" }
+        </div>
       </div>
     </Navbar>
   );
