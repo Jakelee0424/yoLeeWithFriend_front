@@ -5,6 +5,8 @@ import versusStyle from "style/versus.module.css";
 import boardDetailstyles from "style/boardDetail.module.css";
 import { useSelector, useDispatch  } from "react-redux";
 import * as userService from "service/user/user/userService";
+import dayjs from 'dayjs';
+import * as boardService from "service/user/boardMngr/boardService";
 
 function Mypage() {
   const dispatch = useDispatch();
@@ -17,6 +19,7 @@ function Mypage() {
   const [getfileImg, setfileImg] = useState("");
   const fileInput = useRef(null);
   const [formData, setFormData] = useState({}); // 초기값 빈 객체
+  const [countData, setCountData] = useState({}); // 초기값 빈 객체
 
   
 
@@ -41,8 +44,16 @@ function Mypage() {
     formFileData.append('data', JSON.stringify({id: reduxUserInfo.id}));
 
     userService.fetcherUserChangeProfileImg(formFileData).then((outPutData) => {
-      
+      dispatch({
+        type: "changeNickName",  // 액션 타입은 실제 사용하는 것으로 변경
+        payload: {
+          ...reduxUserInfo,
+          id: reduxUserInfo.id,
+          profilePath: outPutData.data.profilePath
+        }
+      });
     })  
+
  }
 
  const changeNickName = async (e) =>{
@@ -63,6 +74,7 @@ function Mypage() {
         type: "changeNickName",  // 액션 타입은 실제 사용하는 것으로 변경
         payload: {
           ...reduxUserInfo,
+          id: reduxUserInfo.id,
           nickName: formData.nickName.value
         }
       });
@@ -121,10 +133,27 @@ function Mypage() {
     }));
   };
 
+  const getCommnetCount = async () =>{
+      const data = { userId: reduxUserInfo.id };
+      const commentCountRes = await boardService
+        .fetcherGetBoardCommentCountByUserId(JSON.stringify(data))
+        .then((result) => result.data);
+      setCountData({
+        totalCount: { value: commentCountRes.totalCount },  // 구조 수정,
+        proteinCount: { value: commentCountRes.proteinCount },
+        bosterCount: { value: commentCountRes.bosterCount },
+        bcaaCount: { value: commentCountRes.bcaaCount }
+      });
+
+  }
+
   useEffect(() => {
     setFormData({
-      nickName: { value: reduxUserInfo.nickName }  // 구조 수정
+      nickName: { value: reduxUserInfo.nickName },  // 구조 수정,
+      oauthType: { value: reduxUserInfo.oauthType },
+      regDt: { value: reduxUserInfo.regDt }
     });
+    getCommnetCount();
   }, []);
  
 
@@ -193,7 +222,7 @@ function Mypage() {
                   <h5>연동 플랫폼</h5>
                 </div>
                 <div style={{height:"90%", width:"50%", marginLeft:"3%", marginRight:"8%", display:"flex", alignItems: "center" }} >
-                  네이버 로그인
+                  {formData.oauthType?.value =="naver" ? "네이버 로그인" : "카카오 로그인"}
                 </div>
               </div>
               <div style={{height:"33%", width:"100%", display:"flex"}}>
@@ -201,7 +230,7 @@ function Mypage() {
                   <h5>가입일</h5>
                 </div>
                 <div style={{height:"90%", width:"50%", marginLeft:"3%", marginRight:"8%", display:"flex", alignItems: "center" }} >
-                  2025.05.05
+                  {dayjs(formData.regDt?.value ?? "").format('YYYY-MM-DD')}
                 </div>
               </div>
             </div>
@@ -209,7 +238,7 @@ function Mypage() {
           <div style={{height:"100%", width:"45%", marginLeft:"5%"}}>
               <div style={{height:"20%", width:"100%", border:"0.1px solid black", borderRadius:"10px", display:"flex", alignItems: "center", justifyContent:"center"}}>
                 <h4 className={styles.text}>
-                  나의 리뷰 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style={{color:"#FF8800"}}>38 </span>건 
+                  나의 리뷰 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style={{color:"#FF8800"}}>{countData.totalCount.value} </span>건 
                 </h4>
               </div>
               <div style={{height:"80%", width:"100%", display:"flex"}}>
@@ -237,7 +266,7 @@ function Mypage() {
                       justifyContent:"center",
                     }}
                     >
-                       <h4 className={styles.text}><span style={{color:"#FF8800"}}>8 </span>건</h4> 
+                       <h4 className={styles.text}><span style={{color:"#FF8800"}}>{countData.bcaaCount.value} </span>건</h4> 
                     </div>
                 </div>
                 <div style={{height:"90%", width:"33%", borderRight:"0.1px solid black", marginTop:"2%", alignItems:"center", justifyContent:"center"}}>
@@ -264,7 +293,7 @@ function Mypage() {
                       justifyContent:"center",
                     }}
                     >
-                       <h4 className={styles.text}><span style={{color:"#FF8800"}}>16 </span>건</h4> 
+                       <h4 className={styles.text}><span style={{color:"#FF8800"}}>{countData.proteinCount.value} </span>건</h4> 
                     </div>
                 </div>
                 <div style={{height:"90%", width:"33%", marginTop:"2%", alignItems:"center", justifyContent:"center"}}>
@@ -291,7 +320,7 @@ function Mypage() {
                       justifyContent:"center",
                     }}
                     >
-                       <h4 className={styles.text}><span style={{color:"#FF8800"}}>14 </span>건</h4> 
+                       <h4 className={styles.text}><span style={{color:"#FF8800"}}>{countData.bosterCount.value} </span>건</h4> 
                     </div>
                 </div>
               </div>
