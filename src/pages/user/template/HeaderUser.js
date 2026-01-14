@@ -74,7 +74,6 @@ const Header = () => {
       try {
         const result = await fetcher.jsonFetch();
         if(result.data){
-          console.log(result.data)
           dispatch({type:"PLUS_ONE",payload: result.data})
           setUserNickName(result.data.nickName)
           setProfileImg(result.data.profilePath)
@@ -145,6 +144,7 @@ const Header = () => {
 
   useEffect(() => {
     setUserNickName(reduxUserInfo.nickName)
+    setProfileImg(reduxUserInfo.profilePath)
   },[reduxUserInfo])
 
   useEffect(() => {

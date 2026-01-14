@@ -11,9 +11,9 @@ const login = (state = initialState, action) => {
   
   switch (action.type) {
     case "PLUS_ONE":
-      return {id: action.payload.id, nickName: action.payload.nickName, profilePath: action.payload.profilePath, oauthType: action.payload.oauthType};
+      return {id: action.payload.id, nickName: action.payload.nickName, profilePath: action.payload.profilePath, oauthType: action.payload.oauthType, regDt: action.payload.regDt};
     case "changeNickName":
-      return {nickName: action.payload.nickName, profilePath: action.payload.profilePath};
+      return {id: action.payload.id, nickName: action.payload.nickName, profilePath: action.payload.profilePath, oauthType: action.payload.oauthType, regDt: action.payload.regDt};
     case "RESET_USER": // 초기화 액션
       return initialState;    
     default:
