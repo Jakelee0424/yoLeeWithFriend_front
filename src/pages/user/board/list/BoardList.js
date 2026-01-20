@@ -57,7 +57,6 @@ function BoardList() {
 
   const clickCategory = async (index) => {
     setSelectCategory(index);
-    console.log(selectCategory)
   }
 
   const fallbackImage = process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
