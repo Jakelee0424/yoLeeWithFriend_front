@@ -7,6 +7,7 @@ import { useSelector, useDispatch  } from "react-redux";
 import * as userService from "service/user/user/userService";
 import dayjs from 'dayjs';
 import * as boardService from "service/user/boardMngr/boardService";
+import { getCodeListByParentIdApi, getCodeNameByIdApi } from "utils/CodeUtil";
 
 function Mypage() {
   const dispatch = useDispatch();
@@ -19,9 +20,15 @@ function Mypage() {
   const [getfileImg, setfileImg] = useState("");
   const fileInput = useRef(null);
   const [formData, setFormData] = useState({}); // 초기값 빈 객체
-  const [countData, setCountData] = useState({}); // 초기값 빈 객체
-
-  
+  const [countData, setCountData] = useState({
+    totalCount: { value: 0 },
+    proteinCount: { value: 0 },
+    bosterCount: { value: 0 },
+    bcaaCount: { value: 0 }
+  });
+  const [commentList, setCommentList] = useState([]); // 초기값 빈 객체
+  const [brandCodeMap, setBrandCodeMap] = useState({});
+  const [boardCategory, setBoardCategory] = useState("boardCategory02");
 
   const renderStars = (score) => {
     if (!score) return "평가 없음";
@@ -139,12 +146,40 @@ function Mypage() {
         .fetcherGetBoardCommentCountByUserId(JSON.stringify(data))
         .then((result) => result.data);
       setCountData({
-        totalCount: { value: commentCountRes.totalCount },  // 구조 수정,
-        proteinCount: { value: commentCountRes.proteinCount },
-        bosterCount: { value: commentCountRes.bosterCount },
-        bcaaCount: { value: commentCountRes.bcaaCount }
+        totalCount: { value: commentCountRes.totalCount ?? 0 },  // 구조 수정,
+        proteinCount: { value: commentCountRes.proteinCount ?? 0},
+        bosterCount: { value: commentCountRes.bosterCount ?? 0},
+        bcaaCount: { value: commentCountRes.bcaaCount ?? 0}
       });
 
+  }
+
+  const getCommnet = async () =>{
+      const data = { userId: reduxUserInfo.id };
+      const commentListRes = await boardService
+        .fetcherGetBoardCommentByUserId(JSON.stringify(data))
+        .then((result) => result.data);
+      console.log(commentListRes)
+      setCommentList(commentListRes)
+
+
+  }
+
+  const loadBrandCodes = async () => {
+    try {
+      const codes = await getCodeListByParentIdApi("boardBrand"); // 상위 코드 ID
+      const codeMap = {};
+      codes.forEach(code => {
+        codeMap[code.id] = code.name;
+      });
+      setBrandCodeMap(codeMap);
+    } catch (e) {
+      console.error("브랜드 코드 로딩 실패", e);
+    }
+  };
+
+  const selectBoardCategory =(boardCategory)=>{
+    setBoardCategory(boardCategory)
   }
 
   useEffect(() => {
@@ -154,6 +189,8 @@ function Mypage() {
       regDt: { value: reduxUserInfo.regDt }
     });
     getCommnetCount();
+    getCommnet();
+    loadBrandCodes();
   }, []);
  
 
@@ -342,7 +379,7 @@ function Mypage() {
               display:"flex",
               alignItems:"center",
               justifyContent:"center",
-              backgroundColor:"#FFFFFF"
+              backgroundColor: boardCategory == "boardCategory02" ?  "rgb(217, 217, 217)" : "#FFFFFF"
             }}
             className={styles.text}
             >
@@ -357,7 +394,7 @@ function Mypage() {
               display:"flex",
               alignItems:"center",
               justifyContent:"center",
-              backgroundColor:"#FFFFFF"
+              backgroundColor: boardCategory == "boardCategory01" ?  "rgb(217, 217, 217)" : "#FFFFFF"
             }}
             className={styles.text}
             >
@@ -372,7 +409,7 @@ function Mypage() {
               display:"flex",
               alignItems:"center",
               justifyContent:"center",
-              backgroundColor:"#FFFFFF"
+              backgroundColor: boardCategory == "boardCategory03" ?  "rgb(217, 217, 217)" : "#FFFFFF"
             }}
             className={styles.text}
             >
@@ -383,239 +420,86 @@ function Mypage() {
         <div className={versusStyle.buttonContainer} style={{justifyContent:"normal", height:"87%"}}>
           <div className={versusStyle.buttonGroup} style={{width:"100%"}}>
             {/* ..... */}
-            <div  className={versusStyle.pickButtonTwo} style={{marginRight:"3%", display:"block"}}>
-              <div style={{height:"10%", width:"100%", marginLeft:"5%", display:"flex", alignItems:"center", font:"caption"}}>리뷰등록일: 2025.05.05</div>
-              <div style={{height:"45%", width:"100%"}}>
-                <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
-                  <img src={profileImg2} style={{width:"50%"}}/>
+            {commentList.map((tdata, index) => (
+              <div key={tdata.commentId} className={versusStyle.pickButtonTwo} style={{marginRight:"3%", display:"block"}}>
+                <div style={{height:"10%", width:"100%", marginLeft:"5%", display:"flex", alignItems:"center", font:"caption"}}>리뷰등록일: {dayjs(tdata.regDt).format('YYYY-MM-DD')}</div>
+                <div style={{height:"45%", width:"100%"}}>
+                  <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
+                    <img src={profileImg2} style={{width:"50%"}}/>
+                  </div>
+                  <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
+                    <div style={{display:"flex", flexDirection:"column", alignItems:"center"}}>
+                      <span className={styles.text}>{tdata.board.boardName}</span>
+                      <span style={{font:"caption"}}>{brandCodeMap[tdata.board.brandCodeId]}</span>
+                    </div>
+                  </div>
                 </div>
-                <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
-                  <div style={{display:"flex", flexDirection:"column", alignItems:"center"}}>
-                    <span className={styles.text}>aaa</span>
-                    <span style={{font:"caption"}}>aaa</span>
+                <div style={{height:"15%", width:"100%", marginLeft:"7%", marginTop:"5%"}}>
+                  <div className={boardDetailstyles.ratingSection}>
+                    <div className={boardDetailstyles.ratingItem}>
+                      <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`} >맛</h4>
+                      <span className={boardDetailstyles.ratingValue2}>
+                        &nbsp;{renderStars(tdata.tasteRate ?? 0)} 
+                      </span>
+                    </div>
+                    <div className={boardDetailstyles.ratingItem}>
+                      <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>가격</h4>
+                      <span className={boardDetailstyles.ratingValue2}>
+                        &nbsp;{renderStars(tdata.priceRate ?? 0)}  
+                      </span>
+                    </div>
+                  </div>
+                  <div className={boardDetailstyles.ratingSection} style={{marginTop:"2%"}}>
+                    <div className={boardDetailstyles.ratingItem}>
+                      <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>성분</h4>
+                      <span className={boardDetailstyles.ratingValue2}>
+                        &nbsp;{renderStars(tdata.ingredientRate ?? 0)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div style={{height:"20%", width:"100%", display:"flex", justifyContent:"center"}}>
+                  <textarea
+                    className={boardDetailstyles.textarea2}
+                    placeholder="이 보충제에 대한 한줄평을 작성해보세요!"
+                    value={tdata.content}
+                  />
+                </div>
+                <div style={{height:"10%", width:"100%", display:"flex", justifyContent:"center"}}>
+                  <div style={{
+                    width:"30%",
+                    height:"50%",
+                    borderRadius:"8px",
+                    border: "2px solid rgba(0, 0, 0, 0.2)",
+                    display:"flex",
+                    alignItems:"center",
+                    justifyContent:"center",
+                    backgroundColor:"#8E8E93",
+                    color:"#FFFFFF",
+                    font:"caption"
+                  }}
+                  >
+                    수정하기
+                  </div>
+                  <div style={{
+                    width:"30%",
+                    height:"50%",
+                    borderRadius:"8px",
+                    marginLeft:"6%",
+                    border: "2px solid rgba(0, 0, 0, 0.2)",
+                    display:"flex",
+                    alignItems:"center",
+                    justifyContent:"center",
+                    backgroundColor:"#000000",
+                    color:"#FFFFFF",
+                    font:"caption"
+                  }}
+                  >
+                    삭제하기
                   </div>
                 </div>
               </div>
-              <div style={{height:"15%", width:"100%", marginLeft:"7%", marginTop:"5%"}}>
-                <div className={boardDetailstyles.ratingSection}>
-                  <div className={boardDetailstyles.ratingItem}>
-                    <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`} >맛</h4>
-                    <span className={boardDetailstyles.ratingValue2}>
-                      &nbsp;{renderStars(3)} 
-                    </span>
-                  </div>
-                  <div className={boardDetailstyles.ratingItem}>
-                    <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>가격</h4>
-                    <span className={boardDetailstyles.ratingValue2}>
-                      &nbsp;{renderStars(3)}  
-                    </span>
-                  </div>
-                </div>
-                <div className={boardDetailstyles.ratingSection} style={{marginTop:"2%"}}>
-                  <div className={boardDetailstyles.ratingItem}>
-                    <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>성분</h4>
-                    <span className={boardDetailstyles.ratingValue2}>
-                      &nbsp;{renderStars(3)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div style={{height:"20%", width:"100%", display:"flex", justifyContent:"center"}}>
-                <textarea
-                  className={boardDetailstyles.textarea2}
-                  placeholder="이 보충제에 대한 한줄평을 작성해보세요!"
-                />
-              </div>
-              <div style={{height:"10%", width:"100%", display:"flex", justifyContent:"center"}}>
-                <div style={{
-                  width:"30%",
-                  height:"50%",
-                  borderRadius:"8px",
-                  border: "2px solid rgba(0, 0, 0, 0.2)",
-                  display:"flex",
-                  alignItems:"center",
-                  justifyContent:"center",
-                  backgroundColor:"#8E8E93",
-                  color:"#FFFFFF",
-                  font:"caption"
-                }}
-                >
-                  수정하기
-                </div>
-                <div style={{
-                  width:"30%",
-                  height:"50%",
-                  borderRadius:"8px",
-                  marginLeft:"6%",
-                  border: "2px solid rgba(0, 0, 0, 0.2)",
-                  display:"flex",
-                  alignItems:"center",
-                  justifyContent:"center",
-                  backgroundColor:"#000000",
-                  color:"#FFFFFF",
-                  font:"caption"
-                }}
-                >
-                  삭제하기
-                </div>
-              </div>
-            </div>
-            {/* ..... */}
-            <div  className={versusStyle.pickButtonTwo} style={{marginRight:"3%", display:"block"}}>
-              <div style={{height:"10%", width:"100%", marginLeft:"5%", display:"flex", alignItems:"center", font:"caption"}}>리뷰등록일: 2025.05.05</div>
-              <div style={{height:"45%", width:"100%"}}>
-                <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
-                  <img src={profileImg2} style={{width:"50%"}}/>
-                </div>
-                <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
-                  <div style={{display:"flex", flexDirection:"column", alignItems:"center"}}>
-                    <span className={styles.text}>aaa</span>
-                    <span style={{font:"caption"}}>aaa</span>
-                  </div>
-                </div>
-              </div>
-              <div style={{height:"15%", width:"100%", marginLeft:"7%", marginTop:"5%"}}>
-                <div className={boardDetailstyles.ratingSection}>
-                  <div className={boardDetailstyles.ratingItem}>
-                    <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`} >맛</h4>
-                    <span className={boardDetailstyles.ratingValue2}>
-                      &nbsp;{renderStars(3)} 
-                    </span>
-                  </div>
-                  <div className={boardDetailstyles.ratingItem}>
-                    <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>가격</h4>
-                    <span className={boardDetailstyles.ratingValue2}>
-                      &nbsp;{renderStars(3)}  
-                    </span>
-                  </div>
-                </div>
-                <div className={boardDetailstyles.ratingSection} style={{marginTop:"2%"}}>
-                  <div className={boardDetailstyles.ratingItem}>
-                    <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>성분</h4>
-                    <span className={boardDetailstyles.ratingValue2}>
-                      &nbsp;{renderStars(3)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div style={{height:"20%", width:"100%", display:"flex", justifyContent:"center"}}>
-                <textarea
-                  className={boardDetailstyles.textarea2}
-                  placeholder="이 보충제에 대한 한줄평을 작성해보세요!"
-                />
-              </div>
-              <div style={{height:"10%", width:"100%", display:"flex", justifyContent:"center"}}>
-                <div style={{
-                  width:"30%",
-                  height:"50%",
-                  borderRadius:"8px",
-                  border: "2px solid rgba(0, 0, 0, 0.2)",
-                  display:"flex",
-                  alignItems:"center",
-                  justifyContent:"center",
-                  backgroundColor:"#8E8E93",
-                  color:"#FFFFFF",
-                  font:"caption"
-                }}
-                >
-                  수정하기
-                </div>
-                <div style={{
-                  width:"30%",
-                  height:"50%",
-                  borderRadius:"8px",
-                  marginLeft:"6%",
-                  border: "2px solid rgba(0, 0, 0, 0.2)",
-                  display:"flex",
-                  alignItems:"center",
-                  justifyContent:"center",
-                  backgroundColor:"#000000",
-                  color:"#FFFFFF",
-                  font:"caption"
-                }}
-                >
-                  삭제하기
-                </div>
-              </div>
-            </div>
-            {/* ..... */}
-            <div  className={versusStyle.pickButtonTwo} style={{marginRight:"3%", display:"block"}}>
-              <div style={{height:"10%", width:"100%", marginLeft:"5%", display:"flex", alignItems:"center", font:"caption"}}>리뷰등록일: 2025.05.05</div>
-              <div style={{height:"45%", width:"100%"}}>
-                <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
-                  <img src={profileImg2} style={{width:"50%"}}/>
-                </div>
-                <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
-                  <div style={{display:"flex", flexDirection:"column", alignItems:"center"}}>
-                    <span className={styles.text}>aaa</span>
-                    <span style={{font:"caption"}}>aaa</span>
-                  </div>
-                </div>
-              </div>
-              <div style={{height:"15%", width:"100%", marginLeft:"7%", marginTop:"5%"}}>
-                <div className={boardDetailstyles.ratingSection}>
-                  <div className={boardDetailstyles.ratingItem}>
-                    <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`} >맛</h4>
-                    <span className={boardDetailstyles.ratingValue2}>
-                      &nbsp;{renderStars(3)} 
-                    </span>
-                  </div>
-                  <div className={boardDetailstyles.ratingItem}>
-                    <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>가격</h4>
-                    <span className={boardDetailstyles.ratingValue2}>
-                      &nbsp;{renderStars(3)}  
-                    </span>
-                  </div>
-                </div>
-                <div className={boardDetailstyles.ratingSection} style={{marginTop:"2%"}}>
-                  <div className={boardDetailstyles.ratingItem}>
-                    <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>성분</h4>
-                    <span className={boardDetailstyles.ratingValue2}>
-                      &nbsp;{renderStars(3)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div style={{height:"20%", width:"100%", display:"flex", justifyContent:"center"}}>
-                <textarea
-                  className={boardDetailstyles.textarea2}
-                  placeholder="이 보충제에 대한 한줄평을 작성해보세요!"
-                />
-              </div>
-              <div style={{height:"10%", width:"100%", display:"flex", justifyContent:"center"}}>
-                <div style={{
-                  width:"30%",
-                  height:"50%",
-                  borderRadius:"8px",
-                  border: "2px solid rgba(0, 0, 0, 0.2)",
-                  display:"flex",
-                  alignItems:"center",
-                  justifyContent:"center",
-                  backgroundColor:"#8E8E93",
-                  color:"#FFFFFF",
-                  font:"caption"
-                }}
-                >
-                  수정하기
-                </div>
-                <div style={{
-                  width:"30%",
-                  height:"50%",
-                  borderRadius:"8px",
-                  marginLeft:"6%",
-                  border: "2px solid rgba(0, 0, 0, 0.2)",
-                  display:"flex",
-                  alignItems:"center",
-                  justifyContent:"center",
-                  backgroundColor:"#000000",
-                  color:"#FFFFFF",
-                  font:"caption"
-                }}
-                >
-                  삭제하기
-                </div>
-              </div>
-            </div>
+            ))}               
           </div>
         </div>
       </div>

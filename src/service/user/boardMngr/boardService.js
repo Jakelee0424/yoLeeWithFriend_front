@@ -117,3 +117,15 @@ export const fetcherGetBoardCommentCountByUserId = async (data) => {
     console.error("error 발생! :", error);
   }
 };
+
+export const fetcherGetBoardCommentByUserId = async (data) => {
+  const fetcher = new Fetcher().setUrl("/board/getBoardCommentByUserId")
+                                .setMethod("GET")
+                                .setData(data);
+  try {
+    const result = await fetcher.jsonFetch();
+    return result;
+  } catch (error) {
+    console.error("error 발생! :", error);
+  }
+};
