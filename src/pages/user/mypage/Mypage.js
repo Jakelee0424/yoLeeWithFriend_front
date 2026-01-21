@@ -5,9 +5,11 @@ import versusStyle from "style/versus.module.css";
 import boardDetailstyles from "style/boardDetail.module.css";
 import { useSelector, useDispatch  } from "react-redux";
 import * as userService from "service/user/user/userService";
+import * as logService from "service/user/logs/logsService";
 import dayjs from 'dayjs';
 import * as boardService from "service/user/boardMngr/boardService";
 import { getCodeListByParentIdApi, getCodeNameByIdApi } from "utils/CodeUtil";
+import { useNavigate } from "react-router-dom";
 
 function Mypage() {
   const dispatch = useDispatch();
@@ -29,6 +31,37 @@ function Mypage() {
   const [commentList, setCommentList] = useState([]); // 초기값 빈 객체
   const [brandCodeMap, setBrandCodeMap] = useState({});
   const [boardCategory, setBoardCategory] = useState("boardCategory02");
+  const navigate = useNavigate();
+
+  const StarSelector = ({ value, onChange }) => {
+  
+  return (
+    <div className={boardDetailstyles.starSelector}>
+      {[1, 2, 3, 4, 5].map((v) => (
+        <span
+          key={v}
+          className={v <= value ? boardDetailstyles.filledStar2 : boardDetailstyles.emptyStar}
+          onClick={() => onChange(v)}
+        >
+          ★
+        </span>
+      ))}
+    </div>
+  );
+};
+
+// 컴포넌트 내부
+const [ratings, setRatings] = useState([
+  { taste: 0, price: 0, ingredient: 0 },
+  { taste: 0, price: 0, ingredient: 0 },
+  { taste: 0, price: 0, ingredient: 0 }
+]);
+
+const updateRating = (index, type, value) => {
+  setRatings(prev => prev.map((rating, i) => 
+    i === index ? { ...rating, [type]: value } : rating
+  ));
+};
 
   const renderStars = (score) => {
     if (!score) return "평가 없음";
@@ -36,6 +69,7 @@ function Mypage() {
     return "★".repeat(rounded) + "☆".repeat(5 - rounded);
   };
 
+ 
   const changeProfileImage = async (e) =>{
     const reader = new FileReader();
     reader.onload = () => {
@@ -180,6 +214,16 @@ function Mypage() {
 
   const selectBoardCategory =(boardCategory)=>{
     setBoardCategory(boardCategory)
+  }
+
+  const goBoardDetail = (boardId) =>{
+    navigate(`/user/board/detail?boardId=${boardId}`);
+  }
+
+  const getBoardList = async () => {
+    const boardList = await logService
+        .fetcherLogBoard(JSON.stringify(data))
+        .then((result) => result.data);
   }
 
   useEffect(() => {
@@ -423,7 +467,7 @@ function Mypage() {
             {commentList.map((tdata, index) => (
               <div key={tdata.commentId} className={versusStyle.pickButtonTwo} style={{marginRight:"3%", display:"block"}}>
                 <div style={{height:"10%", width:"100%", marginLeft:"5%", display:"flex", alignItems:"center", font:"caption"}}>리뷰등록일: {dayjs(tdata.regDt).format('YYYY-MM-DD')}</div>
-                <div style={{height:"45%", width:"100%"}}>
+                <div style={{height:"45%", width:"100%"}} onClick={() => goBoardDetail(tdata.boardId)}>
                   <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
                     <img src={profileImg2} style={{width:"50%"}}/>
                   </div>
@@ -438,23 +482,26 @@ function Mypage() {
                   <div className={boardDetailstyles.ratingSection}>
                     <div className={boardDetailstyles.ratingItem}>
                       <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`} >맛</h4>
-                      <span className={boardDetailstyles.ratingValue2}>
-                        &nbsp;{renderStars(tdata.tasteRate ?? 0)} 
-                      </span>
+                      <StarSelector 
+                        value={tdata.tasteRate} 
+                        onChange={(v) => updateRating(index, 'taste', v)}
+                      />
                     </div>
                     <div className={boardDetailstyles.ratingItem}>
                       <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>가격</h4>
-                      <span className={boardDetailstyles.ratingValue2}>
-                        &nbsp;{renderStars(tdata.priceRate ?? 0)}  
-                      </span>
+                       <StarSelector 
+                          value={tdata.priceRate} 
+                          onChange={(v) => updateRating(index, 'price', v)}
+                        />
                     </div>
                   </div>
                   <div className={boardDetailstyles.ratingSection} style={{marginTop:"2%"}}>
                     <div className={boardDetailstyles.ratingItem}>
                       <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>성분</h4>
-                      <span className={boardDetailstyles.ratingValue2}>
-                        &nbsp;{renderStars(tdata.ingredientRate ?? 0)}
-                      </span>
+                      <StarSelector 
+                        value={tdata.ingredientRate} 
+                        onChange={(v) => updateRating(index, 'ingredient', v)}
+                      />
                     </div>
                   </div>
                 </div>

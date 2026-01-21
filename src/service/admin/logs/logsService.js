@@ -108,3 +108,18 @@ export const fetcherUserLogsList = async (data) => {
 
 };
 
+
+export const fetcherLogBoard = async (data) => {
+
+  const fetcher = new Fetcher().setUrl("/logs/user/"+data.userId)
+                                     .setMethod("GET");
+  try {
+    const result = await fetcher.jsonFetch();
+    return result;
+    //console.log("result : ", result.data);
+  } catch (error) {
+    console.error('login error:', error);
+  }
+
+};
+
