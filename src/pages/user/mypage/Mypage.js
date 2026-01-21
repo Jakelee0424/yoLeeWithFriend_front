@@ -221,6 +221,7 @@ const updateRating = (index, type, value) => {
   }
 
   const getBoardList = async () => {
+    const data = { userId: reduxUserInfo.id };
     const boardList = await logService
         .fetcherLogBoard(JSON.stringify(data))
         .then((result) => result.data);
