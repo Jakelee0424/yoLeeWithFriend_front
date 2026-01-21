@@ -49,6 +49,12 @@ const RollingBanner = ({ items }) => {
     setCurrentIndex(index);
   };
 
+  const goBannerUrl = (url)=>{
+    if(url !=null){
+      window.open(url, '_blank');
+    }
+  }
+
   return (
     <div className={styles.bannerContainer}>
       <div className={styles.rollingWrapper}>
@@ -72,7 +78,8 @@ const RollingBanner = ({ items }) => {
               <div
                 key={idx}
                 className={styles.rollingItem}
-                style={{ width: `${100 / items.length}%` }}
+                style={{ width: `${100 / items.length}%`, cursor:"pointer" }}
+                onClick={()=> goBannerUrl(item.url)}
               >
                 <img src={resolveImageUrl(item.imgUrl)} alt={`banner-${idx}`} />
               </div>
