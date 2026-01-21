@@ -243,6 +243,10 @@
   color: gold;
 }
 
+.filledStar2 {
+  color: black;
+}
+
 .emptyStar {
   color: #ccc;
 }
