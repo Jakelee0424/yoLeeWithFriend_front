@@ -5,7 +5,7 @@ import versusStyle from "style/versus.module.css";
 import boardDetailstyles from "style/boardDetail.module.css";
 import { useSelector, useDispatch  } from "react-redux";
 import * as userService from "service/user/user/userService";
-import * as logService from "service/user/logs/logsService";
+import * as logService from "service/admin/logs/logsService";
 import dayjs from 'dayjs';
 import * as boardService from "service/user/boardMngr/boardService";
 import { getCodeListByParentIdApi, getCodeNameByIdApi } from "utils/CodeUtil";
@@ -225,6 +225,7 @@ const updateRating = (index, type, value) => {
     const boardList = await logService
         .fetcherLogBoard(JSON.stringify(data))
         .then((result) => result.data);
+    console.log(boardList)
   }
 
   useEffect(() => {
@@ -236,6 +237,7 @@ const updateRating = (index, type, value) => {
     getCommnetCount();
     getCommnet();
     loadBrandCodes();
+    getBoardList();
   }, []);
  
 

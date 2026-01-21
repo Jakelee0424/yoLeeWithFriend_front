@@ -111,7 +111,7 @@ export const fetcherUserLogsList = async (data) => {
 
 export const fetcherLogBoard = async (data) => {
 
-  const fetcher = new Fetcher().setUrl("/logs/user/"+data.userId)
+  const fetcher = new Fetcher().setUrl("/logs/user")
                                      .setMethod("GET");
   try {
     const result = await fetcher.jsonFetch();
