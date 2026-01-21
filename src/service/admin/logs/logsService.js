@@ -112,7 +112,8 @@ export const fetcherUserLogsList = async (data) => {
 export const fetcherLogBoard = async (data) => {
 
   const fetcher = new Fetcher().setUrl("/logs/user")
-                                     .setMethod("GET");
+                                     .setMethod("GET")
+                                     .setData(data);
   try {
     const result = await fetcher.jsonFetch();
     return result;
