@@ -29,6 +29,7 @@ function Mypage() {
     bcaaCount: { value: 0 }
   });
   const [commentList, setCommentList] = useState([]); // 초기값 빈 객체
+  const [boardList, setBoardList] = useState([]); // 초기값 빈 객체
   const [brandCodeMap, setBrandCodeMap] = useState({});
   const [boardCategory, setBoardCategory] = useState("boardCategory02");
   const navigate = useNavigate();
@@ -57,9 +58,14 @@ const [ratings, setRatings] = useState([
   { taste: 0, price: 0, ingredient: 0 }
 ]);
 
-const updateRating = (index, type, value) => {
-  setRatings(prev => prev.map((rating, i) => 
-    i === index ? { ...rating, [type]: value } : rating
+const updateRating = (commentId, type, value) => {
+  setCommentList(prev => prev.map(comment => 
+    comment.commentId === commentId 
+      ? { 
+          ...comment, 
+          [`${type}Rate`]: value  // tasteRate, priceRate, ingredientRate
+        } 
+      : comment
   ));
 };
 
@@ -163,6 +169,26 @@ const updateRating = (index, type, value) => {
     }
   };
 
+  const resolveImageUrl2 = (imgUrl) => {
+    if (!imgUrl) return profileImg2;
+    const normalized = normalizePath(imgUrl);
+    const publicIndex = normalized.indexOf("public");
+    if (publicIndex !== -1) {
+      const relativePath = normalized.slice(publicIndex + "public".length);
+      return process.env.PUBLIC_URL + relativePath;
+    } else {
+      const imgIndex = normalized.indexOf("/img");
+      if (imgIndex !== -1) {
+        const relativeImgPath = normalized.slice(imgIndex);
+        return `${relativeImgPath}`;
+      } else if (normalized.startsWith("blob:") || normalized.startsWith("data:")) {
+        return normalized;
+      } else {
+        return profileImg;
+      }
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -173,6 +199,18 @@ const updateRating = (index, type, value) => {
       }
     }));
   };
+
+  const updateComment = (commentId, field, value) => {
+    setCommentList(prev => prev.map(comment => 
+      comment.commentId === commentId 
+        ? { 
+            ...comment, 
+            [field]: value
+          } 
+        : comment
+    ));
+  };
+
 
   const getCommnetCount = async () =>{
       const data = { userId: reduxUserInfo.id };
@@ -188,8 +226,8 @@ const updateRating = (index, type, value) => {
 
   }
 
-  const getCommnet = async () =>{
-      const data = { userId: reduxUserInfo.id };
+  const getCommnet = async (boardCategory) =>{
+      const data = { userId: reduxUserInfo.id , brandCodeId: boardCategory};
       const commentListRes = await boardService
         .fetcherGetBoardCommentByUserId(JSON.stringify(data))
         .then((result) => result.data);
@@ -214,6 +252,7 @@ const updateRating = (index, type, value) => {
 
   const selectBoardCategory =(boardCategory)=>{
     setBoardCategory(boardCategory)
+    getCommnet(boardCategory)
   }
 
   const goBoardDetail = (boardId) =>{
@@ -225,7 +264,34 @@ const updateRating = (index, type, value) => {
     const boardList = await logService
         .fetcherLogBoard(JSON.stringify(data))
         .then((result) => result.data);
+    setBoardList(boardList)
     console.log(boardList)
+  }
+
+  const deleteComment = async (commentId) =>{
+    if(window.confirm("한줄평을 삭제하시겠습니까? ")){
+      const data = { commentId: commentId };
+      const boardList = await boardService
+          .deleteComment(JSON.stringify(data)).then((result) => result.data);
+      getCommnet(boardCategory);
+    }
+  }
+
+  const modifyComment = async (commentId) =>{
+    
+    if(window.confirm("한줄평을 수정하시겠습니까? ")){
+      const updatedComment = commentList.find(c => c.commentId === commentId);
+      const data = { commentId: commentId ,
+        tasteRate: updatedComment.tasteRate,
+        priceRate: updatedComment.priceRate,
+        ingredientRate: updatedComment.ingredientRate,
+        content : updatedComment.content
+      };
+      const boardList = await boardService
+          .modifyComment(JSON.stringify(data)).then((result) => result.data);
+      getCommnet(boardCategory);
+    }
+    alert("수정되었습니다.")
   }
 
   useEffect(() => {
@@ -235,7 +301,7 @@ const updateRating = (index, type, value) => {
       regDt: { value: reduxUserInfo.regDt }
     });
     getCommnetCount();
-    getCommnet();
+    getCommnet("boardCategory02");
     loadBrandCodes();
     getBoardList();
   }, []);
@@ -426,9 +492,11 @@ const updateRating = (index, type, value) => {
               display:"flex",
               alignItems:"center",
               justifyContent:"center",
-              backgroundColor: boardCategory == "boardCategory02" ?  "rgb(217, 217, 217)" : "#FFFFFF"
+              backgroundColor: boardCategory == "boardCategory02" ?  "rgb(217, 217, 217)" : "#FFFFFF",
+              cursor:"pointer"
             }}
             className={styles.text}
+            onClick={() => selectBoardCategory("boardCategory02")}
             >
               BCAA
             </div>
@@ -441,9 +509,11 @@ const updateRating = (index, type, value) => {
               display:"flex",
               alignItems:"center",
               justifyContent:"center",
-              backgroundColor: boardCategory == "boardCategory01" ?  "rgb(217, 217, 217)" : "#FFFFFF"
+              backgroundColor: boardCategory == "boardCategory01" ?  "rgb(217, 217, 217)" : "#FFFFFF",
+              cursor:"pointer"
             }}
             className={styles.text}
+            onClick={() => selectBoardCategory("boardCategory01")}
             >
               프로틴
             </div>
@@ -456,9 +526,11 @@ const updateRating = (index, type, value) => {
               display:"flex",
               alignItems:"center",
               justifyContent:"center",
-              backgroundColor: boardCategory == "boardCategory03" ?  "rgb(217, 217, 217)" : "#FFFFFF"
+              backgroundColor: boardCategory == "boardCategory03" ?  "rgb(217, 217, 217)" : "#FFFFFF",
+              cursor:"pointer"
             }}
             className={styles.text}
+            onClick={() => selectBoardCategory("boardCategory03")}
             >
               부스터
             </div>
@@ -472,7 +544,7 @@ const updateRating = (index, type, value) => {
                 <div style={{height:"10%", width:"100%", marginLeft:"5%", display:"flex", alignItems:"center", font:"caption"}}>리뷰등록일: {dayjs(tdata.regDt).format('YYYY-MM-DD')}</div>
                 <div style={{height:"45%", width:"100%"}} onClick={() => goBoardDetail(tdata.boardId)}>
                   <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
-                    <img src={profileImg2} style={{width:"50%"}}/>
+                    <img src={resolveImageUrl2(tdata.imgUrl)} style={{width:"50%"}}/>
                   </div>
                   <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
                     <div style={{display:"flex", flexDirection:"column", alignItems:"center"}}>
@@ -487,14 +559,14 @@ const updateRating = (index, type, value) => {
                       <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`} >맛</h4>
                       <StarSelector 
                         value={tdata.tasteRate} 
-                        onChange={(v) => updateRating(index, 'taste', v)}
+                        onChange={(v) => updateRating(tdata.commentId, 'taste', v)}
                       />
                     </div>
                     <div className={boardDetailstyles.ratingItem}>
                       <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>가격</h4>
                        <StarSelector 
                           value={tdata.priceRate} 
-                          onChange={(v) => updateRating(index, 'price', v)}
+                          onChange={(v) => updateRating(tdata.commentId, 'price', v)}
                         />
                     </div>
                   </div>
@@ -503,7 +575,7 @@ const updateRating = (index, type, value) => {
                       <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>성분</h4>
                       <StarSelector 
                         value={tdata.ingredientRate} 
-                        onChange={(v) => updateRating(index, 'ingredient', v)}
+                        onChange={(v) => updateRating(tdata.commentId, 'ingredient', v)}
                       />
                     </div>
                   </div>
@@ -513,6 +585,7 @@ const updateRating = (index, type, value) => {
                     className={boardDetailstyles.textarea2}
                     placeholder="이 보충제에 대한 한줄평을 작성해보세요!"
                     value={tdata.content}
+                    onChange={(e) => updateComment(tdata.commentId, 'content', e.target.value)}
                   />
                 </div>
                 <div style={{height:"10%", width:"100%", display:"flex", justifyContent:"center"}}>
@@ -528,6 +601,7 @@ const updateRating = (index, type, value) => {
                     color:"#FFFFFF",
                     font:"caption"
                   }}
+                  onClick={() => modifyComment(tdata.commentId)}
                   >
                     수정하기
                   </div>
@@ -544,6 +618,7 @@ const updateRating = (index, type, value) => {
                     color:"#FFFFFF",
                     font:"caption"
                   }}
+                  onClick={() => deleteComment(tdata.commentId)}
                   >
                     삭제하기
                   </div>
@@ -568,109 +643,36 @@ const updateRating = (index, type, value) => {
             }}
           >
             {/* ..... */}
+            {boardList.map((tdata, index) => (
               <div
+                key={index}
                 style={{
                   flex: "1 1 18%",
                   minWidth: "12rem",
                   display: "flex",
                   flexDirection: "column",
                   marginBottom: "1rem",
-                }}
+                  cursor:"pointer"
+                }
+              }
+              onClick={
+               () =>   goBoardDetail(tdata.boardId)  
+              }
               >
                 <img
-                  src={profileImg2}
-                  alt={"sssss"}
+                  src={resolveImageUrl2(tdata.imgUrl)}
                   style={{ objectFit: "contain", width: "100%", height: "12rem", cursor:"pointer" }}
                 />
                 <div className={styles.text} style={{ textAlign: "center" }}>
-                  sssssss
+                  {tdata.boardName}
                 </div>
-                <div style={{ textAlign: "center" }}>{"ssssss"}</div>
+                <div style={{ textAlign: "center" }}>{tdata.brandCodeId}</div>
               </div>
-              {/* ..... */}
-              <div
-                style={{
-                  flex: "1 1 18%",
-                  minWidth: "12rem",
-                  display: "flex",
-                  flexDirection: "column",
-                  marginBottom: "1rem",
-                }}
-              >
-                <img
-                  src={profileImg2}
-                  alt={"sssss"}
-                  style={{ objectFit: "contain", width: "100%", height: "12rem", cursor:"pointer" }}
-                />
-                <div className={styles.text} style={{ textAlign: "center" }}>
-                  sssssss
-                </div>
-                <div style={{ textAlign: "center" }}>{"ssssss"}</div>
-              </div>
-              {/* ..... */}
-              <div
-                style={{
-                  flex: "1 1 18%",
-                  minWidth: "12rem",
-                  display: "flex",
-                  flexDirection: "column",
-                  marginBottom: "1rem",
-                }}
-              >
-                <img
-                  src={profileImg2}
-                  alt={"sssss"}
-                  style={{ objectFit: "contain", width: "100%", height: "12rem", cursor:"pointer" }}
-                />
-                <div className={styles.text} style={{ textAlign: "center" }}>
-                  sssssss
-                </div>
-                <div style={{ textAlign: "center" }}>{"ssssss"}</div>
-              </div>
-              {/* ..... */}
-              <div
-                style={{
-                  flex: "1 1 18%",
-                  minWidth: "12rem",
-                  display: "flex",
-                  flexDirection: "column",
-                  marginBottom: "1rem",
-                }}
-              >
-                <img
-                  src={profileImg2}
-                  alt={"sssss"}
-                  style={{ objectFit: "contain", width: "100%", height: "12rem", cursor:"pointer" }}
-                />
-                <div className={styles.text} style={{ textAlign: "center" }}>
-                  sssssss
-                </div>
-                <div style={{ textAlign: "center" }}>{"ssssss"}</div>
-              </div>
-              {/* ..... */}
-              <div
-                style={{
-                  flex: "1 1 18%",
-                  minWidth: "12rem",
-                  display: "flex",
-                  flexDirection: "column",
-                  marginBottom: "1rem",
-                }}
-              >
-                <img
-                  src={profileImg2}
-                  alt={"sssss"}
-                  style={{ objectFit: "contain", width: "100%", height: "12rem", cursor:"pointer" }}
-                />
-                <div className={styles.text} style={{ textAlign: "center" }}>
-                  sssssss
-                </div>
-                <div style={{ textAlign: "center" }}>{"ssssss"}</div>
-              </div>
+              ))}    
           </div>
         </div>
       </div>
-    <div style={{fontSize:"10px", marginBottom:"3%"}}>! 서비스 <a style={{cursor:"pointer"}} onClick={() => alert("탈퇴!")}>탈퇴</a>를 원하시는 경우, 탈퇴를 클릭하세요. (탈퇴 시, 모든 데이터는 삭제처리되며 복구할 수 없습니다.)</div>
+    <div style={{fontSize:"10px", marginBottom:"3%"}}>! 서비스 탈퇴를 원하시는 경우, <a style={{cursor:"pointer"}} onClick={ () => alert("탈퇴!")}>탈퇴</a>를 클릭하세요. (탈퇴 시, 모든 데이터는 삭제처리되며 복구할 수 없습니다.)</div>
     </div>
     
   );
