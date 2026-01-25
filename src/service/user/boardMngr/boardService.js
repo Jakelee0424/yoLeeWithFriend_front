@@ -129,3 +129,35 @@ export const fetcherGetBoardCommentByUserId = async (data) => {
     console.error("error 발생! :", error);
   }
 };
+
+export const deleteComment = async (data) => {
+
+  const fetcher = new Fetcher().setUrl("/board/deleteBoardComment")
+                                     .setMethod("DELETE")
+                                     .setData(data);
+  try {
+    const result = await fetcher.jsonFetch();
+    return result;
+    //console.log("result : ", result.data);
+  } catch (error) {
+    console.error('login error:', error);
+    
+  }
+
+};
+
+export const modifyComment = async (data) => {
+
+  const fetcher = new Fetcher().setUrl("/board/modifyComment")
+                                     .setMethod("PUT")
+                                     .setData(data);
+  try {
+    const result = await fetcher.jsonFetch();
+    return result;
+    //console.log("result : ", result.data);
+  } catch (error) {
+    console.error('login error:', error);
+    
+  }
+
+};
