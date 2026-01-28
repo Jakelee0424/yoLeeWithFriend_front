@@ -94,6 +94,7 @@ const BoardDetail = ({ item, onChange }) => {
     const commentList = await boardService
       .fetcherGetBoardCommentById(JSON.stringify(data))
       .then((result) => result.data);
+      console.log(commentList)
     setComments(commentList);
   };
 
@@ -166,7 +167,7 @@ const BoardDetail = ({ item, onChange }) => {
   }
 
   const fallbackImage = process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
-
+  const fallbackImage2 = process.env.PUBLIC_URL + "/asset/images/profileImg.png";
   const normalizePath = (path) => path.replace(/\\/g, "/");
 
   const resolveImageUrl = (imgUrl) => {
@@ -185,6 +186,26 @@ const BoardDetail = ({ item, onChange }) => {
         return normalized;
       } else {
         return fallbackImage;
+      }
+    }
+  };
+
+  const resolveImageUrl2 = (imgUrl) => {
+    if (!imgUrl) return fallbackImage2;
+    const normalized = normalizePath(imgUrl);
+    const publicIndex = normalized.indexOf("public");
+    if (publicIndex !== -1) {
+      const relativePath = normalized.slice(publicIndex + "public".length);
+      return process.env.PUBLIC_URL + relativePath;
+    } else {
+      const imgIndex = normalized.indexOf("/img");
+      if (imgIndex !== -1) {
+        const relativeImgPath = normalized.slice(imgIndex);
+        return `${relativeImgPath}`;
+      } else if (normalized.startsWith("blob:") || normalized.startsWith("data:")) {
+        return normalized;
+      } else {
+        return fallbackImage2;
       }
     }
   };
@@ -279,7 +300,7 @@ const BoardDetail = ({ item, onChange }) => {
             ) : (
               comments.map((c, idx) => (
                 <div key={idx} className={styles.commentItem}>
-                  <img src={c.user.profilePath} alt="profile" className={styles.profileImg} />
+                  <img src={resolveImageUrl2(c.imgUrl)} alt="profile" className={styles.profileImg} />
                   <div className={styles.commentContentBox}>
                     <div className={styles.nickName}>{c.user.nickName}</div>
                     <div className={styles.commentContent}>{c.content}</div>

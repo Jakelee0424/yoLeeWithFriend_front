@@ -1,0 +1,51 @@
+.emptyWrapper {
+  height: 87%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.emptyBox {
+  width: 100%;
+  max-width: 420px;
+  padding: 40px 20px;
+  text-align: center;
+  border-radius: 16px;
+  background-color: #f7f7f7;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.emptyTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.emptyDesc {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.emptyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  border-radius: 24px;
+  background-color: #000;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.emptyButton:hover {
+  background-color: #333;
+}

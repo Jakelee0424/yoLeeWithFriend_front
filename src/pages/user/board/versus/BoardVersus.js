@@ -5,6 +5,7 @@ import fontstyles from "style/font.module.css";
 import questionIcon from "../../../../otherLib/bootStrap/assets/images/icon/question.png"
 import { useNavigate } from "react-router-dom";
 import styles from "style/boardDetail.module.css";
+import * as boardService from "service/user/boardMngr/boardService";
 
 const STORAGE_KEY = "boardVersusState";
 
@@ -43,8 +44,58 @@ function BoardVersus() {
         nuinfoList,
       })
     );
-    console.log(selectedBoard)
+    
   }, [selectedBoard, nuinfoList]);
+
+  useEffect(() => {
+    for(let i =0; i<selectedBoard.length; i++){
+      if(selectedBoard[i] && selectedBoard[i].boardId){
+        console.log(selectedBoard[i].boardId)
+        let tempData = { boardId: selectedBoard[i].boardId };
+      
+        boardService
+          .fetcherGetBoardCommentById(JSON.stringify(tempData))
+          .then(
+             (outPutData) => {
+              if(outPutData.data.length > 0){
+                setSelectedBoard((prev) => {
+                  const updated = [...prev];
+                  if(updated[i]){
+                    console.log(outPutData.data)
+                    console.log(updated[i])
+                    updated[i].comment = outPutData.data;
+                  }
+                  return updated;
+                });
+              }
+              
+            }
+            
+          );
+        boardService
+              .fetcherGetBoardRateById(JSON.stringify(tempData))
+              .then(
+                  (outPutData) => {
+                    if(outPutData.data){
+                      setSelectedBoard((prev) => {
+                        const updated = [...prev];
+                        if(updated[i]){
+                          updated[i].avgIngredientRate = outPutData.data.avgIngredientRate;
+                          updated[i].avgPriceRate = outPutData.data.avgPriceRate;
+                          updated[i].avgTasteRate = outPutData.data.avgTasteRate;
+                        }
+                        return updated;
+                      });
+                    }
+                    
+                  }
+                  
+                );
+      }
+    }
+  }, []);
+
+  
 
   const fallbackImage = process.env.PUBLIC_URL + "/asset/images/BSN 신타6 엣지 1.92kg 초코 (48회분).png";
 

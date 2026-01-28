@@ -73,7 +73,12 @@ const Header = () => {
                                          .setAccessToken(token.accessToken);
       try {
         const result = await fetcher.jsonFetch();
+        
         if(result.data){
+          if(result.data.status =="ban"){
+            alert("로그인이 금지된 계정입니다. 관리자에게 문의해주세요.")
+            handleLogout();
+          }
           dispatch({type:"PLUS_ONE",payload: result.data})
           setUserNickName(result.data.nickName)
           setProfileImg(result.data.profilePath)

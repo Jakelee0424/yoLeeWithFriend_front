@@ -3,6 +3,7 @@ import { Input } from "reactstrap";
 import styles from '../../../style/font.module.css';
 import versusStyle from "style/versus.module.css";
 import boardDetailstyles from "style/boardDetail.module.css";
+import Mypagestyles from "style/mypage.module.css";
 import { useSelector, useDispatch  } from "react-redux";
 import * as userService from "service/user/user/userService";
 import * as logService from "service/admin/logs/logsService";
@@ -184,7 +185,7 @@ const updateRating = (commentId, type, value) => {
       } else if (normalized.startsWith("blob:") || normalized.startsWith("data:")) {
         return normalized;
       } else {
-        return profileImg;
+        return profileImg2;
       }
     }
   };
@@ -293,6 +294,26 @@ const updateRating = (commentId, type, value) => {
     }
     alert("수정되었습니다.")
   }
+
+  const deleteUser = async  (userId) => {
+    if (window.confirm("탈퇴하시겠습니까?")) { 
+      const inputData ={
+        id: userId,
+      };
+      userService.fetcherUserDelte(inputData).then((outPutData) => {
+        if(outPutData.result === "SUCCESS"){
+          alert("완료되었습니다.")
+          handleLogout();
+        }
+      })  
+    }      
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    dispatch({ type: "RESET_USER" });
+    navigate("/")
+  };
 
   useEffect(() => {
     setFormData({
@@ -536,6 +557,7 @@ const updateRating = (commentId, type, value) => {
             </div>
             <div style={{marginLeft:"2%"}}>※ 이미지 및 제품명을 클릭하면, 각 제품 정보 페이지로 이동합니다. </div>
         </div>
+        {commentList.length > 0 ? 
         <div className={versusStyle.buttonContainer} style={{justifyContent:"normal", height:"87%"}}>
           <div className={versusStyle.buttonGroup} style={{width:"100%"}}>
             {/* ..... */}
@@ -544,7 +566,7 @@ const updateRating = (commentId, type, value) => {
                 <div style={{height:"10%", width:"100%", marginLeft:"5%", display:"flex", alignItems:"center", font:"caption"}}>리뷰등록일: {dayjs(tdata.regDt).format('YYYY-MM-DD')}</div>
                 <div style={{height:"45%", width:"100%"}} onClick={() => goBoardDetail(tdata.boardId)}>
                   <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
-                    <img src={resolveImageUrl2(tdata.imgUrl)} style={{width:"50%"}}/>
+                    <img src={resolveImageUrl2(tdata.imgUrl)} style={{width:"43%"}}/>
                   </div>
                   <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
                     <div style={{display:"flex", flexDirection:"column", alignItems:"center"}}>
@@ -627,12 +649,31 @@ const updateRating = (commentId, type, value) => {
             ))}               
           </div>
         </div>
+        : 
+        <div className={Mypagestyles.emptyWrapper}>
+          <div className={Mypagestyles.emptyBox}>
+            <div className={Mypagestyles.emptyIcon}>📝</div>
+            <h3 className={Mypagestyles.emptyTitle}>아직 작성한 리뷰가 없어요</h3>
+            <p className={Mypagestyles.emptyDesc}>
+              보충제를 사용해보고<br />
+              솔직한 후기를 남겨보세요!
+            </p>
+            <div
+              className={Mypagestyles.emptyButton}
+              onClick={() => navigate("/user/board/list")} // 보충제 목록 페이지
+            >
+              보충제 보러가기
+            </div>
+          </div>
+        </div>
+        } 
       </div>
       <div style={{height:"60%", width:"100%", marginTop:"6%"}}>
         <div style={{height:"7%", width:"100%", marginBottom:"2%"}}>
             <div style={{height:"100%", width:"50%"}}><h4 className={styles.text}>최근 본 상품</h4></div>
             <div style={{height:"100%", width:"50%"}}></div>
         </div>
+        {boardList.length >0 ? 
         <div>
           <div
             style={{
@@ -652,7 +693,8 @@ const updateRating = (commentId, type, value) => {
                   display: "flex",
                   flexDirection: "column",
                   marginBottom: "1rem",
-                  cursor:"pointer"
+                  cursor:"pointer",
+                  maxWidth: "18rem",
                 }
               }
               onClick={
@@ -666,13 +708,31 @@ const updateRating = (commentId, type, value) => {
                 <div className={styles.text} style={{ textAlign: "center" }}>
                   {tdata.boardName}
                 </div>
-                <div style={{ textAlign: "center" }}>{tdata.brandCodeId}</div>
+                <div style={{ textAlign: "center" }}>{brandCodeMap[tdata.brandCodeId]}</div>
               </div>
               ))}    
           </div>
         </div>
+        : 
+        <div className={Mypagestyles.emptyWrapper}>
+          <div className={Mypagestyles.emptyBox}>
+            <div className={Mypagestyles.emptyIcon}>🔎</div>
+            <h3 className={Mypagestyles.emptyTitle}>아직 확인한 보충제가 없어요</h3>
+            <p className={Mypagestyles.emptyDesc}>
+              보충제를 확인해보고<br />
+              솔직한 후기를 남겨보세요!
+            </p>
+            <div
+              className={Mypagestyles.emptyButton}
+              onClick={() => navigate("/user/board/list")} // 보충제 목록 페이지
+            >
+              보충제 보러가기
+            </div>
+          </div>
+        </div>
+        }
       </div>
-    <div style={{fontSize:"10px", marginBottom:"3%"}}>! 서비스 탈퇴를 원하시는 경우, <a style={{cursor:"pointer"}} onClick={ () => alert("탈퇴!")}>탈퇴</a>를 클릭하세요. (탈퇴 시, 모든 데이터는 삭제처리되며 복구할 수 없습니다.)</div>
+    <div style={{fontSize:"10px", marginBottom:"3%"}}>! 서비스 탈퇴를 원하시는 경우, <a style={{cursor:"pointer", color:"red"}} onClick={ () => deleteUser(reduxUserInfo.id)}>탈퇴</a>를 클릭하세요. (탈퇴 시, 모든 데이터는 삭제처리되며 복구할 수 없습니다.)</div>
     </div>
     
   );
