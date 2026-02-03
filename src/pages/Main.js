@@ -118,61 +118,63 @@ function Main() {
   },[]);
 
 
-  const protienImg = process.env.PUBLIC_URL +"/asset/images/protein_19499571.png";
-  const protien2Img = process.env.PUBLIC_URL +"/asset/images/interactive_56784531.png";
+  const proteinImg = process.env.PUBLIC_URL +"/asset/images/protein_19499571.png";
+  const protein2Img = process.env.PUBLIC_URL +"/asset/images/interactive_56784531.png";
   return (
     <div className="App" style={{width:"100%",height:"100%"}}>
       <div style={{
-        display: windowSize.width > 800 ? "flex" : "none",
+        display: "flex",
+        flexDirection: windowSize.width > 800 ? "row" : "column",
+        gap: windowSize.width > 800 ? "3%" : "1rem",
       }}>
         <div style={{
           backgroundColor:"black"
-          ,width:"60%"
-          ,height:"20rem"
-          ,marginRight:"3%"
+          ,width: windowSize.width > 800 ? "60%" : "100%"
+          ,height: windowSize.width > 800 ? "20rem" : "25rem"
+          ,marginRight: windowSize.width > 800 ? "3%" : "0"
           ,display: "flex"
           ,borderRadius:"10px"
           ,position:"relative"
         }}>
-          <img style={{zIndex:"999", position:"absolute", top:"2%", left:"30%", width:"40%", height:"100%" }} src={protienImg} />
-          <div style={{width:"50%",height:"9rem"}}>
-            <div style={{width:"100%",height:"9rem"}}>
-              <div className={styles.text} style={{color:"white", paddingLeft:"8%", paddingTop:"5%", fontSize:"24px"}}>보충제가고민되나요?</div>
-              <div className={styles.text} style={{color:"white", paddingLeft:"8%", paddingTop:"5%", fontSize:"24px"}}>나에게 맞는 <span style={{color:"#FF8282"}}>보충제</span>를 골라보세요</div>
+          <img style={{zIndex: "999", position: "absolute", top: "2%", left: windowSize.width > 800 ? "30%" : "50%", width: windowSize.width > 800 ? "40%" : "60%", height: "100%", objectFit: "contain", transform: windowSize.width > 800 ? "none" : "translateX(-50%)" }} src={proteinImg} />
+          <div style={{width: windowSize.width > 800 ? "50%" : "100%"}}>
+            <div style={{height: windowSize.width > 800 ? "9rem" : "auto"}}>
+              <div className={styles.text} style={{color:"white", paddingLeft: windowSize.width > 800 ? "8%" : "5%", paddingTop: windowSize.width > 800 ? "5%" : "3%", fontSize: windowSize.width > 800 ? "23px" : "20px"}}>보충제가 고민되나요?</div>
+              <div className={styles.text} style={{color:"white", paddingLeft: windowSize.width > 800 ? "8%" : "5%", paddingTop: windowSize.width > 800 ? "5%" : "3%", fontSize: windowSize.width > 800 ? "23px" : "20px"}}>나에게 맞는 <span style={{color:"#FF8282"}}>보충제</span>를 골라보세요</div>
             </div>
-            <div style={{width:"100%",height:"9rem"}}></div>
+            <div style={{height: windowSize.width > 800 ? "9rem" : "auto"}}></div>
           </div>
-          <div style={{width:"50%",height:"18rem"}}> 
-            <div style={{width:"100%",height:"9rem"}}></div>
-            <div style={{width:"100%",height:"9rem"}}>
-              <div style={{backgroundColor:"white", width:"40%", height:"4.5rem", borderRadius:"10px", marginLeft: "53%", marginTop:"18%"}}>
-                <div style={{marginLeft:"15%", paddingTop:"7%", cursor:"pointer"}}
+          <div style={{width: windowSize.width > 800 ? "50%" : "100%",height: windowSize.width > 800 ? "18rem" : "auto"}}> 
+            <div style={{width:"100%",height: windowSize.width > 800 ? "9rem" : "1rem"}}></div>
+            <div style={{width:"100%",height: windowSize.width > 800 ? "9rem" : "auto"}}>
+              <div style={{backgroundColor:"white", width: windowSize.width > 800 ? "40%" : "60%", height:"4.5rem", borderRadius:"10px", marginLeft: windowSize.width > 800 ? "53%" : "auto", marginRight: windowSize.width > 800 ? "0" : "auto", marginTop: windowSize.width > 800 ? "18%" : "5%"}}>
+                <div style={{marginLeft:"15%", paddingTop:"7%", cursor:"pointer", textAlign: windowSize.width > 800 ? "left" : "center"}}
                   onClick={(e) => {clickProtien1()}}
                 >
-                  <div className={styles.text}>보충제</div>
-                  <div className={styles.text}>비교하러 가기 <b>{`>`}</b></div>
+                  <div className={styles.text} style={{fontSize: windowSize.width > 800 ? "inherit" : "14px"}}>보충제</div>
+                  <div className={styles.text} style={{fontSize: windowSize.width > 800 ? "inherit" : "14px"}}>비교하러 가기 <b>{`>`}</b></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div style={{
-          width:"37%"
-          ,height:"20rem"
+          width: windowSize.width > 800 ? "37%" : "100%"
+          ,height: windowSize.width > 800 ? "20rem" : "25rem"
           ,position:"relative"
           ,borderRadius:"10px"
           ,backgroundColor:"#E8AC77"
         }}>
-          <img style={{zIndex:"999", position:"absolute", top:"40%", left:"7%", width:"35%", height:"60%" }} src={protien2Img} />
-          <div style={{width:"100%", height:"5rem"}}><div className={styles.text} style={{paddingLeft:"8%", paddingTop:"4%", fontSize:"24px", color:"white"}}>BCAA? 프로틴? 부스터?</div></div>
-          <div style={{width:"100%", height:"5rem"}}><div className={styles.text} style={{paddingLeft:"8%", fontSize:"24px", color:"white"}}><span style={{color:"#FF0000"}}>뭘</span> 먹어야 할까?</div></div>
-          <div style={{width:"100%", height:"10rem"}}>
-            <div style={{backgroundColor:"white", width:"35%", height:"4.5rem", borderRadius:"10px", marginLeft: "60%", marginTop:"11%"}}>
-              <div style={{marginLeft:"15%", paddingTop:"7%", cursor:"pointer"}}
+          <img style={{zIndex:"999", position:"absolute", top: windowSize.width > 800 ? "40%" : "20%", left: windowSize.width > 800 ? "7%" : "50%", width: windowSize.width > 800 ? "35%" : "50%", height: windowSize.width > 800 ? "60%" : "auto", objectFit: "contain", transform: windowSize.width > 800 ? "none" : "translateX(-50%)"}} src={protein2Img} />
+          <div style={{width:"100%", height: windowSize.width > 800 ? "5rem" : "auto"}}><div className={styles.text} style={{paddingLeft: windowSize.width > 800 ? "8%" : "5%", paddingTop: windowSize.width > 800 ? "4%" : "2%", fontSize: windowSize.width > 800 ? "24px" : "18px", color:"white"}}>BCAA? 프로틴? 부스터?</div></div>
+          <div style={{width:"100%", height: windowSize.width > 800 ? "5rem" : "auto"}}><div className={styles.text} style={{paddingLeft: windowSize.width > 800 ? "8%" : "5%", fontSize: windowSize.width > 800 ? "24px" : "18px", color:"white"}}><span style={{color:"#FF0000"}}>뭘</span> 먹어야 할까?</div></div>
+          <div style={{width:"100%", height: windowSize.width > 800 ? "10rem" : "auto"}}>
+            <div style={{backgroundColor:"white", width: windowSize.width > 800 ? "35%" : "60%", height:"4.5rem", borderRadius:"10px", marginLeft: windowSize.width > 800 ? "60%" : "auto", marginRight: windowSize.width > 800 ? "0" : "auto", marginTop: windowSize.width > 800 ? "11%" : "2%"}}>
+              <div style={{marginLeft:"15%", paddingTop:"7%", cursor:"pointer", textAlign: windowSize.width > 800 ? "left" : "center"}}
                 onClick={(e) => {clickProtien2()}}
               >
-                <div className={styles.text}>보충제</div>
-                <div className={styles.text}>보러가기 <b>{`>`}</b></div>
+                <div className={styles.text} style={{fontSize: windowSize.width > 800 ? "inherit" : "14px"}}>보충제</div>
+                <div className={styles.text} style={{fontSize: windowSize.width > 800 ? "inherit" : "14px"}}>보러가기 <b>{`>`}</b></div>
               </div>
             </div>  
           </div>   
