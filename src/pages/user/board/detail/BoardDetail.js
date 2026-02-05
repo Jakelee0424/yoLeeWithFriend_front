@@ -27,6 +27,8 @@ const BoardDetail = ({ item, onChange }) => {
   const [priceRating, setPriceRating] = useState(0);
   const [ingredientRating, setIngredientRating] = useState(0);
   const [boardInfo, setBoardInfo] = useState(null);
+  const [commentCount, setCommentCount] = useState(0);
+  const [commentId, setCommentId] = useState(0);
 
   // ✅ 게시글 평균 평점 상태
   const [boardRate, setBoardRate] = useState({
@@ -59,13 +61,37 @@ const BoardDetail = ({ item, onChange }) => {
     const result = await boardService.fetcherSaveBoardComment(JSON.stringify(newComment));
     if (result.data == "Y") {
       getCommentList(boardId);
-      getBoardRate(boardId); // ✅ 저장 후 평점 다시 조회
+      getBoardRate(boardId);
+      getBoardByFetcher(boardId);
+      getCommentCount(boardId); // ✅ 저장 후 평점 다시 조회
     }
 
-    setComment("");
-    setTasteRating(0);
-    setPriceRating(0);
-    setIngredientRating(0);
+
+  };
+
+  const modifyComment = async () => {
+
+    if (comment.trim() === "") {
+      alert("한줄평 내용을 입력해주세요.");
+      return false;
+    }
+
+    if(window.confirm("한줄평을 수정하시겠습니까? ")){
+    const data = { commentId: commentId ,
+      userId: user.id,
+      content: comment,
+      tasteRate: tasteRating,
+      priceRate: priceRating,
+      ingredientRate: ingredientRating,
+    };
+    const boardList = await boardService
+          .modifyComment(JSON.stringify(data)).then((result) => result.data);
+    }
+    alert("수정되었습니다.")
+    getCommentList(boardId);
+    getBoardRate(boardId);
+    getBoardByFetcher(boardId);
+    getCommentCount(boardId);
   };
 
   const renderStars = (score) => {
@@ -210,10 +236,55 @@ const BoardDetail = ({ item, onChange }) => {
     }
   };
 
+  const getCommentCount = async (boardId)=>{
+    const data = { boardId: boardId, userId: user.id };
+    const result = await boardService
+      .fetcherGetCountByUserIdAndDelYn(JSON.stringify(data))
+      .then((result) => result.data);
+    if(result.count > 0){
+      const tempData = { commentId: result.commentId, userId: user.id };
+      const comment = await boardService
+      .fetcherGetCommentbyCommentIdAndDelYn(JSON.stringify(tempData))
+      .then((result) => result.data);
+      console.log(comment)
+      setComment(comment.content);
+      setCommentId(comment.commentId)
+      setTasteRating(comment.tasteRate);
+      setPriceRating(comment.priceRate);
+      setIngredientRating(comment.ingredientRate);
+
+    }
+    
+    setCommentCount(result.count)
+  }
+
+  const deleteComment = async (commentId) =>{
+      if(window.confirm("한줄평을 삭제하시겠습니까? ")){
+        const data = { commentId: commentId };
+        const boardList = await boardService
+            .deleteComment(JSON.stringify(data)).then((result) => result.data);
+        setComment("")
+        setIngredientRating(0)
+        setPriceRating(0)
+        setTasteRating(0)
+        getCommentList(boardId);
+        getBoardRate(boardId);
+        getBoardByFetcher(boardId);
+        getCommentCount(boardId);
+      }
+    }
+
   useEffect(() => {
     getCommentList(boardId);
     getBoardRate(boardId);
     getBoardByFetcher(boardId);
+    getCommentCount(boardId);
+    
+  }, []);
+
+  useEffect(() => {
+    getCommentCount(boardId);
+    
   }, []);
 
   return (
@@ -331,7 +402,22 @@ const BoardDetail = ({ item, onChange }) => {
               value={comment}
               onChange={(e) => setComment(e.target.value)}
             />
-            <button className={styles.submitButton} onClick={saveComment}>등록</button>
+            {commentCount !=0 ?
+              (
+                <div style={{
+                  display:"flex",
+                  justifyContent: "flex-end",
+                  gap:"20"
+                }}>
+                  <button className={styles.submitButton} onClick={modifyComment}>수정</button>
+                  <button className={styles.submitButton} onClick={() => deleteComment(commentId)}>삭제</button>
+                </div>
+              )
+              :
+              (
+                <button className={styles.submitButton} onClick={saveComment}>등록</button>
+              )
+            } 
           </div>
         </div>
       </div>

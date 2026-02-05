@@ -53,7 +53,6 @@ function App () {
                   </Route>
                   <Route index element={<Main />} /> {/* 기본 경로 */}  
                 </Route>
-                </Route>
                 <Route path="/login" element={<Login />} /> {/* 기본 경로 */}  
               </Route>
               <Route path="/login/callback/naver" element={<OAuth2RedirectHandler/>} />
