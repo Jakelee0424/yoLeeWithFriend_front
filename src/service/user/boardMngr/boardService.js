@@ -161,3 +161,27 @@ export const modifyComment = async (data) => {
   }
 
 };
+
+export const fetcherGetCountByUserIdAndDelYn = async (data) => {
+  const fetcher = new Fetcher().setUrl("/board/countByUserIdAndDelYn")
+                                .setMethod("GET")
+                                .setData(data);
+  try {
+    const result = await fetcher.jsonFetch();
+    return result;
+  } catch (error) {
+    console.error("error 발생! :", error);
+  }
+};
+
+export const fetcherGetCommentbyCommentIdAndDelYn = async (data) => {
+  const fetcher = new Fetcher().setUrl("/board/commentbyCommentIdAndDelYn")
+                                .setMethod("GET")
+                                .setData(data);
+  try {
+    const result = await fetcher.jsonFetch();
+    return result;
+  } catch (error) {
+    console.error("error 발생! :", error);
+  }
+};
