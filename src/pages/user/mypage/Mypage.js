@@ -1,4 +1,4 @@
-import { useEffect,React,useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Input } from "reactstrap";
 import styles from '../../../style/font.module.css';
 import versusStyle from "style/versus.module.css";
@@ -33,6 +33,7 @@ function Mypage() {
   const [boardList, setBoardList] = useState([]); // 초기값 빈 객체
   const [brandCodeMap, setBrandCodeMap] = useState({});
   const [boardCategory, setBoardCategory] = useState("boardCategory02");
+  const [clickCount, setClickCount] = useState(0);
   const navigate = useNavigate();
 
   const StarSelector = ({ value, onChange }) => {
@@ -226,16 +227,45 @@ const updateRating = (commentId, type, value) => {
       });
 
   }
+  const chunkArray = (array, size) => {
+    const chunks = [];
+    for (let i = 0; i < array.length; i += size) {
+      chunks.push(array.slice(i, i + size));
+    }
+    return chunks;
+  };
 
-  const getCommnet = async (boardCategory) =>{
-      const data = { userId: reduxUserInfo.id , brandCodeId: boardCategory};
-      const commentListRes = await boardService
-        .fetcherGetBoardCommentByUserId(JSON.stringify(data))
-        .then((result) => result.data);
-      console.log(commentListRes)
-      setCommentList(commentListRes)
-
-
+  const getCommnet = async (boardCategory, zeroCount) =>{
+      
+    const data = { 
+      userId: reduxUserInfo.id, 
+      brandCodeId: boardCategory, 
+      page: zeroCount ? zeroCount : clickCount 
+    };
+    
+    const commentListRes = await boardService
+      .fetcherGetBoardCommentByUserId(JSON.stringify(data))
+      .then((result) => result.data);
+    
+    if(zeroCount == 0){
+      // 첫 로드
+      setCommentList(chunkArray(commentListRes, 3));
+    } else {
+      // 더보기 - 기존 데이터 유지하고 새 데이터만 추가
+      let allComments = [];
+      let clickCountTemp = clickCount +1
+      for(let i = 0; i <= clickCountTemp; i++){
+        const data = { userId: reduxUserInfo.id, brandCodeId: boardCategory, page: i };
+        const commentListRes = await boardService
+          .fetcherGetBoardCommentByUserId(JSON.stringify(data))
+          .then((result) => result.data);
+        
+        allComments = [...allComments, ...commentListRes];
+      }
+    
+      console.log('전체 댓글:', allComments);
+      setCommentList(chunkArray(allComments, 3));
+    }
   }
 
   const loadBrandCodes = async () => {
@@ -253,7 +283,8 @@ const updateRating = (commentId, type, value) => {
 
   const selectBoardCategory =(boardCategory)=>{
     setBoardCategory(boardCategory)
-    getCommnet(boardCategory)
+    setClickCount(0)
+    getCommnet(boardCategory, 0)
   }
 
   const goBoardDetail = (boardId) =>{
@@ -266,7 +297,6 @@ const updateRating = (commentId, type, value) => {
         .fetcherLogBoard(JSON.stringify(data))
         .then((result) => result.data);
     setBoardList(boardList)
-    console.log(boardList)
   }
 
   const deleteComment = async (commentId) =>{
@@ -275,6 +305,7 @@ const updateRating = (commentId, type, value) => {
       const boardList = await boardService
           .deleteComment(JSON.stringify(data)).then((result) => result.data);
       getCommnet(boardCategory);
+      getCommnetCount();
     }
   }
 
@@ -314,6 +345,24 @@ const updateRating = (commentId, type, value) => {
     dispatch({ type: "RESET_USER" });
     navigate("/")
   };
+
+  const moreGetComment =() =>{
+    setClickCount(clickCount + 1)
+    getCommnet(boardCategory, clickCount + 1)
+    if(boardCategory == "boardCategory01"){
+      if(commentList.length >= countData.proteinCount.value/3){
+        alert("불러올 리뷰가 더없습니다!")
+      }
+    }else if(boardCategory == "boardCategory02"){
+      if(commentList.length >= countData.bcaaCount.value/3){
+        alert("불러올 리뷰가 더없습니다!")
+      }
+    }else if(boardCategory == "boardCategory3"){
+      if(commentList.length >= countData.bosterCount.value/3){
+        alert("불러올 리뷰가 더없습니다!")
+      }
+    }
+  }
 
   useEffect(() => {
     setFormData({
@@ -498,12 +547,12 @@ const updateRating = (commentId, type, value) => {
           </div>
         </div>
       </div>
-      <div style={{height:"80%", width:"100%", marginTop:"4%"}}>
+      <div style={{height:`${(commentList?.length || 1) * 87}%`, width:"100%", marginTop:"4%"}}>
         <div style={{height:"7%", width:"100%", marginBottom:"2%"}}>
             <div style={{height:"100%", width:"50%"}}><h4 className={styles.text}>나의 리뷰내역</h4></div>
             <div style={{height:"100%", width:"50%"}}></div>
         </div>
-        <div style={{height:"6%", width:"100%", marginBottom:"2%", display:"flex"}}>
+        <div style={{height: ``, width:"100%", marginBottom:"2%", display:"flex"}}>
             <div style={{
               width:"8%",
               height:"100%",
@@ -558,95 +607,116 @@ const updateRating = (commentId, type, value) => {
             <div style={{marginLeft:"2%"}}>※ 이미지 및 제품명을 클릭하면, 각 제품 정보 페이지로 이동합니다. </div>
         </div>
         {commentList.length > 0 ? 
-        <div className={versusStyle.buttonContainer} style={{justifyContent:"normal", height:"87%"}}>
-          <div className={versusStyle.buttonGroup} style={{width:"100%"}}>
+        
+        <div className={versusStyle.buttonContainer} style={{justifyContent:"normal", height: "87%", display:"flex", flexDirection:"column"}}>
             {/* ..... */}
-            {commentList.map((tdata, index) => (
-              <div key={tdata.commentId} className={versusStyle.pickButtonTwo} style={{marginRight:"3%", display:"block"}}>
-                <div style={{height:"10%", width:"100%", marginLeft:"5%", display:"flex", alignItems:"center", font:"caption"}}>리뷰등록일: {dayjs(tdata.regDt).format('YYYY-MM-DD')}</div>
-                <div style={{height:"45%", width:"100%"}} onClick={() => goBoardDetail(tdata.boardId)}>
-                  <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
-                    <img src={resolveImageUrl2(tdata.imgUrl)} style={{width:"43%"}}/>
-                  </div>
-                  <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
-                    <div style={{display:"flex", flexDirection:"column", alignItems:"center"}}>
-                      <span className={styles.text}>{tdata.board.boardName}</span>
-                      <span style={{font:"caption"}}>{brandCodeMap[tdata.board.brandCodeId]}</span>
+            {commentList.map((data, index) => (
+            <div className={versusStyle.buttonGroup2} style={{width:"100%", marginBottom:"2%", gap:"2%"}}>
+            {data.map((tdata, idx) => (
+                <div key={tdata.commentId} className={versusStyle.pickButtonTwo2} style={{display:"block"}}>
+                  <div style={{height:"10%", width:"100%", marginLeft:"5%", display:"flex", alignItems:"center", font:"caption"}}>리뷰등록일: {dayjs(tdata.regDt).format('YYYY-MM-DD')}</div>
+                  <div style={{height:"45%", width:"100%"}} onClick={() => goBoardDetail(tdata.boardId)}>
+                    <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
+                      <img src={resolveImageUrl2(tdata.imgUrl)} style={{width:"43%"}}/>
+                    </div>
+                    <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
+                      <div style={{display:"flex", flexDirection:"column", alignItems:"center"}}>
+                        <span className={styles.text}>{tdata.board.boardName}</span>
+                        <span style={{font:"caption"}}>{brandCodeMap[tdata.board.brandCodeId]}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div style={{height:"15%", width:"100%", marginLeft:"7%", marginTop:"5%"}}>
-                  <div className={boardDetailstyles.ratingSection}>
-                    <div className={boardDetailstyles.ratingItem}>
-                      <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`} >맛</h4>
-                      <StarSelector 
-                        value={tdata.tasteRate} 
-                        onChange={(v) => updateRating(tdata.commentId, 'taste', v)}
-                      />
-                    </div>
-                    <div className={boardDetailstyles.ratingItem}>
-                      <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>가격</h4>
-                       <StarSelector 
-                          value={tdata.priceRate} 
-                          onChange={(v) => updateRating(tdata.commentId, 'price', v)}
+                  <div style={{height:"15%", width:"100%", marginLeft:"7%", marginTop:"5%"}}>
+                    <div className={boardDetailstyles.ratingSection}>
+                      <div className={boardDetailstyles.ratingItem}>
+                        <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`} >맛</h4>
+                        <StarSelector 
+                          value={tdata.tasteRate} 
+                          onChange={(v) => updateRating(tdata.commentId, 'taste', v)}
                         />
+                      </div>
+                      <div className={boardDetailstyles.ratingItem}>
+                        <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>가격</h4>
+                        <StarSelector 
+                            value={tdata.priceRate} 
+                            onChange={(v) => updateRating(tdata.commentId, 'price', v)}
+                          />
+                      </div>
+                    </div>
+                    <div className={boardDetailstyles.ratingSection} style={{marginTop:"2%"}}>
+                      <div className={boardDetailstyles.ratingItem}>
+                        <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>성분</h4>
+                        <StarSelector 
+                          value={tdata.ingredientRate} 
+                          onChange={(v) => updateRating(tdata.commentId, 'ingredient', v)}
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div className={boardDetailstyles.ratingSection} style={{marginTop:"2%"}}>
-                    <div className={boardDetailstyles.ratingItem}>
-                      <h4 className={`${boardDetailstyles.sectionTitle} ${styles.text}`}>성분</h4>
-                      <StarSelector 
-                        value={tdata.ingredientRate} 
-                        onChange={(v) => updateRating(tdata.commentId, 'ingredient', v)}
-                      />
+                  <div style={{height:"20%", width:"100%", display:"flex", justifyContent:"center"}}>
+                    <textarea
+                      className={boardDetailstyles.textarea2}
+                      placeholder="이 보충제에 대한 한줄평을 작성해보세요!"
+                      value={tdata.content}
+                      onChange={(e) => updateComment(tdata.commentId, 'content', e.target.value)}
+                    />
+                  </div>
+                  <div style={{height:"10%", width:"100%", display:"flex", justifyContent:"center"}}>
+                    <div style={{
+                      width:"30%",
+                      height:"50%",
+                      borderRadius:"8px",
+                      border: "2px solid rgba(0, 0, 0, 0.2)",
+                      display:"flex",
+                      alignItems:"center",
+                      justifyContent:"center",
+                      backgroundColor:"#8E8E93",
+                      color:"#FFFFFF",
+                      font:"caption"
+                    }}
+                    onClick={() => modifyComment(tdata.commentId)}
+                    >
+                      수정하기
+                    </div>
+                    <div style={{
+                      width:"30%",
+                      height:"50%",
+                      borderRadius:"8px",
+                      marginLeft:"6%",
+                      border: "2px solid rgba(0, 0, 0, 0.2)",
+                      display:"flex",
+                      alignItems:"center",
+                      justifyContent:"center",
+                      backgroundColor:"#000000",
+                      color:"#FFFFFF",
+                      font:"caption"
+                    }}
+                    onClick={() => deleteComment(tdata.commentId)}
+                    >
+                      삭제하기
                     </div>
                   </div>
                 </div>
-                <div style={{height:"20%", width:"100%", display:"flex", justifyContent:"center"}}>
-                  <textarea
-                    className={boardDetailstyles.textarea2}
-                    placeholder="이 보충제에 대한 한줄평을 작성해보세요!"
-                    value={tdata.content}
-                    onChange={(e) => updateComment(tdata.commentId, 'content', e.target.value)}
-                  />
-                </div>
-                <div style={{height:"10%", width:"100%", display:"flex", justifyContent:"center"}}>
-                  <div style={{
-                    width:"30%",
-                    height:"50%",
-                    borderRadius:"8px",
-                    border: "2px solid rgba(0, 0, 0, 0.2)",
-                    display:"flex",
-                    alignItems:"center",
-                    justifyContent:"center",
-                    backgroundColor:"#8E8E93",
-                    color:"#FFFFFF",
-                    font:"caption"
-                  }}
-                  onClick={() => modifyComment(tdata.commentId)}
-                  >
-                    수정하기
-                  </div>
-                  <div style={{
-                    width:"30%",
-                    height:"50%",
-                    borderRadius:"8px",
-                    marginLeft:"6%",
-                    border: "2px solid rgba(0, 0, 0, 0.2)",
-                    display:"flex",
-                    alignItems:"center",
-                    justifyContent:"center",
-                    backgroundColor:"#000000",
-                    color:"#FFFFFF",
-                    font:"caption"
-                  }}
-                  onClick={() => deleteComment(tdata.commentId)}
-                  >
-                    삭제하기
-                  </div>
-                </div>
-              </div>
             ))}               
+            </div>
+          ))} 
+          <div style={{display:"flex", justifyContent:"center", alignItems:"center", height: `${ 16 / Math.pow(2,commentList.length)}%`, marginTop:"2%"}}>
+              <div style={{
+                width:"8%",
+                height:"100%",
+                borderRadius:"8px",
+                border: "2px solid rgba(0, 0, 0, 0.2)",
+                display:"flex",
+                alignItems:"center",
+                justifyContent:"center",
+                backgroundColor: boardCategory == "boardCategory03" ?  "rgb(217, 217, 217)" : "#FFFFFF",
+                cursor:"pointer"
+              }}
+              className={styles.text}
+              onClick={() => moreGetComment()}
+              >
+                더보기 +
+              </div>
           </div>
         </div>
         : 

@@ -10,6 +10,11 @@
   justify-content: space-between;
 }
 
+.buttonGroup2 {
+  width: 100%;
+  display: flex;
+}
+
 /* 반응형 pickButton */
 .pickButton {
   border: none;
@@ -27,6 +32,22 @@
 }
 
 .pickButtonTwo {
+  border: none;
+  width: 33%;
+  height: 100%;
+  font-size: 1rem;
+  border-radius: 10px;
+  transition: 0.5s;
+  cursor: pointer;
+  background-color: #D9D9D957;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-size: 1.1rem;
+}
+
+.pickButtonTwo2 {
   border: none;
   width: 33%;
   height: 100%;
